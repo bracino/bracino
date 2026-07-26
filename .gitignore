@@ -1,0 +1,76 @@
+# Bracino monorepo
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+.cursor/
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+secrets/
+**/secrets/
+
+# ESP-IDF / firmware build
+**/build/
+**/sdkconfig.old
+**/dependencies.lock
+**/managed_components/
+**/.cache/
+**/compile_commands.json
+*.elf
+*.bin
+*.map
+*.hex
+
+# Node / Node-RED local
+node_modules/
+npm-debug.log*
+**/node_modules/
+server/nodered/.config.nodes.json
+server/nodered/.config.runtime.json
+server/nodered/.sessions.json
+server/nodered/node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Docker / local volume residue
+*.log
+tmp/
+.tmp/
+server/**/data/
+server/**/influx-data/
+server/**/grafana-data/
+
+# KiCad junk / backups (keep sources)
+**/fp-info-cache
+**/*-backups/
+**/*.kicad_prl
+**/~*.lck
+*.bak
+
+# Coverage / test noise
+coverage/
+*.cov
+.coverage
+
+# Local overrides
+*.local
+sdkconfig.defaults.local
