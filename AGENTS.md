@@ -1,126 +1,138 @@
 # AGENTS.md — Bracino
 
-Guidance for humans and coding agents working in this repository.
+Guidance for humans and coding agents in this repository.
 
 ## What this is
 
-**Bracino** replaces a failed Paradigma MES-BBU controller for a central heating plant (7-unit condo, Tuscany). Phase 1: ESP32-C3 control node runs the BBU (thermal storage) pump loop autonomously; an ESP32 WROOM gateway bridges ESP-NOW ↔ WiFi/MQTT to a self-hosted supervision stack (Mosquitto, Node-RED, InfluxDB, Grafana).
+**Bracino** replaces a failed Paradigma MES-BBU controller for a central heating plant (7-unit condo, Tuscany).
 
-Canonical product/context dump: `project_slug.md`. Prefer that file over tribal knowledge when product intent is unclear.
+**Phase 1 only (active tree):**
+
+- `firmware/node-bbu` — autonomous BBU (thermal storage) pump control node  
+- `firmware/gateway-wroom` — ESP-NOW ↔ WiFi/MQTT gateway  
+- `server/` — Mosquitto, Node-RED, InfluxDB, Grafana (LAN, compose-from-git)  
+- `hardware/bbu-controller` — PCB when off protoboard  
+
+Long-form intent: [`project_slug.md`](project_slug.md). Human entry: [`README.md`](README.md). Capability snapshot: [`docs/STATUS.md`](docs/STATUS.md). Plan: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Non-negotiable: control autonomy
 
-**The control node is authoritative over the pump on its own.** It reads its own sensors and runs its own control loop whether or not the gateway, broker, or backend are up. MQTT and the server stack are supervisory only (telemetry out, non-critical commands in). Nothing above the control node may sit in the critical path of correct pump operation. OTA and remote features must not violate this.
+**The control node is authoritative over the pump on its own.** Local sensors + local control loop must work if gateway, broker, or backend are down. MQTT/server are supervisory (telemetry out, non-critical commands in). Reject changes that put pump safety or on/off decisions on the network path.
 
-If a change couples pump safety or on/off decisions to network reachability, reject or redesign it.
+## Repo layout
 
-## Repo layout (monorepo)
-
-```
+```text
 bracino/
-  firmware/
-    node-c3-bbu/     # phase 1 — BBU pump control (ESP32-C3)
-    node-c3-acs/     # phase 2 — ACS loop (later)
-    gateway-wroom/   # ESP-NOW ↔ WiFi/MQTT gateway
-    monitor-btu/     # phase 3 — energy accounting (later)
-  hardware/
-    bbu-controller/  # KiCad when off protoboard
-  server/
-    docker-compose.yml
-    mosquitto/
-    nodered/
-    grafana/
-    influx-init/
-  docs/
+  firmware/node-bbu/
+  firmware/gateway-wroom/
+  hardware/bbu-controller/
+  server/{docker-compose later, mosquitto, nodered, grafana, influx-init}/
+  docs/                 # STATUS, ROADMAP, schemas as they land
+  issues/{open,closed,fixtures}/
+  ephemera/             # gitignored scratch (create locally as needed)
   project_slug.md
   AGENTS.md
+  README.md
 ```
 
-Rationale: one history/tag set across firmware + server when MQTT topics or payloads change; split later under the `bracino` org only if a component earns independence (no submodules).
-
-Empty phase directories may hold a short `README.md` stub only until work starts. Do not invent premature abstractions “for phase 2.”
+- Monorepo under GitHub org `bracino`. No submodules.
+- **Do not** recreate phase 2/3 firmware trees until that work starts.
+- Directory `node-bbu` is **MCU-neutral** (bench may be ESP32-C3 now; name does not encode flash target).
 
 ## Stack and environment
 
 | Layer | Choice |
 |--------|--------|
-| Control / gateway firmware | C, ESP-IDF |
-| Broker | Mosquitto (retained state, LWT per node) |
+| Firmware | C, ESP-IDF |
+| Broker | Mosquitto (retained + LWT) |
 | Logic / light UI | Node-RED (non-safety-critical only) |
-| History / graphs | InfluxDB + Grafana |
-| Deploy model | `git clone && docker compose up` on LAN; no cloud dependency for control |
+| History | InfluxDB + Grafana |
+| Deploy | `git clone && docker compose up` on LAN |
 
-- Dev: headless Ubuntu Server VM; tree under `~/projects` is shared with the host.
-- Shared heavy toolchains (ESP-IDF, etc.): `~/projects/shared` — do not vendor full IDF into this repo.
-- Secrets: environment variables / untracked env files. Never commit credentials into Node-RED flows, compose files, or firmware sources.
-- InfluxDB **data** is not config; backup separately (NAS, then cloud). Config that rebuilds the stack lives in git.
+- Dev VM: headless Ubuntu; `~/projects` shared with host.
+- Shared IDF and large toolchains: `~/projects/shared` — do not vendor full IDF here.
+- Secrets: env / untracked files only.
+- Influx **data** ≠ config; backup separately. Stack config ∈ git.
+
+## Issues notebook (`issues/`)
+
+Full rules: [`issues/README.md`](issues/README.md).
+
+| Path | Role |
+|------|------|
+| `issues/open/NNN-slug.md` | Active work |
+| `issues/closed/NNN-slug.md` | Done / wontfix — keep lore |
+| `issues/fixtures/` | Committed minimal repro material |
+| `ephemera/` | Local scratch only (gitignored) |
+
+**Session habit**
+
+1. Skim `issues/open/` before firmware, protocol, or server work.  
+2. Numbered human scribbles → file/update `NNN` issues.  
+3. On finish: move to `closed/`, fill **Fix** + **Verify**; bump STATUS/ROADMAP if capability or contracts changed.  
+4. Promote durable schema decisions into `docs/` once settled (issues are the trail; docs are the contract).
 
 ## Coding norms
 
 ### Firmware (ESP-IDF / C)
 
-- Prefer clear C over cleverness; match existing project style when present.
-- Keep the autonomous control loop and local I/O paths free of hard dependencies on ESP-NOW, WiFi, MQTT, or OTA success.
-- Fail safe on sensor faults (define and document behavior; default toward “don’t destroy the plant”).
-- Watch stack sizes, logging-in-locks, and other ESP32 footguns; see repo skills if present (e.g. esp-idf-build).
-- Protocol and topic renames are cross-cutting — update firmware **and** `server/` in the same change when possible.
+- Clear C; match in-tree style when it exists.
+- Keep control loop + local I/O free of hard deps on ESP-NOW / WiFi / MQTT / OTA success.
+- Define fail-safe sensor-fault behavior (default: don’t destroy the plant).
+- Mind ESP32 footguns (stack sizes, log-in-lock, etc.); use esp-idf-build skill when building/flashing.
+- Protocol renames: firmware + `server/` + `docs/` together when possible.
+- Agents prepare build/flash commands; **humans** run them on hardware unless explicitly asked otherwise.
 
-### Server / infra
+### Server
 
-- Mosquitto, Node-RED `flows.json` (no embedded secrets), Grafana provisioning YAML/JSON → git.
-- Prefer provisioning-as-code over click-ops so disaster recovery stays `compose up`.
-- Node-RED holds schedules, thresholds, coordination — not pump safety interlocks that must work offline.
+- Mosquitto, Node-RED flows (no embedded secrets), Grafana provisioning → git.
+- Node-RED: schedules/thresholds/coordination — **not** offline pump interlocks.
 
 ### Docs
 
-- Durable decisions and schemas belong under `docs/` (MQTT topics, ESP-NOW payloads, BOM notes).
-- Update `project_slug.md` only when product/phase intent actually changes; don’t use it as a scratch pad.
+- Settled MQTT/ESP-NOW/BOM → `docs/`.
+- `project_slug.md` only when product intent actually changes.
 
-## Phases (don’t skip the runway)
+## Phase priority (phase 1)
 
-1. **Prototype** — protoboard control + gateway; correct, reliable BBU pump logic.
-2. **Harden** — PCB; ACS node.
-3. **Energy accounting** — monitor-only BTU/fuel path.
-4. **Further variants** — only when usefulness is proven.
+**Autonomous pump control → ESP-NOW link → MQTT telemetry → server dashboards → convenience.**
 
-Phase 1 priority order when unclear: **correct autonomous pump control → solid ESP-NOW link → MQTT telemetry → server dashboards → convenience features.**
+## Open design debts
 
-## Open design debts (resolve explicitly; don’t silently invent)
+Undecided until written under `docs/` or closed as design issues:
 
-Until written down in `docs/`, treat these as undecided:
+- HW shape / BOM / verification  
+- MQTT topics + payloads  
+- ESP-NOW payloads  
+- Node-RED / Grafana first cut  
+- Influx backup/retention policy  
 
-- Hardware shape / BOM / schematic (ADC, current sense, solenoid drive)
-- Hardware test/verification strategy
-- MQTT topic + payload schema (stabilize early)
-- ESP-NOW payload between control node and gateway
-- Node-RED flow structure and first dashboard
-- InfluxDB backup/retention policy
+Propose minimal concrete schemas in `docs/` rather than scattering magic strings.
 
-When implementing in one of these areas, propose a minimal concrete schema or decision in `docs/` rather than scattering magic strings.
+## Git habits
 
-## Git and PR habits
+- Remote: `git@github.com:bracino/bracino.git` (SSH).
+- Prefer atomic cross-layer commits for contracts.
+- No build trees, secrets, `ephemera/`, venvs, `node_modules/`.
 
-- Remote: `https://github.com/bracino/bracino` (monorepo under org `bracino`).
-- Prefer atomic commits when firmware and server contracts move together.
-- Do not commit build artifacts, `sdkconfig.old`, managed_components blobs unless the project deliberately vendors them, node_modules, Python venvs, or `.env` files.
-- Tags may eventually span “whole stack” releases; no need to force versioning before first working prototype.
+## Do not
 
-## What agents should not do
-
-- Put network or broker availability in the pump critical path.
-- Add Home Assistant (explicitly set aside) without a human decision to revisit.
-- Introduce cloud control planes or require WAN for heating to work.
-- Expand monorepo into nested git repos/submodules without an explicit split decision.
-- Flash hardware or claim bench results without the user running the action (agents may prepare build/flash commands).
+- Network/broker in the pump critical path  
+- Expand HA or cloud control without an explicit human decision  
+- Pre-create future-node firmware directories  
+- Nested repos/submodules  
+- Claim bench results without hardware runs  
+- Delete closed issues  
 
 ## Quick pointers
 
 | Need | Where |
 |------|--------|
-| Product intent | `project_slug.md` |
+| Product intent | `project_slug.md`, `README.md` |
+| Now / next | `docs/STATUS.md`, `docs/ROADMAP.md` |
+| Active work | `issues/open/` |
 | Agent rules | this file |
-| MQTT / ESP-NOW schemas | `docs/` (once written) |
-| Compose stack | `server/` |
-| BBU firmware | `firmware/node-c3-bbu/` |
+| BBU firmware | `firmware/node-bbu/` |
 | Gateway firmware | `firmware/gateway-wroom/` |
-| Shared ESP-IDF installs | `~/projects/shared` (outside repo) |
+| Compose stack | `server/` |
+| Shared ESP-IDF | `~/projects/shared` (outside repo) |

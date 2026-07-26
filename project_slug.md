@@ -43,10 +43,9 @@ Self-hosted, local-network-only, no cloud dependency, designed to survive WAN ou
 ```
 bracino/
   firmware/
-    node-c3-bbu/        (phase 1)
-    node-c3-acs/        (phase 2)
-    gateway-wroom/
-    monitor-btu/         (phase 3)
+    node-bbu/            (phase 1; MCU-neutral name)
+    gateway-wroom/       (phase 1)
+    # later: ACS node, BTU monitor — add dirs when work starts
   hardware/
     bbu-controller/      (KiCad, once off protoboard)
   server/
@@ -55,10 +54,11 @@ bracino/
     nodered/
     grafana/
     influx-init/
-  docs/
+  docs/                  # STATUS, ROADMAP, schemas
+  issues/                # open/closed lab notebook
 ```
 
-Rationale: atomic commits across firmware + server config when protocol/topic changes happen; one version history and tag set spanning the whole stack; individual components can still be split into standalone repos under the same org later if one ever earns independence (no submodules).
+Rationale: atomic commits across firmware + server config when protocol/topic changes happen; one version history and tag set spanning the whole stack; individual components can still be split into standalone repos under the same org later if one ever earns independence (no submodules). Phase 1 keeps only BBU + gateway trees; recreate future node folders when needed. Control firmware directory is `node-bbu` (not `node-c3-bbu`) so hardware can change without a rename parade.
 
 ## Phases
 

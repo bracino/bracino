@@ -74,3 +74,6 @@ coverage/
 # Local overrides
 *.local
 sdkconfig.defaults.local
+
+# Local scratch captures
+ephemera/

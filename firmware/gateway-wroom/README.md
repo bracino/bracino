@@ -1,4 +1,6 @@
 # gateway-wroom
 
-Stub — not started yet. See `project_slug.md` and root `AGENTS.md`.
+Phase 1 WiFi gateway: ESP-NOW (control-node link) ↔ WiFi/MQTT (uplink).
+
+Dev module today: ESP32 WROOM-class. Same pairing target as `firmware/node-bbu`.
 
