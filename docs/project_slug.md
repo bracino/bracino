@@ -1,3 +1,9 @@
+# project_slug.md — kickoff artifact (historical)
+
+> **Not maintained.** This file is the original project kickoff dump used to stand the monorepo up. It may lag README, STATUS, ROADMAP, AGENTS, and `issues/`. **Do not** update it to track current decisions; let it go stale. Prefer those living docs. Kept only for archaeology and early wording (name etymology, plant context).
+
+---
+
 # Bracino
 
 Replacement control and monitoring system for the central heating plant ("la caldaia") serving a 7-unit condo in the Tuscan countryside.
@@ -44,7 +50,7 @@ Self-hosted, local-network-only, no cloud dependency, designed to survive WAN ou
 bracino/
   firmware/
     node-bbu/            (phase 1; MCU-neutral name)
-    gateway-wroom/       (phase 1)
+    gateway/       (phase 1)
     # later: ACS node, BTU monitor — add dirs when work starts
   hardware/
     bbu-controller/      (KiCad, once off protoboard)

@@ -77,3 +77,6 @@ sdkconfig.defaults.local
 
 # Local scratch captures
 ephemera/
+
+# Session bridge (local only; see AGENTS.md)
+session-kickoff.md

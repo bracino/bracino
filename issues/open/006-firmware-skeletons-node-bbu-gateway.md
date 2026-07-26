@@ -1,9 +1,9 @@
-# 006 — Firmware skeletons for node-bbu and gateway-wroom
+# 006 — Firmware skeletons for node-bbu and gateway
 
 - **Status:** open
 - **Type:** task
 - **Opened:** 2026-07-26
-- **Refs:** `firmware/node-bbu/`, `firmware/gateway-wroom/`, `~/projects/shared` ESP-IDF
+- **Refs:** `firmware/node-bbu/`, `firmware/gateway/`, `~/projects/shared` ESP-IDF
 
 ## Context
 

@@ -8,7 +8,7 @@ The aging Paradigma MES-BBU (~25 years) has corrupted firmware and no longer swi
 
 **Status:** [docs/STATUS.md](docs/STATUS.md) · **Roadmap:** [docs/ROADMAP.md](docs/ROADMAP.md) · **Issues notebook:** [issues/](issues/README.md)
 
-**Agents / contributors:** [AGENTS.md](AGENTS.md) · fuller product dump: [project_slug.md](project_slug.md)
+**Agents / contributors:** [AGENTS.md](AGENTS.md) · **License:** [MIT](LICENSE)
 
 ## Architecture principle (non-negotiable)
 
@@ -19,7 +19,7 @@ The aging Paradigma MES-BBU (~25 years) has corrupted firmware and no longer swi
 | Piece | Role |
 |--------|------|
 | **Control node** (`firmware/node-bbu`) | Autonomous BBU pump logic: tank temps (ADC), pump via solenoid, current sense. Bench HW today is ESP32-class (often C3); directory name stays MCU-neutral. |
-| **Gateway** (`firmware/gateway-wroom`) | ESP-NOW ↔ WiFi/MQTT bridge (ESP32 WROOM-class ). Works without the control node joining a WiFi BSS. |
+| **Gateway** (`firmware/gateway`) | ESP-NOW ↔ WiFi/MQTT bridge (ESP32 WROOM-class on the bench; name is module-neutral). Works without the control node joining a WiFi BSS. |
 | **Server stack** (`server/`) | LAN-only: Mosquitto, Node-RED, InfluxDB, Grafana — `git clone && docker compose up` rebuild model. |
 | **Hardware** (`hardware/bbu-controller/`) | KiCad / design notes once off protoboard. |
 
@@ -38,15 +38,15 @@ Later phases (ACS node, BTU monitor, …) are **out of tree until needed** — s
 bracino/
   firmware/
     node-bbu/            # BBU pump control
-    gateway-wroom/       # ESP-NOW ↔ MQTT gateway
+    gateway/             # ESP-NOW ↔ MQTT gateway
   hardware/
     bbu-controller/      # PCB when ready
   server/                # docker compose + service config
     mosquitto/ nodered/ grafana/ influx-init/
-  docs/                  # STATUS, ROADMAP, schemas as they land
+  docs/                  # STATUS, ROADMAP, schemas; historical slug
   issues/                # open/ closed/ fixtures/ lab notebook
-  project_slug.md        # long-form intent
   AGENTS.md
+  LICENSE
 ```
 
 Atomic commits across firmware + server when MQTT/ESP-NOW contracts change. No nested repos/submodules.
@@ -88,4 +88,4 @@ Track concrete work in [`issues/`](issues/README.md); summarize capability in [`
 
 ## License
 
-TBD (not set yet).
+[MIT](LICENSE) — Copyright (c) 2026 Bracino contributors.

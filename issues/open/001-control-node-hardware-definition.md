@@ -3,7 +3,7 @@
 - **Status:** open
 - **Type:** design
 - **Opened:** 2026-07-26
-- **Refs:** `project_slug.md`, `hardware/bbu-controller/`, `firmware/node-bbu/`
+- **Refs:** `docs/project_slug.md`, `hardware/bbu-controller/`, `firmware/node-bbu/`
 
 ## Context
 

@@ -3,7 +3,7 @@
 - **Status:** open
 - **Type:** design
 - **Opened:** 2026-07-26
-- **Refs:** `firmware/gateway-wroom/`, `server/`, `docs/`
+- **Refs:** `firmware/gateway/`, `server/`, `docs/`
 
 ## Context
 

@@ -3,7 +3,7 @@
 - **Status:** open
 - **Type:** design
 - **Opened:** 2026-07-26
-- **Refs:** `server/influx-init/`, `project_slug.md` (year-on-year from ~2027)
+- **Refs:** `server/influx-init/`, `docs/project_slug.md` (year-on-year from ~2027)
 
 ## Context
 

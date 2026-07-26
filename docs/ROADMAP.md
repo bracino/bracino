@@ -22,7 +22,7 @@ Preferred order when something has to wait:
 - [ ] Hardware test / verification strategy
 - [ ] **MQTT topic + payload schema** (stabilize before many nodes care)
 - [ ] **ESP-NOW payload** between `node-bbu` and gateway
-- [ ] v0 firmware skeletons: `firmware/node-bbu`, `firmware/gateway-wroom`
+- [ ] v0 firmware skeletons: `firmware/node-bbu`, `firmware/gateway`
 - [ ] Node-RED flow structure + first useful views
 - [ ] InfluxDB backup/retention (NAS + cloud) — policy before years of data matter
 
@@ -60,7 +60,7 @@ Recreate directories when work actually starts.
 | Use | Not |
 |-----|-----|
 | `firmware/node-bbu` | `node-c3-bbu` (MCU may change) |
-| `firmware/gateway-wroom` | (rename only if the module story changes) |
+| `firmware/gateway` | `gateway-wroom` (module-neutral, like `node-bbu`) |
 
 ## Convention stability
 

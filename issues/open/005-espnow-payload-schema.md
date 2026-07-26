@@ -3,7 +3,7 @@
 - **Status:** open
 - **Type:** design
 - **Opened:** 2026-07-26
-- **Refs:** related `004`, `firmware/node-bbu/`, `firmware/gateway-wroom/`
+- **Refs:** related `004`, `firmware/node-bbu/`, `firmware/gateway/`
 
 ## Context
 
