@@ -6,7 +6,9 @@ Living product docs: root `README.md`, `AGENTS.md`, `docs/STATUS.md`, `docs/ROAD
 
 ## Prototype (KiCad v0.06)
 
-Module board: ESP32-C3-ZERO, ADS1115, ZMCT103C, JQC-3FE-S-Z relay + snubber, 12 V → 5 V buck, 1.8″ TFT + encoder (not on the breadboard yet). Pin map: `module_pin_mapping_bbu_controller_prototype.csv`.
+Project lives here, next to the notes: `bbu_controller_prototype_kicad/` (`.kicad_pro` / `_sch` / `_pcb` plus the v0.06 BOM, netlist, and ERC export). Pin map: `module_pin_mapping_bbu_controller_prototype.csv`.
+
+Module board: ESP32-C3-ZERO, ADS1115, ZMCT103C, JQC-3FE-S-Z relay + snubber, 12 V → 5 V buck, 1.8″ TFT + encoder (not on the breadboard yet).
 
 **Open hardware change (not in v0.06 yet):** drive relay `IN` with an NPN (or N-FET) from GPIO10. Module VCC = 5 V. Direct GPIO10 → IN does not work (5 V pull-up). See STATUS.
 

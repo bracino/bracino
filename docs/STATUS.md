@@ -17,7 +17,7 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | Repo layout + git remote | Solid (phase 1 only) |
 | Root README / AGENTS / MIT license | Solid |
 | STATUS / ROADMAP / issues notebook | Process solid; this file tracks bench reality |
-| Control-node HW definition | **Mostly settled** — ADR 001 + KiCad v0.06 (uncommitted tree may still hold the schematic) |
+| Control-node HW definition | **Mostly settled** — ADR 001 + KiCad v0.06 under `hardware/bbu-controller/` |
 | `node-bbu` firmware | **Bring-up only** — builds (ESP-IDF 5.2 / esp32c3); serial `on`/`off`/`s`/`scan`. No control loop |
 | `gateway` firmware | **Not started** |
 | MQTT topic + payload schema | **Not decided** |

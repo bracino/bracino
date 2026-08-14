@@ -1,5 +1,8 @@
 # Bracino monorepo
 
+# Hardware development references
+# hw_refs/ # Keep this in the repo for now
+
 # OS / editor
 .DS_Store
 Thumbs.db
@@ -64,6 +67,7 @@ server/**/grafana-data/
 **/*-backups/
 **/*.kicad_prl
 **/~*.lck
+**/.history/
 *.bak
 
 # Coverage / test noise
