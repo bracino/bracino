@@ -17,20 +17,22 @@ Preferred order when something has to wait:
 
 ### Design debts to close early
 
-- [ ] Control-node monitoring/control hardware definition (what + how)
-- [ ] BOM / schematic notes (ADC, current sense, solenoid drive)
-- [ ] Hardware test / verification strategy
-- [ ] **MQTT topic + payload schema** (stabilize before many nodes care)
+- [x] Control-node monitoring/control hardware definition (what + how) — ADR 001; relay 5 V IN still needs a transistor
+- [x] BOM / schematic notes (module proto) — KiCad v0.06; schematic revision in progress (NPN on relay IN)
+- [ ] Hardware test / verification strategy (plant checklist still open; breadboard CT/relay notes exist)
+- [ ] **MQTT topic + payload schema** (stabilize before many nodes care; CT field is boolean — DESIGN_NOTE_001)
 - [ ] **ESP-NOW payload** between `node-bbu` and gateway
-- [ ] v0 firmware skeletons: `firmware/node-bbu`, `firmware/gateway`
+- [ ] v0 firmware: control-loop skeleton on `node-bbu`; gateway still empty
 - [ ] Node-RED flow structure + first useful views
 - [ ] InfluxDB backup/retention (NAS + cloud) — policy before years of data matter
 
 ### Implementation milestones (checklist)
 
-- [ ] Repo scaffold, docs, issues notebook (this pass)
+- [x] Repo scaffold, docs, issues notebook
 - [ ] Documented MQTT + ESP-NOW contracts under `docs/`
-- [ ] `node-bbu` builds under ESP-IDF; local loop stub + I/O hooks
+- [x] `node-bbu` builds under ESP-IDF; bring-up I/O (relay + A0), not the loop
+- [ ] Relay 5 V drive via transistor; invert GPIO polarity in firmware; re-check fail-safe OFF at boot
+- [ ] NTCs on A1–A3 + calibration
 - [ ] Pump differential logic proven on bench (even before PCB)
 - [ ] Gateway builds; ESP-NOW bring-up with control node
 - [ ] MQTT publish path + retained state / LWT

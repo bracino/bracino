@@ -1,0 +1,80 @@
+# ADR: Prototype BBU Controller – Module-Based Architecture (v0.06)
+
+**Status:** Accepted  
+**Date:** 2026-08-12  
+**Deciders:** Bracino project  
+**Tags:** hardware, prototype, safety-critical, autonomous-control
+
+## Context
+
+The Paradigma MES-BBU controller in the 7-unit condo boiler room near Radicondoli has failed (firmware stuck in manual mode). A replacement is required that:
+
+- Controls a Grundfos ~220 V / ~380 W pump via relay based on tank differential temperatures.
+- Provides current telemetry via CT for monitoring.
+- Remains fully autonomous (local control loop must work without network).
+- Supports a simple local UI (display + rotary encoder).
+- Can later report status via ESP-NOW / MQTT (supervisory only).
+- Can be built quickly with readily available modules on a prototype board, with enough parts for three units as backups.
+
+Constraints include limited GPIO on the chosen MCU module, the need for proper 220 VAC isolation/creepage on the switched side, and a desire to keep discrete part count low.
+
+## Decision
+
+Adopt a module-centric prototype architecture on a single board (KiCad schematic v0.06):
+
+- **MCU:** Waveshare ESP32-C3-ZERO (provides 5 V in, 3.3 V out, USB-C, limited but sufficient GPIOs).
+- **ADC:** ADS1115 4-channel 16-bit I²C module (A0 = CT, A1–A3 = NTC dividers).
+- **Current sense:** ZMCT103C module (1000:1, on-board burden + conditioning) powered from 3.3 V.
+- **Temperature:** Three 10 kΩ NTCs with 10 kΩ pull-downs forming dividers into the ADS1115.
+- **Actuator:** JQC-3FE-S-Z style 5 V relay module (low-level trigger on IN). GPIO10 must not drive IN directly (5 V pull-up on IN; C3 pad is 3.3 V). Planned: NPN or N-FET so GPIO10 high sinks IN to GND (firmware polarity inverts vs v0.06). Module VCC stays 5 V; 3.3 V on the module is a bench workaround only.
+- **Snubber:** Dedicated module across the relay contacts containing:
+  - 200 Ω 2 W resistor
+  - 104J 630 V 100 nF metallized film capacitor
+  - 10D471K MOV (470 V)
+- **UI:** 1.8″ ST7735S TFT (SPI, CS hard-tied to GND, RESET with 4.7 kΩ external pull-up) + rotary encoder with switch, brought out on dual 1×9 headers for a remote panel.
+- **Power:** External 12 V → PPTC (60 V / 0.4 A) → Schottky (1N5819) → bulk capacitor → adjustable buck module set to 5 V. 3.3 V taken from the ESP32-C3-ZERO regulator. Local decoupling capacitors on the rails.
+- **Pull-ups:** Rely on MCU internal pull-ups wherever possible (encoder A/B/SW, etc.) to minimise discrete parts.
+- **GPIO policy:** No further functional expansion expected. Several pins are strapping or USB-related and treated as off-limits. GPIO10 (relay) also drives the on-board WS2812; the LED is unused in firmware and any incidental illumination when the relay is off is accepted.
+- **Design principle:** The control node is fully autonomous. Network features are supervisory only.
+
+Bring-up order (safety-first):
+
+1. Rails only (verify 12 V → 5 V → 3.3 V).
+2. Relay + snubber (hand-driven, then small AC load).
+3. CT with dummy current (calibration).
+4. MCU + relay drive under firmware (no load → small AC load).
+5. ADS1115 + NTCs (calibration).
+6. UI daughterboard last.
+
+## Consequences
+
+### Positive
+- Fast to assemble and debug with modules.
+- Clear separation of the 220 VAC zone.
+- Sufficient measurement resolution and local UI for the required differential control + telemetry.
+- Three complete prototypes possible from existing stock.
+- Low discrete part count; easy to rework or replace modules.
+
+### Negative / Accepted risks
+- Limited future expansion (SPI CS permanently selected, most GPIOs used or reserved).
+- CT output swing is constrained when the ZMCT module is run at 3.3 V. Bench (2026-08-14): path is usable only as on/off — see DESIGN_NOTE_001. Not a calibrated ammeter.
+- GPIO10 cannot drive the 5 V relay module IN (pull-up fights the pad and back-feeds 5 V). Transistor interface required; GPIO10 still shares the unused WS2812.
+- Mechanical isolation (creepage, slots, potting) on the AC side remains a manual assembly responsibility.
+- PCB layout must be refactored to use individual components instead of modules, requiring footprint files, gerbers, etc.
+
+### Neutral
+- Further refinements (extra decoupling, soft-start of the relay, exact calibration constants, etc.) deferred until after first-article testing.
+
+## Alternatives considered
+
+- Discrete relay + driver + custom snubber (rejected for speed and simplicity on the prototype).
+- Different CT or burden arrangement (ZMCT module preferred for ease of protoboard wiring and known reputation).
+- MCP3204 or other SPI ADC (ADS1115 chosen for I²C simplicity and existing module stock).
+- Hardware SPI for the TFT (bit-bang accepted given pin constraints and single-device use).
+- More elaborate power sequencing or isolated supplies (unnecessary for this scope).
+
+## References
+
+- KiCad schematic / netlist / BOM / ERC: bbu_controller_prototype_kicad v0.06
+- Module pin-mapping CSV (physical orientation and notes)
+- Project constraints: autonomous local control, supervisory telemetry only

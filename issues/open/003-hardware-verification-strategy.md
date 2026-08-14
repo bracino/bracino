@@ -17,7 +17,11 @@ A short checklist: bring-up steps, must-pass cases before leaving the loop unatt
 
 Document under `docs/` once drafted; link from STATUS.
 
-Breadboard sketch now in `firmware/node-bbu/` (relay GPIO10 + ADS1115 A0 / ZMCT). Serial `on`/`off`/`s` is enough to set the CT pot before NTCs. Not the plant checklist.
+Breadboard sketch: `firmware/node-bbu/` (GPIO10 + ADS1115 A0). Serial `on`/`off`/`s`/`scan`.
+
+Partial bench (2026-08-14): rails OK; I2C 0x48; CT pot 2 CCW — idle vs ~0.15 A fan is a clear gap; amp-level loads are not linear (DESIGN_NOTE_001). Relay at 5 V does not obey GPIO10; 3.3 V on the module is a temporary workaround.
+
+Still needed for a plant checklist: transistor drive + fail-safe OFF at reset; NTC open/short behaviour; **server/gateway down** still correct; no unattended real BBU pump on the bring-up sketch.
 
 ## Fix
 

@@ -50,7 +50,7 @@ bracino/
 | Deploy | `git clone && docker compose up` on LAN |
 
 - Dev VM: headless Ubuntu; `~/projects` shared with host.
-- Shared IDF and large toolchains: `~/projects/shared` — do not vendor full IDF here.
+- Shared IDF and large toolchains: `~/projects/share` (IDF at `~/projects/share/lib/esp/esp-idf`) — do not vendor full IDF here. Older notes said `~/projects/shared`.
 - Secrets: env / untracked files only.
 - Influx **data** ≠ config; backup separately. Stack config ∈ git.
 
@@ -149,4 +149,4 @@ Propose minimal concrete schemas in `docs/` rather than scattering magic strings
 | BBU firmware | `firmware/node-bbu/` |
 | Gateway firmware | `firmware/gateway/` |
 | Compose stack | `server/` |
-| Shared ESP-IDF | `~/projects/shared` (outside repo) |
+| Shared ESP-IDF | `~/projects/share/lib/esp/esp-idf` (outside repo) |

@@ -17,6 +17,8 @@ Two buildable projects; README notes for IDF path; control task runnable without
 
 Start minimal; wire schemas from 004/005 as they land. Do not block first PWM/GPIO blink-style bring-up on schema perfection.
 
+`node-bbu` now builds (ESP-IDF 5.2, `esp32c3`) as a serial bring-up app, not a control/telemetry split. After the relay transistor: invert `relay_set()`. Gateway still a placeholder.
+
 ## Fix
 
 ## Verify

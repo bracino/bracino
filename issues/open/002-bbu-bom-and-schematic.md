@@ -17,6 +17,8 @@ BOM candidates + schematic notes (even hand-drawn scanned to fixtures/docs) cove
 
 Draft after 001 boundaries; prefer parts already on the shelf when they meet range/accuracy.
 
+KiCad v0.06 + pin-mapping CSV exist under `hardware/bbu-controller/`. Next schematic rev: NPN (or N-FET) + base resistor between GPIO10 and relay IN; module VCC remains 5 V. Add that part to the BOM when the symbol is in.
+
 ## Fix
 
 ## Verify

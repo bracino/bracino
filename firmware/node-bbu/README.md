@@ -14,13 +14,13 @@ Pins match schematic v0.06 (`hardware/bbu-controller/bbu_controller_prototype_ki
 
 | Net | Pin | Notes |
 |-----|-----|--------|
-| RELAY | GPIO10 | Active-low into JQC-3FE-S-Z `IN`. Also the unused on-board WS2812. |
+| RELAY | GPIO10 | **Today (v0.06 / no transistor):** active-low into module `IN`. **After the NPN:** invert — GPIO10 high = coil on. Also the unused on-board WS2812. |
 | ADC_SDA | GPIO7 | ADS1115 SDA (module 10 kΩ pull-ups) |
 | ADC_SCL | GPIO6 | ADS1115 SCL |
 | A0 | ADS1115 AIN0 | ZMCT103C `OUT` |
 | I2C addr | 0x48 | Module ADDR pulled low |
 
-Relay is **forced OFF at boot** (GPIO10 high). Do not put the real BBU pump on this sketch.
+Relay is **forced GPIO10 high at boot**. That is OFF only while IN is driven directly (and only if the 3.3 V module workaround is in use). After the transistor, high = ON — invert `relay_set()` before any AC load. Do not put the real BBU pump on this sketch.
 
 ### Build / flash
 
@@ -46,6 +46,6 @@ If `set-target` was already run for another chip, `idf.py fullclean` first.
 | `scan` | I2C probe |
 | `h` | Help |
 
-CT output is mid-rail AC. Idle (no conductor through the core) `s` should show **rms near 0**; `mid` is the module bias (often ~VCC/2). With a known load, turn the pot so peak-to-peak stays well inside ±4096 mV (FSR). `SAT` means the PGA is clipping — reduce gain.
+CT on this prototype is **on/off only** ([DESIGN_NOTE_001](../../docs/DESIGN_NOTE_001_ct_binary_only.md)). At pot = 2 CCW, 3.3 V: relay off ≈ 0 mV rms; contacts closed / no motor ≈ 37 mV; ~0.15 A fan ≈ 175 mV. A threshold around 80–100 mV is the intended discriminator. `mid` is bias, not current; it walks after large loads.
 
-Suggested order (ADR 001): no AC load → small known AC load → pot → then NTCs on A1–A3 (not in this sketch yet).
+Suggested next bench steps: transistor on relay IN (then invert GPIO) → NTCs on A1–A3.
