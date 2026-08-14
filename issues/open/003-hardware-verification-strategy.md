@@ -17,6 +17,8 @@ A short checklist: bring-up steps, must-pass cases before leaving the loop unatt
 
 Document under `docs/` once drafted; link from STATUS.
 
+Breadboard sketch now in `firmware/node-bbu/` (relay GPIO10 + ADS1115 A0 / ZMCT). Serial `on`/`off`/`s` is enough to set the CT pot before NTCs. Not the plant checklist.
+
 ## Fix
 
 ## Verify
