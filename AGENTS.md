@@ -58,13 +58,16 @@ bracino/
 
 Local-only scratch at the **repo root**, gitignored — an ephemeral extension of this file for cross-session handoff (e.g. “continue hardware talk tomorrow”).
 
+A second local-only file, `session-kickoff.md.bak`, is the previous-session copy. Also gitignored. It exists so a wipe, empty overwrite, or other munging of the live pad does not lose the last non-empty handoff.
+
 **New session (agents):**
 
 1. If `session-kickoff.md` exists and is **non-empty** (more than whitespace), **read it** and **surface its substance to the user** before diving into other work.
-2. After it has been read/presented (or the user dismisses it), **zero the file out without deleting it** — truncate to empty (or whitespace-only), leave the path in place so the user can keep using it as a bridge pad.
-3. Do **not** commit `session-kickoff.md`. Do not treat it as durable docs; promote anything lasting into `issues/`, `docs/STATUS.md`, `docs/ROADMAP.md`, or this file.
+2. If the live file is **empty or missing**, check `session-kickoff.md.bak`. If the backup is **non-empty**, **read it**, treat it as the handoff, and **surface its substance** the same way. Mention that the live pad was empty and the backup was used.
+3. After the live file (or, if that was empty, the backup) has been read/presented (or the user dismisses it), **copy the non-empty source onto `session-kickoff.md.bak`** (overwrite the previous backup). Then **zero `session-kickoff.md` without deleting it** — truncate to empty (or whitespace-only), leave the path in place so the user can keep using it as a bridge pad. Do **not** empty the `.bak`.
+4. Do **not** commit `session-kickoff.md` or `session-kickoff.md.bak`. Do not treat them as durable docs; promote anything lasting into `issues/`, `docs/STATUS.md`, `docs/ROADMAP.md`, or this file.
 
-Humans may freely overwrite the file mid-session to stage the next bridge.
+Humans may freely overwrite the live file mid-session to stage the next bridge. Overwriting the live file does not update the backup; the backup is only refreshed by the agent step above, so a mid-session munge of the live pad still has the last ingested copy.
 
 ## Issues notebook (`issues/`)
 
@@ -120,7 +123,7 @@ Propose minimal concrete schemas in `docs/` rather than scattering magic strings
 
 - Remote: `git@github.com:bracino/bracino.git` (SSH).
 - Prefer atomic cross-layer commits for contracts.
-- No build trees, secrets, `ephemera/`, `session-kickoff.md`, venvs, `node_modules/`.
+- No build trees, secrets, `ephemera/`, `session-kickoff.md`, `session-kickoff.md.bak`, venvs, `node_modules/`.
 - **Commits:** agents **may create local commits without asking** when a coherent unit of work is done and the tree is intentional (scaffolding, issue filing, focused fixes). Use clear messages; don’t vacuum unrelated junk.
 - **Push to GitHub:** **always ask first** unless the user explicitly ordered a push for this step (“push that”, “push to origin”, etc.). “Commit when it makes sense” ≠ permission to push.
 
