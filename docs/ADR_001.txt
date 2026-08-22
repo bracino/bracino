@@ -1,7 +1,7 @@
-# ADR: Prototype BBU Controller – Module-Based Architecture (v0.06)
+# ADR: Prototype BBU Controller – Module-Based Architecture (v0.08)
 
 **Status:** Accepted  
-**Date:** 2026-08-12  
+**Date:** 2026-08-12 (v0.08 protoboard 2026-08-22)  
 **Deciders:** Bracino project  
 **Tags:** hardware, prototype, safety-critical, autonomous-control
 
@@ -20,13 +20,13 @@ Constraints include limited GPIO on the chosen MCU module, the need for proper 2
 
 ## Decision
 
-Adopt a module-centric prototype architecture on a single board (KiCad schematic v0.06):
+Adopt a module-centric prototype architecture on a single board (KiCad schematic v0.08; describe the circuit from the BOM / netlist / ERC exports, not the `.kicad_sch` source):
 
 - **MCU:** Waveshare ESP32-C3-ZERO (provides 5 V in, 3.3 V out, USB-C, limited but sufficient GPIOs).
 - **ADC:** ADS1115 4-channel 16-bit I²C module (A0 = CT, A1–A3 = NTC dividers).
 - **Current sense:** ZMCT103C module (1000:1, on-board burden + conditioning) powered from 3.3 V.
-- **Temperature:** Three 10 kΩ NTCs with 10 kΩ pull-downs forming dividers into the ADS1115.
-- **Actuator:** JQC-3FE-S-Z style 5 V relay module (low-level trigger on IN). GPIO10 must not drive IN directly (5 V pull-up on IN; C3 pad is 3.3 V). Planned: NPN or N-FET so GPIO10 high sinks IN to GND (firmware polarity inverts vs v0.06). Module VCC stays 5 V; 3.3 V on the module is a bench workaround only.
+- **Temperature:** Three 10 kΩ NTCs (TH1–TH3) from +3.3 V to the ADC tap, each with a 10 kΩ to GND (R4–R6) into ADS1115 A1–A3.
+- **Actuator:** JQC-3FE-S-Z style 5 V relay module (low-level trigger on IN). GPIO10 does not drive IN directly. Q1 (2N3904): GPIO10 → R1 2 kΩ → base; collector = module IN; emitter = GND. GPIO10 high sinks IN (coil ON). Module VCC stays 5 V. Direct-drive / 3.3 V-on-module was a v0.06 bench workaround only.
 - **Snubber:** Dedicated module across the relay contacts containing:
   - 200 Ω 2 W resistor
   - 104J 630 V 100 nF metallized film capacitor
@@ -34,7 +34,8 @@ Adopt a module-centric prototype architecture on a single board (KiCad schematic
 - **UI:** 1.8″ ST7735S TFT (SPI, CS hard-tied to GND, RESET with 4.7 kΩ external pull-up) + rotary encoder with switch, brought out on dual 1×9 headers for a remote panel.
 - **Power:** External 12 V → PPTC (60 V / 0.4 A) → Schottky (1N5819) → bulk capacitor → adjustable buck module set to 5 V. 3.3 V taken from the ESP32-C3-ZERO regulator. Local decoupling capacitors on the rails.
 - **Pull-ups:** Rely on MCU internal pull-ups wherever possible (encoder A/B/SW, etc.) to minimise discrete parts.
-- **GPIO policy:** No further functional expansion expected. Several pins are strapping or USB-related and treated as off-limits. GPIO10 (relay) also drives the on-board WS2812; the LED is unused in firmware and any incidental illumination when the relay is off is accepted.
+- **GPIO policy:** No further functional expansion expected. Several pins are strapping or USB-related and treated as off-limits. GPIO10 (relay) also drives the on-board WS2812; that LED stays unused (bench: dark regardless of coil). GPIO8 (strapping don’t-care at SPI boot) is the heartbeat LED (D1 + R7).
+- **USB vs plant 5 V:** J7 is a 2-pin jumper on the 5 V rail only (buck VO ↔ board +5 V, including the C3 5 V pin). Jumper out isolates the buck even if 12 V remains on the inlet; USB is then free. Do not parallel USB VBUS and buck VO. A mechanical USB-blocking holder is planned, not built. ADS1115 ADDR and ALRT are not brought to the protoboard (module onboard pulls). F1 PPTC is in the schematic; first article built without it, space left.
 - **Design principle:** The control node is fully autonomous. Network features are supervisory only.
 
 Bring-up order (safety-first):
@@ -58,7 +59,7 @@ Bring-up order (safety-first):
 ### Negative / Accepted risks
 - Limited future expansion (SPI CS permanently selected, most GPIOs used or reserved).
 - CT output swing is constrained when the ZMCT module is run at 3.3 V. Bench (2026-08-14): path is usable only as on/off — see DESIGN_NOTE_001. Not a calibrated ammeter.
-- GPIO10 cannot drive the 5 V relay module IN (pull-up fights the pad and back-feeds 5 V). Transistor interface required; GPIO10 still shares the unused WS2812.
+- GPIO10 cannot drive the 5 V relay module IN directly (pull-up fights the pad and back-feeds 5 V). Q1 isolates the pad; GPIO10 still shares the unused WS2812. Firmware must treat high = ON (invert vs the v0.06 direct-drive sketch).
 - Mechanical isolation (creepage, slots, potting) on the AC side remains a manual assembly responsibility.
 - PCB layout must be refactored to use individual components instead of modules, requiring footprint files, gerbers, etc.
 
@@ -75,6 +76,6 @@ Bring-up order (safety-first):
 
 ## References
 
-- KiCad schematic / netlist / BOM / ERC: bbu_controller_prototype_kicad v0.06
+- KiCad netlist / BOM / ERC: bbu_controller_prototype_kicad v0.08 (agents: do not read `.kicad_sch`)
 - Module pin-mapping CSV (physical orientation and notes)
 - Project constraints: autonomous local control, supervisory telemetry only

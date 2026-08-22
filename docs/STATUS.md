@@ -1,12 +1,12 @@
 # Status
 
-**As of:** 2026-08-14  
+**As of:** 2026-08-22  
 **Phase:** 1 — prototype (BBU control node + WiFi gateway)  
 **Repo:** https://github.com/bracino/bracino
 
 ## Summary
 
-Hardware definition for the module prototype is written (ADR 001, KiCad v0.06). Breadboard bring-up of rails, ADS1115, and the CT path is in progress. `firmware/node-bbu` has a **bench sketch** (relay toggle + A0 rms), not a control loop. No ESP-NOW, MQTT schema, or compose stack yet.
+Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08**). The **protoboard is soldered to v0.08** and has passed the same I/O tests as the breadboard: heartbeat on external 5 V, relay switches loads, coil and NTCs read reasonable values. `firmware/node-bbu` is still a **bench sketch** (relay + A0–A3 + GPIO8 heartbeat). No control loop, ESP-NOW, MQTT, or compose stack. Next firmware work is the **offline loop** (°C + faults + on/off with hysteresis).
 
 Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMAP.md). Kickoff scrap (not maintained): [`project_slug.md`](project_slug.md).
 
@@ -17,28 +17,49 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | Repo layout + git remote | Solid (phase 1 only) |
 | Root README / AGENTS / MIT license | Solid |
 | STATUS / ROADMAP / issues notebook | Process solid; this file tracks bench reality |
-| Control-node HW definition | **Mostly settled** — ADR 001 + KiCad v0.06 under `hardware/bbu-controller/` |
-| `node-bbu` firmware | **Bring-up only** — builds (ESP-IDF 5.2 / esp32c3); serial `on`/`off`/`s`/`scan`. No control loop |
+| Control-node HW definition | **Settled for the module proto** — ADR 001 + KiCad **v0.08**. Protoboard built |
+| `node-bbu` firmware | **Bring-up only** — serial I/O + GPIO8 ~1 Hz heartbeat. No control loop |
 | `gateway` firmware | **Not started** |
 | MQTT topic + payload schema | **Not decided** |
 | ESP-NOW payload schema | **Not decided** |
-| Relay drive (5 V module vs GPIO10) | **Open** — 5 V IN pull-up overpowers the C3; module temporarily on 3.3 V. NPN (or FET) planned |
-| CT / current sense | **Binary only** on this prototype — [DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md) |
-| NTCs (A1–A3) | **Not on the breadboard yet** |
+| Relay drive (5 V module vs GPIO10) | **OK on protoboard** — Q1 2N3904, high = ON. Coil toggles and holds; switches bench loads |
+| CT / current sense | **Binary only** — [DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md) |
+| NTCs (A1–A3) | **Wired and reading** on protoboard (same divider as breadboard). No °C conversion yet |
+| 12 V / buck vs USB | **Heartbeat OK on external 5 V** (USB unplugged). J7 is a **5 V-only** jumper (buck VO ↔ board +5 V) |
 | `server/` docker compose + provisioning | **Not started** |
 | Grafana dashboards / Node-RED flows | **Not started** |
 | Influx backup/retention policy | **Not decided** |
 
-## Bench (2026-08-14) — do not overclaim
+## Bench — do not overclaim
 
-Verified by hand on the breadboard (not automated):
+Verified by hand on the **breadboard** (2026-08-14 / 15), then repeated on the **v0.08 protoboard** (human-reported 2026-08-22). Agents have not re-run these.
+
+Breadboard (2026-08-14 / 15):
 
 - 12 V → buck 5 V → MCU 3.3 V rails.
 - ADS1115 at 0x48 on GPIO7 SDA / GPIO6 SCL.
 - ZMCT103C on 3.3 V, A0, pot **2 turns CCW** from full CW: relay off ≈ 0 mV rms; relay on / no load ≈ 37 mV; ~0.15 A fan ≈ 175 mV. Dryer currents 0.84–7.8 A are **not** monotonic — do not treat A0 as amperes.
-- Relay module at 5 V: IN looks like a 5 V pull-up; GPIO10 cannot force off; toggling GPIO10 did nothing. Module then run at 3.3 V so bench loads could be switched. **Not** the long-term drive.
+- Q1 on GPIO10; module VCC **5 V**. Coil toggles as commanded and holds. Later: switches bench loads.
+- NTC dividers (TH1/R4 → A1, TH2/R5 → A2, TH3/R6 → A3). Lab ambient **28 °C**: mid **1758–1769 mV**, rms **0**, pp **0–1 mV**. Warming **raises** mid; cooling **lowers** it. Direction matches NTC from +3.3 V to the tap, 10 kΩ to GND.
+- A3 faults: **open** mid **13 mV**; **short** mid **3283 mV**; restore **1762–1769 mV**. Firmware must treat those rails as **fault**, not °C.
+- CT: ~0.13 A → A0 rms **168–173 mV**; contacts closed / no load → **37–38 mV**. `mid` still walks. Same gap as 2026-08-14 ([DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md)).
+- Tank range **18–95 °C** stays on this 10 kΩ/10 kΩ divider (~1.4–3.1 V), clear of open/short. Keep the divider. ADS internal ref is not ratiometric to 3.3 V; ΔT mostly cancels rail drift.
+- On-board WS2812 on GPIO10 stays dark; leave unused. Do not put a webserver on `node-bbu`. Gateway / ESP-NOW / backend wait until the **offline loop** exists.
 
-Shared ESP-IDF is under `~/projects/share/lib/esp/esp-idf` (AGENTS still says `~/projects/shared`).
+Protoboard (human-reported 2026-08-22): soldered to KiCad **v0.08**. Same I/O suite passed: heartbeat on external 5 V, relay switches loads, coil and NTCs read reasonable values. PPTC (F1) not populated; space left. ADS1115 ADDR and ALRT pins not brought out (module onboard pulls; float is fine). AC side (terminal block, relay, snubber) sits on a 1 mm plastic isolation pad.
+
+KiCad **v0.08** BOM / netlist (do not treat `.kicad_sch` as the agent-readable source):
+
+- **Q1** 2N3904: GPIO10 (`RELAY`) → **R1** 2 kΩ → Q1 base; Q1 collector = module `IN`; Q1 emitter = GND. Module VCC on **+5 V**. GPIO10 **high** sinks IN (coil **ON**).
+- **TH1 / R4** → A1, **TH2 / R5** → A2, **TH3 / R6** → A3. Each NTC from +3.3 V to the tap; each 10 kΩ from the tap to GND.
+- **D1 / R7** (2.2 kΩ): GPIO8 heartbeat LED to GND.
+- **D2 / R8** (4.7 kΩ): 12 V power LED on the post-Schottky buck VIN. USB must not light it.
+- **J7**: 2-pin jumper, **5 V only**. **In** = buck VO (`+5V_VO`) → board `+5 V` (C3 5 V pin included). **Out** = buck isolated from the rail even if 12 V is still on the inlet; USB free. GND unswitched. Mechanical USB-blocking holder not built yet.
+- **F1** PPTC is in the schematic; not fitted on this article.
+
+Still open on the protoboard: USB-blocking jumper holder, NTC cable builds, connector / jumper labels, PPTC when stock arrives. UI (TFT + encoder) not on this board yet.
+
+Shared ESP-IDF is under `~/projects/share/lib/esp/esp-idf`.
 
 ## Known constraints (always true)
 
@@ -50,9 +71,9 @@ Shared ESP-IDF is under `~/projects/share/lib/esp/esp-idf` (AGENTS still says `~
 ## Architecture (current tree)
 
 ```text
-firmware/node-bbu/         bring-up firmware (relay + A0)
+firmware/node-bbu/         bring-up firmware (relay via Q1 + A0–A3 + GPIO8)
 firmware/gateway/          placeholder README
-hardware/bbu-controller/   KiCad prototype v0.06 + pin map
+hardware/bbu-controller/   KiCad prototype v0.08 + pin map
 server/{mosquitto,nodered,grafana,influx-init}/
 docs/STATUS.md ROADMAP.md ADR_001.txt DESIGN_NOTE_001…
 docs/CONTEXT/ HW_REFS/     plant notes + datasheets
@@ -68,7 +89,7 @@ issues/{open,closed,fixtures}/
 cd firmware/node-bbu && idf.py build
 ```
 
-Flash/monitor is a human step (`/dev/ttyACM0` on the C3-Zero; port may drop on reset). No compose stack yet.
+Flash/monitor is a human step (`/dev/ttyACM0` on the C3-Zero; port may drop on reset — retry, do not rebuild from scratch). Monitor quit: **Ctrl+]**. Pull **J7** before plugging USB. No compose stack yet.
 
 ## License
 

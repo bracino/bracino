@@ -109,6 +109,12 @@ Full rules: [`issues/README.md`](issues/README.md).
 - Settled MQTT/ESP-NOW/BOM → `docs/`.
 - Prefer STATUS/ROADMAP/issues over the historical slug.
 
+### Hardware (KiCad)
+
+- **Do not read** `.kicad_sch` / `.kicad_pcb` (or other KiCad source) to describe the circuit.
+- For what is connected to what, use the exported **BOM**, **netlist**, and **ERC** next to the project (currently `hardware/bbu-controller/bbu_controller_prototype_kicad/*-v0.08-*`) plus `module_pin_mapping_bbu_controller_prototype.csv`.
+- Humans edit the schematic in KiCad; agents treat those exports as the readable description.
+
 ## Phase priority (phase 1)
 
 **Who/what on the wire (hardware + local control loop) first**, then ESP-NOW, then MQTT, then server dashboards, then convenience. Protocols come after the physical talkers are clear.

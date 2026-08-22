@@ -38,4 +38,4 @@ The real BBU pump is a plain induction motor (~350 W ≈ 1.5 A). Expect the fan-
 ## Related
 
 - ADR 001 already flagged 3.3 V CT swing as a risk; this note records the measured outcome.
-- Relay drive is a separate hardware issue (5 V module IN vs GPIO10); see STATUS / session handoff. It does not change this current-sense decision.
+- Relay drive is a separate hardware path (Q1 2N3904 on GPIO10 → module IN in v0.08). It does not change this current-sense decision.

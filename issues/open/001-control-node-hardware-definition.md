@@ -17,7 +17,7 @@ A short hardware definition good enough to write firmware I/O against and to sta
 
 Work in chat / sketches; promote settled notes to `docs/` or `hardware/bbu-controller/`. Keep MCU choice swappable (`node-bbu` naming).
 
-Settled enough to write I/O against: ADR 001 (modules, pins, 12 V → 5 V → 3.3 V). Remaining: 5 V relay IN vs GPIO10 (transistor; schematic revision in progress). CT is boolean on this proto (DESIGN_NOTE_001). NTCs not brought up yet.
+Settled enough to write I/O against: ADR 001 + KiCad **v0.08** (modules, pins, Q1 on relay IN, TH1–TH3 on A1–A3, GPIO8 LED, 12 V LED, J7 5 V-only jumper). CT is boolean (DESIGN_NOTE_001). Protoboard soldered and I/O-checked (heartbeat on external 5 V, relay switches loads, NTCs reasonable). Remaining hardware: USB-blocking jumper holder, NTC cables, labels, PPTC when stock arrives. UI not on this board yet.
 
 ## Fix
 

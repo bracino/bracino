@@ -17,12 +17,12 @@ Preferred order when something has to wait:
 
 ### Design debts to close early
 
-- [x] Control-node monitoring/control hardware definition (what + how) — ADR 001; relay 5 V IN still needs a transistor
-- [x] BOM / schematic notes (module proto) — KiCad v0.06; schematic revision in progress (NPN on relay IN)
-- [ ] Hardware test / verification strategy (plant checklist still open; breadboard CT/relay notes exist)
+- [x] Control-node monitoring/control hardware definition (what + how) — ADR 001; Q1 2N3904 on relay IN (v0.08)
+- [x] BOM / schematic notes (module proto) — KiCad v0.08 on disk; protoboard soldered
+- [ ] Hardware test / verification strategy (plant checklist still open; protoboard I/O matches breadboard)
 - [ ] **MQTT topic + payload schema** (stabilize before many nodes care; CT field is boolean — DESIGN_NOTE_001)
 - [ ] **ESP-NOW payload** between `node-bbu` and gateway
-- [ ] v0 firmware: control-loop skeleton on `node-bbu`; gateway still empty
+- [ ] v0 firmware: offline control loop on `node-bbu` (°C + faults + on/off); gateway still empty
 - [ ] Node-RED flow structure + first useful views
 - [ ] InfluxDB backup/retention (NAS + cloud) — policy before years of data matter
 
@@ -30,10 +30,15 @@ Preferred order when something has to wait:
 
 - [x] Repo scaffold, docs, issues notebook
 - [ ] Documented MQTT + ESP-NOW contracts under `docs/`
-- [x] `node-bbu` builds under ESP-IDF; bring-up I/O (relay + A0), not the loop
-- [ ] Relay 5 V drive via transistor; invert GPIO polarity in firmware; re-check fail-safe OFF at boot
-- [ ] NTCs on A1–A3 + calibration
-- [ ] Pump differential logic proven on bench (even before PCB)
+- [x] `node-bbu` builds under ESP-IDF; bring-up I/O (relay + A0–A3), not the loop
+- [x] Flash inverted `relay_set()`; coil toggles and holds. GPIO10 backfeed not DVM’d this pass
+- [x] GPIO8 heartbeat; external 5 V (USB unplugged); coil commanded off stays off
+- [x] KiCad v0.08 exports (GPIO8 LED, 12 V LED, 5 V-only J7 jumper); protoboard soldered and I/O-checked
+- [x] NTCs + 10 kΩ dividers wired on A1–A3 (breadboard, then protoboard)
+- [x] Firmware samples A1–A3 (`r` / `s1`–`s3`)
+- [x] NTC open/short on A3 (open ≈ 13 mV, short ≈ 3283 mV, 28 °C ≈ 1760 mV)
+- [ ] NTC °C conversion; treat near-0 / near-rail as fault
+- [ ] Pump on/off logic proven on bench (setpoint / hysteresis; no real BBU pump yet)
 - [ ] Gateway builds; ESP-NOW bring-up with control node
 - [ ] MQTT publish path + retained state / LWT
 - [ ] `server/docker-compose.yml` + Mosquitto config in git

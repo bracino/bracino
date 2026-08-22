@@ -17,7 +17,7 @@ Two buildable projects; README notes for IDF path; control task runnable without
 
 Start minimal; wire schemas from 004/005 as they land. Do not block first PWM/GPIO blink-style bring-up on schema perfection.
 
-`node-bbu` now builds (ESP-IDF 5.2, `esp32c3`) as a serial bring-up app, not a control/telemetry split. After the relay transistor: invert `relay_set()`. Gateway still a placeholder.
+`node-bbu` builds (ESP-IDF 5.2, `esp32c3`) as a serial bring-up app. Flashed polarity + A0–A3 look sane. GPIO8 heartbeat confirmed on the v0.08 protoboard (USB and external 5 V). Do not add a webserver on this node. Control-loop work is **009**. Gateway still a placeholder.
 
 ## Fix
 

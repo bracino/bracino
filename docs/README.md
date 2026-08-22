@@ -4,7 +4,7 @@
 |-----|------|
 | [STATUS.md](STATUS.md) | What works now |
 | [ROADMAP.md](ROADMAP.md) | Phase 1 plan and later ideas |
-| [ADR_001.txt](ADR_001.txt) | Accepted module-prototype architecture (v0.06) |
+| [ADR_001.txt](ADR_001.txt) | Accepted module-prototype architecture (v0.08) |
 | [DESIGN_NOTE_001_ct_binary_only.md](DESIGN_NOTE_001_ct_binary_only.md) | Prototype CT reports running / not, not amperes |
 | [../issues/](../issues/README.md) | open/closed lab notebook |
 | [project_slug.md](project_slug.md) | Kickoff artifact only (historical; OK stale) |

@@ -17,11 +17,13 @@ A short checklist: bring-up steps, must-pass cases before leaving the loop unatt
 
 Document under `docs/` once drafted; link from STATUS.
 
-Breadboard sketch: `firmware/node-bbu/` (GPIO10 + ADS1115 A0). Serial `on`/`off`/`s`/`scan`.
+Bring-up sketch: `firmware/node-bbu/` (GPIO10 via Q1 + ADS1115 A0–A3 + GPIO8 heartbeat). Serial `on`/`off`/`r`/`r0`–`r3`/`s`/`s0`–`s3`/`scan`.
 
-Partial bench (2026-08-14): rails OK; I2C 0x48; CT pot 2 CCW — idle vs ~0.15 A fan is a clear gap; amp-level loads are not linear (DESIGN_NOTE_001). Relay at 5 V does not obey GPIO10; 3.3 V on the module is a temporary workaround.
+Breadboard (2026-08-14 / 15): rails OK; I2C 0x48; CT pot 2 CCW — idle vs ~0.15 A fan is a clear gap; amp-level loads are not linear (DESIGN_NOTE_001). Q1 + 5 V module; coil toggles and holds. NTC at lab **28 °C** ~1760 mV; A3 **open** 13 mV; A3 **short** 3283 mV. CT ~0.13 A → ~170 mV rms; no load → ~37 mV. 18–95 °C fits the divider.
 
-Still needed for a plant checklist: transistor drive + fail-safe OFF at reset; NTC open/short behaviour; **server/gateway down** still correct; no unattended real BBU pump on the bring-up sketch.
+Protoboard (human-reported 2026-08-22): same suite passed — heartbeat on external 5 V, relay switches loads, coil and NTCs reasonable.
+
+Still needed: °C + fault rails; pump on/off logic on the bench; **server/gateway down** still correct; plant checklist before an unattended real BBU pump. Do not hang the real pump on the bring-up sketch.
 
 ## Fix
 

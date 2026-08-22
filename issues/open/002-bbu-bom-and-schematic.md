@@ -17,7 +17,9 @@ BOM candidates + schematic notes (even hand-drawn scanned to fixtures/docs) cove
 
 Draft after 001 boundaries; prefer parts already on the shelf when they meet range/accuracy.
 
-KiCad v0.06 + pin-mapping CSV exist under `hardware/bbu-controller/`. Next schematic rev: NPN (or N-FET) + base resistor between GPIO10 and relay IN; module VCC remains 5 V. Add that part to the BOM when the symbol is in.
+KiCad **v0.08** BOM / netlist / ERC + pin-mapping CSV under `hardware/bbu-controller/`. Protoboard soldered to that schematic. Q1 2N3904 + R1 2 kΩ sit between GPIO10 and relay IN; module VCC is 5 V. TH1–TH3 + R4–R6 (10 kΩ) are the A1–A3 dividers. GPIO8 → D1 → R7 2.2 kΩ. D2 / R8 is the 12 V LED. **J7** is a 2-pin 5 V-only jumper (buck VO ↔ board +5 V), not the earlier 4-pin VIN+VO idea. Agents describe the circuit from those exports, not `.kicad_sch`.
+
+Still on this issue only if the schematic itself moves: USB-blocking holder is mechanical, not a net change. F1 PPTC is drawn, not fitted.
 
 ## Fix
 
