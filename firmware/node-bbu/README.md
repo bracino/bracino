@@ -6,16 +6,16 @@ Hardware target is currently ESP32-class (often ESP32-C3 on the bench); the dire
 
 See root `README.md`, `AGENTS.md`. Kickoff history (stale OK): `docs/project_slug.md`.
 
-## Breadboard bring-up (now)
+## Bring-up (now)
 
-What is in this tree today is a **bench sketch**, not the control loop. It toggles the pump relay and reads ADS1115 A0–A3 (ZMCT103C + three NTC dividers).
+Local loop lives in `control.c` ([DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md)). **Boots MANUAL** / coil OFF. `auto` runs NORMAL. A1=TPO, A2=TPU, A3=AMB (printed, never used for control). NTC β=**3950**. CT is loaded / not.
 
 Pins match schematic v0.08 (`hardware/bbu-controller/bbu_controller_prototype_kicad/` — use the BOM/netlist, not `.kicad_sch`):
 
 | Net | Pin | Notes |
 |-----|-----|--------|
 | RELAY | GPIO10 | Via Q1 2N3904 (R1 2 kΩ base): GPIO10 **high** = coil ON. Boot holds the pad **low**. On-board WS2812 unused (stays dark). |
-| HEART | GPIO8 | ~1 Hz LED (D1 + R7 2.2 kΩ to GND). |
+| HEART | GPIO8 | Idle 100 ms on / 900 ms off; RUNNING steady; alert 300/300 ms. |
 | ADC_SDA | GPIO7 | ADS1115 SDA (module 10 kΩ pull-ups) |
 | ADC_SCL | GPIO6 | ADS1115 SCL |
 | A0 | ADS1115 AIN0 | ZMCT103C `OUT` |
@@ -42,11 +42,15 @@ If `set-target` was already run for another chip, `idf.py fullclean` first.
 
 | Cmd | Action |
 |-----|--------|
-| `on` / `off` / `t` | Relay on, off, toggle (GPIO10 high = ON) |
-| `r` | One sample of A0–A3 (mV + raw counts) |
-| `r0`…`r3` | One sample of that channel |
-| `s` | 64-sample A0 burst: mid / AC rms / peak-to-peak — use this for the pot |
-| `s0`…`s3` | Same burst on that channel (`mid` on A1–A3 is the NTC tap) |
+| `on` / `off` / `t` | Relay on, off, toggle — forces **MANUAL** |
+| `r` | A0 mV; TPO/TPU/AMB as °C and mV |
+| `r0`…`r3` | One channel |
+| `s` | 64-sample A0 burst: mid / AC rms / p-p — use this for CT tests |
+| `s0`…`s3` | Same burst; A1–A3 also print °C from mid |
+| `auto` / `manual` / `test` | NORMAL loop / sticky manual / 15 min then NORMAL |
+| `sim tpo 55` / `sim tpu 30` / `sim clear` | Inject tank temps for desk proof of start/stop |
+| `prog` | Programming mode: `NAME VALUE`, `save`, `default`, `exit` |
+| `st` | Mode, cycle, warnings, params |
 | `scan` | I2C probe |
 | `h` | Help |
 
@@ -54,6 +58,8 @@ CT on this prototype is **on/off only** ([DESIGN_NOTE_001](../../docs/DESIGN_NOT
 
 Free-text lines (`ambient`, `open`, …) are not commands; the sketch prints `unknown`.
 
-GPIO8 blinks with or without USB. Flash over USB with **J7 out** (buck VO isolated from the 5 V rail). Do not plug USB while J7 is in. A mechanical USB-blocking holder is not built yet.
+GPIO8: idle flash, steady when the relay is on, rapid if a warning/fault is latched (stuck-on, max run time, TPO bad, TPO_ONLY, FAULT). Flash over USB with **J7 out**. Do not plug USB while J7 is in.
+
+`prog` names: `tpo_setpoint_c`, `hysteresis_c`, `min_on_time_s`, `min_off_time_s`, `ct_confirm_s`, `min_tpo_tpu_delta_c`, `max_run_time_min`. `save` writes NVS.
 
 Monitor quit: **Ctrl+]**. If the ACM node vanishes after reset, `ls /dev/ttyACM*` and `idf.py -p … flash` again — do not fullclean.

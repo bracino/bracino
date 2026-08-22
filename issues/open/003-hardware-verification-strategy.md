@@ -23,7 +23,7 @@ Breadboard (2026-08-14 / 15): rails OK; I2C 0x48; CT pot 2 CCW — idle vs ~0.15
 
 Protoboard (human-reported 2026-08-22): same suite passed — heartbeat on external 5 V, relay switches loads, coil and NTCs reasonable.
 
-Still needed: °C + fault rails; pump on/off logic on the bench; **server/gateway down** still correct; plant checklist before an unattended real BBU pump. Do not hang the real pump on the bring-up sketch.
+Desk `sim` of the loop passed (2026-08-22). Still needed: °C vs thermometer; dummy AC load; **server/gateway down** still correct; plant checklist before an unattended real BBU pump. Do not hang the real pump on this image yet.
 
 ## Fix
 

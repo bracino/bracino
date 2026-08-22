@@ -6,7 +6,7 @@
 
 ## Summary
 
-Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08**). The **protoboard is soldered to v0.08** and has passed the same I/O tests as the breadboard: heartbeat on external 5 V, relay switches loads, coil and NTCs read reasonable values. `firmware/node-bbu` is still a **bench sketch** (relay + A0–A3 + GPIO8 heartbeat). No control loop, ESP-NOW, MQTT, or compose stack. Next firmware work is the **offline loop** (°C + faults + on/off with hysteresis).
+Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08**). The **protoboard is soldered to v0.08** and has passed the same I/O tests as the breadboard. `firmware/node-bbu` runs the offline loop ([DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md)): boots MANUAL, `auto` / `sim` on the desk. Human-reported **desk `sim` walk-through passed** (2026-08-22). Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
 
 Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMAP.md). Kickoff scrap (not maintained): [`project_slug.md`](project_slug.md).
 
@@ -18,13 +18,13 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | Root README / AGENTS / MIT license | Solid |
 | STATUS / ROADMAP / issues notebook | Process solid; this file tracks bench reality |
 | Control-node HW definition | **Settled for the module proto** — ADR 001 + KiCad **v0.08**. Protoboard built |
-| `node-bbu` firmware | **Bring-up only** — serial I/O + GPIO8 ~1 Hz heartbeat. No control loop |
+| `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002 in `control.c`. Desk `sim` passed. Boots MANUAL. Not plant-proven |
 | `gateway` firmware | **Not started** |
 | MQTT topic + payload schema | **Not decided** |
 | ESP-NOW payload schema | **Not decided** |
 | Relay drive (5 V module vs GPIO10) | **OK on protoboard** — Q1 2N3904, high = ON. Coil toggles and holds; switches bench loads |
 | CT / current sense | **Binary only** — [DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md) |
-| NTCs (A1–A3) | **Wired and reading** on protoboard (same divider as breadboard). No °C conversion yet |
+| NTCs (A1–A3) | **°C in firmware** (β=3950). A1=TPO, A2=TPU, A3=AMB (print only). Open/short = FAULT |
 | 12 V / buck vs USB | **Heartbeat OK on external 5 V** (USB unplugged). J7 is a **5 V-only** jumper (buck VO ↔ board +5 V) |
 | `server/` docker compose + provisioning | **Not started** |
 | Grafana dashboards / Node-RED flows | **Not started** |
@@ -43,6 +43,8 @@ Breadboard (2026-08-14 / 15):
 - NTC dividers (TH1/R4 → A1, TH2/R5 → A2, TH3/R6 → A3). Lab ambient **28 °C**: mid **1758–1769 mV**, rms **0**, pp **0–1 mV**. Warming **raises** mid; cooling **lowers** it. Direction matches NTC from +3.3 V to the tap, 10 kΩ to GND.
 - A3 faults: **open** mid **13 mV**; **short** mid **3283 mV**; restore **1762–1769 mV**. Firmware must treat those rails as **fault**, not °C.
 - CT: ~0.13 A → A0 rms **168–173 mV**; contacts closed / no load → **37–38 mV**. `mid` still walks. Same gap as 2026-08-14 ([DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md)).
+
+Protoboard CT sweep (2026-08-22, relay ON, `s` n=64): no-load **37–38 mV** rms; 0.13 A **176–180**; 0.86 A **175–177**; 2.0 A **168** (below the fan); 3.6 A **240–242**; 4.1 A **233–236** (`mid` walks); 7.8 A **289–295**; return to no-load **37–38**. Loaded vs not is clear. Amperes are not. Stay boolean.
 - Tank range **18–95 °C** stays on this 10 kΩ/10 kΩ divider (~1.4–3.1 V), clear of open/short. Keep the divider. ADS internal ref is not ratiometric to 3.3 V; ΔT mostly cancels rail drift.
 - On-board WS2812 on GPIO10 stays dark; leave unused. Do not put a webserver on `node-bbu`. Gateway / ESP-NOW / backend wait until the **offline loop** exists.
 
@@ -71,7 +73,7 @@ Shared ESP-IDF is under `~/projects/share/lib/esp/esp-idf`.
 ## Architecture (current tree)
 
 ```text
-firmware/node-bbu/         bring-up firmware (relay via Q1 + A0–A3 + GPIO8)
+firmware/node-bbu/         local loop (DESIGN_NOTE_002) + serial / sim
 firmware/gateway/          placeholder README
 hardware/bbu-controller/   KiCad prototype v0.08 + pin map
 server/{mosquitto,nodered,grafana,influx-init}/

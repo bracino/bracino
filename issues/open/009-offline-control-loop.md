@@ -3,26 +3,30 @@
 - **Status:** open
 - **Type:** task
 - **Opened:** 2026-08-22
-- **Refs:** `firmware/node-bbu/`, `006`, `docs/DESIGN_NOTE_001_ct_binary_only.md`, `docs/CONTEXT/BBU_Module_Technical_Notes_edit_v3.md`
+- **Refs:** `firmware/node-bbu/`, `006`, `docs/DESIGN_NOTE_002_bbu_control_loop.md`, `docs/DESIGN_NOTE_001_ct_binary_only.md`
 
 ## Context
 
-Protoboard I/O is good enough to write against. `node-bbu` is still a serial bench sketch. The plant needs a local loop that runs with gateway / broker / USB unplugged.
+Protoboard I/O is good enough to write against. The plant needs a local loop that runs with gateway / broker / USB unplugged.
+
+Control law: [DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md). TPO = TH1/A1, TPU = TH2/A2, AMB = TH3/A3 (print only). CT is confirm-running only.
 
 ## Expected
 
-On-node: NTC mV → °C with open/short as **fault** (not a temperature); CT as running / not; pump on/off from local sensors only. Serial stay as debug / manual override. No ESP-NOW, MQTT, or webserver in this issue.
+On-node: NTC mV → °C with open/short as **fault**; CT as running / not; `NORMAL` IDLE/RUNNING; `FAULT` / `TPO_ONLY` / `MANUAL` / `TESTING`. Serial debug / mode override. No ESP-NOW, MQTT, or webserver.
 
 ## Proposal
 
-Three slices (do not start 2 until 1 prints sane °C on the protoboard):
-
-1. Conversion + faults on the existing `r` / `s` commands.
-2. A control task that samples and drives the relay; serial `auto` / `on` / `off`.
-3. Bench proof with dummy loads and forced open/short. Real BBU pump is out of scope here.
-
-Must decide before slice 2: control law (MES-style TPO/TPU vs setpoint, vs a simple ΔT), which TH is which, and fail-safe on sensor fault (default proposal: pump **OFF**).
+`control.c` implements the note. Boots MANUAL. `auto` / `sim` for desk proof.
 
 ## Fix
 
+`firmware/node-bbu/main/{control,ntc,params}.c`. Host tests in `firmware/node-bbu/test/test_control.c`.
+
 ## Verify
+
+- [x] Host unit tests (`gcc` on `test_control.c`)
+- [x] Desk `sim` walk-through on the protoboard (human, 2026-08-22): start, stay RUNNING with hot top / cold bottom, stop when charged, FAULT on bad TPO
+- [ ] °C vs a thermometer
+- [ ] Dummy AC load on the relay (not the real BBU pump)
+- [ ] Real BBU pump — out of scope until the above
