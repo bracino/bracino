@@ -25,6 +25,8 @@ Menus show DESIGN_NOTE_002 names (setpoint, hysteresis, min on/off, TPO−TPU of
 
 `firmware/node-bbu/main/{tft,enc,ui}.c`. Modes in `control.c`.
 
+Bench 2026-08-25: glyphs were Y-mirrored (ST7735 MY vs char RAM order); 2 Hz dark bar was full-row `fill_rect` at 500 ms; Home had only one cursor item so rotation looked dead. Glyphs sent bottom-first; live lines are cached (no row wipe); Home shows `enc N`; decoder is debounced A-edge. Serial `enc` prints A/B/SW. Gamma tables added (dim may still be LED/R3).
+
 ## Verify
 
 - [ ] Splash then Home on the breadboard TFT

@@ -24,6 +24,7 @@
 #include "control.h"
 #include "ntc.h"
 #include "params.h"
+#include "enc.h"
 #include "ui.h"
 
 #define PIN_RELAY          GPIO_NUM_10
@@ -208,7 +209,7 @@ static void print_help(void)
         "  sim tpo 55       inject TPO °C (desk loop proof)\n"
         "  sim tpu 30       inject TPU °C\n"
         "  sim clear        use real NTCs again\n"
-        "  prog / st / scan / h\n"
+        "  prog / st / scan / enc / h\n"
         "GPIO8: idle 100/900, RUNNING steady, alert 300/300.\n"
         "Boots Manual. CT is loaded/not. Do not hang the real BBU pump.\n");
 }
@@ -501,6 +502,11 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
         cmd_burst(0);
     } else if ((ch = parse_ch_suffix(line, 's')) >= 0) {
         cmd_burst(ch);
+    } else if (strcmp(line, "enc") == 0) {
+        int a = 0, b = 0, sw = 0;
+        enc_levels(&a, &b, &sw);
+        printf("enc A=%d B=%d SW=%d net=%d (SW 0=pressed)\n",
+               a, b, sw, enc_net());
     } else if (strcmp(line, "scan") == 0) {
         cmd_scan(bus);
     } else if (strcmp(line, "st") == 0 || strcmp(line, "status") == 0) {

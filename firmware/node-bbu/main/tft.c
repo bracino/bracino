@@ -1,5 +1,7 @@
 #include "tft.h"
 
+#include <string.h>
+
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -24,6 +26,8 @@
 #define ST7735_PWCTR4  0xC3
 #define ST7735_PWCTR5  0xC4
 #define ST7735_VMCTR1  0xC5
+#define ST7735_GMCTRP1 0xE0
+#define ST7735_GMCTRN1 0xE1
 
 /* Many MSP1803 / “green tab” 128x160 panels. */
 #define XSTART 2
@@ -220,10 +224,13 @@ void tft_char(int x, int y, char c, uint16_t fg, uint16_t bg)
     const uint8_t *g = FONT5X7[idx - 0x20];
     window(x, y, 6, 8);
     wr_gpio(TFT_PIN_DC, 1);
+    /* MY makes the first RAM write land at the bottom of the window, so
+     * send font rows bottom-first (bit0 = top of glyph). */
     for (int row = 0; row < 8; row++) {
+        int bit = 6 - row;
         for (int col = 0; col < 6; col++) {
             uint16_t px = bg;
-            if (col < 5 && row < 7 && (g[col] & (1u << row))) {
+            if (col < 5 && bit >= 0 && (g[col] & (1u << bit))) {
                 px = fg;
             }
             spi_byte((uint8_t)(px >> 8));
@@ -242,9 +249,15 @@ void tft_text(int x, int y, const char *s, uint16_t fg, uint16_t bg)
 
 void tft_text_row(int row, const char *s, uint16_t fg, uint16_t bg)
 {
-    int y = row * ROW_H;
-    tft_fill_rect(0, y, TFT_W, ROW_H, bg);
-    tft_text(2, y + 4, s, fg, bg);
+    char buf[22];
+    memset(buf, ' ', 21);
+    buf[21] = '\0';
+    size_t n = strlen(s);
+    if (n > 21) {
+        n = 21;
+    }
+    memcpy(buf, s, n);
+    tft_text(2, row * ROW_H + 4, buf, fg, bg);
 }
 
 void tft_init(void)
@@ -288,6 +301,26 @@ void tft_init(void)
     cmd(ST7735_INVOFF);
     cmd(ST7735_MADCTL); data(0xC8); /* MX | MY | BGR */
     cmd(ST7735_COLMOD); data(0x05);
+    cmd(ST7735_GMCTRP1);
+    {
+        static const uint8_t gp[] = {
+            0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D,
+            0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10
+        };
+        for (unsigned i = 0; i < sizeof(gp); i++) {
+            data(gp[i]);
+        }
+    }
+    cmd(ST7735_GMCTRN1);
+    {
+        static const uint8_t gn[] = {
+            0x03, 0x1D, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D,
+            0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10
+        };
+        for (unsigned i = 0; i < sizeof(gn); i++) {
+            data(gn[i]);
+        }
+    }
     cmd(ST7735_NORON);
     vTaskDelay(pdMS_TO_TICKS(10));
     cmd(ST7735_DISPON);

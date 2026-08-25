@@ -10,7 +10,7 @@ See root `README.md`, `AGENTS.md`. Kickoff history (stale OK): `docs/project_slu
 
 Local loop lives in `control.c` ([DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md)). **Boots Manual** / coil OFF. User modes: **Auto** / **Manual** / **Test** / **Off** (there is no Normal). `auto` runs the TPO/TPU loop. `halt` is Off. A1=TPO, A2=TPU, A3=AMB (printed, never used for control). NTC β=**3950**. CT is loaded / not.
 
-TFT + encoder (breadboard, issue 010): bit-bang ST7735S on GPIO9 SCK / GPIO4 SDA / GPIO3 DC / GPIO2 RESET (CS tied GND). Encoder A/B/SW = GPIO0 / GPIO1 / GPIO5, internal pull-ups. Click enters; hold ~0.8 s returns Home.
+TFT + encoder (breadboard, issue 010): bit-bang ST7735S on GPIO9 SCK / GPIO4 SDA / GPIO3 DC / GPIO2 RESET (CS tied GND). Encoder A/B/SW = GPIO0 / GPIO1 / GPIO5, internal pull-ups. Click enters; hold ~0.8 s returns Home. Home shows `enc N` while you turn; serial `enc` prints A/B/SW.
 
 Pins match schematic v0.08 (`hardware/bbu-controller/bbu_controller_prototype_kicad/` — use the BOM/netlist, not `.kicad_sch`):
 
