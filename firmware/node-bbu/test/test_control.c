@@ -67,7 +67,7 @@ int main(void)
     expect(c.mode == BBU_MODE_MANUAL && !c.relay_on, "boot MANUAL off");
 
     /* auto + cold TPO: wait min_off then RUNNING */
-    bbu_ctrl_request_mode(&c, BBU_MODE_NORMAL);
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
     s.tpo = ok_c(50.0f);
     s.tpu = ok_c(30.0f);
     s.ct_present = false;
@@ -89,7 +89,7 @@ int main(void)
     expect(c.cycle == BBU_CYCLE_IDLE && !c.relay_on, "stop when charged");
 
     /* TPO fault → FAULT, pump off */
-    bbu_ctrl_request_mode(&c, BBU_MODE_NORMAL);
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
     s.tpo = ok_c(50.0f);
     s.tpu = ok_c(30.0f);
     s.ct_present = true;
@@ -99,14 +99,14 @@ int main(void)
     tick_n(&c, s, &p, 1);
     expect(c.mode == BBU_MODE_FAULT && !c.relay_on, "TPO fail → FAULT off");
 
-    /* TPO recovers → NORMAL (not MANUAL) */
+    /* TPO recovers → Auto (not Manual) */
     s.tpo = ok_c(50.0f);
     tick_n(&c, s, &p, 1);
-    expect(c.mode == BBU_MODE_NORMAL, "TPO recover → NORMAL");
+    expect(c.mode == BBU_MODE_AUTO, "TPO recover → Auto");
 
     /* TPU fail while RUNNING → TPO_ONLY, keep pumping */
     bbu_ctrl_init(&c);
-    bbu_ctrl_request_mode(&c, BBU_MODE_NORMAL);
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
     s.tpo = ok_c(50.0f);
     s.tpu = ok_c(30.0f);
     s.ct_present = true;
@@ -116,27 +116,27 @@ int main(void)
     expect(c.mode == BBU_MODE_TPO_ONLY && c.relay_on, "TPU fail → TPO_ONLY keep ON");
     s.tpu = ok_c(30.0f);
     tick_n(&c, s, &p, 1);
-    expect(c.mode == BBU_MODE_NORMAL && c.relay_on, "TPU recover keeps RUNNING");
+    expect(c.mode == BBU_MODE_AUTO && c.relay_on, "TPU recover keeps RUNNING");
 
-    /* no CT after confirm → warn, stay NORMAL (old box was blind to current) */
+    /* no CT after confirm → warn, stay Auto (old box was blind to current) */
     bbu_ctrl_init(&c);
-    bbu_ctrl_request_mode(&c, BBU_MODE_NORMAL);
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
     s.tpo = ok_c(50.0f);
     s.tpu = ok_c(30.0f);
     s.ct_present = false;
     tick_n(&c, s, &p, 61);
     expect(c.cycle == BBU_CYCLE_RUNNING, "started");
     tick_n(&c, s, &p, 12);
-    expect(c.mode == BBU_MODE_NORMAL && c.warn_noct, "no CT → warn, stay NORMAL");
+    expect(c.mode == BBU_MODE_AUTO && c.warn_noct, "no CT → warn, stay Auto");
     tick_n(&c, s, &p, 5);
-    expect(c.mode == BBU_MODE_NORMAL && c.warn_noct, "no flap while CT still missing");
+    expect(c.mode == BBU_MODE_AUTO && c.warn_noct, "no flap while CT still missing");
     s.ct_present = true;
     tick_n(&c, s, &p, 1);
-    expect(c.mode == BBU_MODE_NORMAL && !c.warn_noct, "CT back clears no-CT warn");
+    expect(c.mode == BBU_MODE_AUTO && !c.warn_noct, "CT back clears no-CT warn");
 
     /* TPO_ONLY stop does not need TPU delta */
     bbu_ctrl_init(&c);
-    bbu_ctrl_request_mode(&c, BBU_MODE_NORMAL);
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
     s.tpo = ok_c(50.0f);
     s.tpu = bad_rail();
     s.ct_present = true;
@@ -156,12 +156,12 @@ int main(void)
 
     /* inversion slack */
     bbu_ctrl_init(&c);
-    bbu_ctrl_request_mode(&c, BBU_MODE_NORMAL);
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
     s.tpo = ok_c(60.0f);
     s.tpu = ok_c(60.4f);
     s.ct_present = true;
     tick_n(&c, s, &p, 1);
-    expect(c.mode == BBU_MODE_NORMAL, "0.4 C invert is slack");
+    expect(c.mode == BBU_MODE_AUTO, "0.4 C invert is slack");
     s.tpu = ok_c(62.0f);
     tick_n(&c, s, &p, 1);
     expect(c.mode == BBU_MODE_TPO_ONLY, "TPU > TPO+1 is severe");
@@ -174,6 +174,24 @@ int main(void)
     tick_n(&c, s, &p, 3);
     expect(c.warn_stuck && c.mode == BBU_MODE_MANUAL && !c.relay_on,
            "stuck-on warns, stays MANUAL off");
+
+    /* Off: cold TPO must not start */
+    bbu_ctrl_init(&c);
+    bbu_ctrl_request_mode(&c, BBU_MODE_OFF);
+    s.tpo = ok_c(20.0f);
+    s.tpu = ok_c(20.0f);
+    s.ct_present = false;
+    tick_n(&c, s, &p, 120);
+    expect(c.mode == BBU_MODE_OFF && !c.relay_on, "Off does not auto-start");
+
+    /* Off survives TPO fault and recover */
+    s.tpo = bad_rail();
+    tick_n(&c, s, &p, 1);
+    expect(c.mode == BBU_MODE_FAULT && c.user_mode == BBU_MODE_OFF && !c.relay_on,
+           "Off + bad TPO → Fault overlay, user still Off");
+    s.tpo = ok_c(20.0f);
+    tick_n(&c, s, &p, 1);
+    expect(c.mode == BBU_MODE_OFF && !c.relay_on, "TPO recover stays Off");
 
     if (g_fail) {
         printf("%d failed\n", g_fail);

@@ -2,6 +2,12 @@
 
 #include <string.h>
 
+static bool is_user_mode(bbu_mode_t m)
+{
+    return m == BBU_MODE_AUTO || m == BBU_MODE_MANUAL ||
+           m == BBU_MODE_TESTING || m == BBU_MODE_OFF;
+}
+
 static void go_idle(bbu_ctrl_t *c)
 {
     c->cycle = BBU_CYCLE_IDLE;
@@ -18,23 +24,26 @@ static void go_running(bbu_ctrl_t *c)
     c->relay_on = true;
     c->run_s = 0;
     c->warn_maxrun = false;
+    c->starts++;
 }
 
 void bbu_ctrl_init(bbu_ctrl_t *c)
 {
     memset(c, 0, sizeof(*c));
     c->mode = BBU_MODE_MANUAL;
+    c->user_mode = BBU_MODE_MANUAL;
     c->cycle = BBU_CYCLE_IDLE;
 }
 
 const char *bbu_mode_name(bbu_mode_t m)
 {
     switch (m) {
-    case BBU_MODE_NORMAL:   return "NORMAL";
-    case BBU_MODE_TPO_ONLY: return "TPO_ONLY";
-    case BBU_MODE_TESTING:  return "TESTING";
-    case BBU_MODE_FAULT:    return "FAULT";
-    default:                return "MANUAL";
+    case BBU_MODE_AUTO:     return "Auto";
+    case BBU_MODE_TPO_ONLY: return "Auto*";
+    case BBU_MODE_TESTING:  return "Test";
+    case BBU_MODE_FAULT:    return "Fault";
+    case BBU_MODE_OFF:      return "Off";
+    default:                return "Manual";
     }
 }
 
@@ -45,13 +54,27 @@ const char *bbu_cycle_name(bbu_cycle_t cy)
 
 void bbu_ctrl_request_mode(bbu_ctrl_t *c, bbu_mode_t mode)
 {
+    if (!is_user_mode(mode)) {
+        return;
+    }
+    c->user_mode = mode;
+    c->mode_s = 0;
+    c->tpo_only_src = 0;
+    if (c->mode == BBU_MODE_FAULT) {
+        if (mode == BBU_MODE_AUTO || mode == BBU_MODE_OFF) {
+            go_idle(c);
+        }
+        return;
+    }
+    if (mode == BBU_MODE_AUTO &&
+        (c->mode == BBU_MODE_AUTO || c->mode == BBU_MODE_TPO_ONLY)) {
+        return;
+    }
     if (c->mode == mode) {
         return;
     }
     c->mode = mode;
-    c->mode_s = 0;
-    c->tpo_only_src = 0;
-    if (mode == BBU_MODE_FAULT || mode == BBU_MODE_NORMAL || mode == BBU_MODE_TPO_ONLY) {
+    if (mode == BBU_MODE_AUTO || mode == BBU_MODE_OFF) {
         go_idle(c);
     }
 }
@@ -60,6 +83,7 @@ void bbu_ctrl_manual_relay(bbu_ctrl_t *c, bool on)
 {
     if (c->mode != BBU_MODE_MANUAL && c->mode != BBU_MODE_TESTING) {
         c->mode = BBU_MODE_MANUAL;
+        c->user_mode = BBU_MODE_MANUAL;
         c->mode_s = 0;
         c->tpo_only_src = 0;
     }
@@ -68,6 +92,12 @@ void bbu_ctrl_manual_relay(bbu_ctrl_t *c, bool on)
     } else {
         go_idle(c);
     }
+}
+
+void bbu_ctrl_clear_stats(bbu_ctrl_t *c)
+{
+    c->starts = 0;
+    c->total_run_s = 0;
 }
 
 static float on_c(const bbu_params_t *p)
@@ -95,6 +125,7 @@ uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *
 
     if (c->relay_on) {
         c->run_s += dt;
+        c->total_run_s += dt;
         if (c->run_s >= p->max_run_time_min * 60u) {
             c->warn_maxrun = true;
         }
@@ -110,8 +141,9 @@ uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *
         c->warn_stuck = false;
     }
 
-    if (c->mode == BBU_MODE_TESTING && c->mode_s >= BBU_TEST_LIMIT_S) {
-        c->mode = BBU_MODE_NORMAL;
+    if (c->user_mode == BBU_MODE_TESTING && c->mode_s >= BBU_TEST_LIMIT_S) {
+        c->user_mode = BBU_MODE_AUTO;
+        c->mode = BBU_MODE_AUTO;
         c->mode_s = 0;
         c->tpo_only_src = 0;
         go_idle(c);
@@ -133,38 +165,45 @@ uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *
             c->mode = BBU_MODE_FAULT;
             c->mode_s = 0;
             c->tpo_only_src = 0;
+            c->last_fault = BBU_LAST_TPO;
             go_idle(c);
         }
         goto done;
     }
 
     if (c->mode == BBU_MODE_FAULT) {
-        c->mode = BBU_MODE_NORMAL;
+        c->mode = c->user_mode;
         c->mode_s = 0;
         go_idle(c);
     }
 
-    if (c->mode == BBU_MODE_MANUAL || c->mode == BBU_MODE_TESTING) {
+    if (c->mode == BBU_MODE_MANUAL || c->mode == BBU_MODE_TESTING ||
+        c->mode == BBU_MODE_OFF) {
+        goto done;
+    }
+
+    if (c->user_mode != BBU_MODE_AUTO) {
         goto done;
     }
 
     if (tpu_bad) {
         c->tpo_only_src |= 1u;
+        c->last_fault = BBU_LAST_TPU;
     } else {
         c->tpo_only_src &= ~1u;
     }
 
     if (c->tpo_only_src) {
-        if (c->mode == BBU_MODE_NORMAL) {
+        if (c->mode == BBU_MODE_AUTO) {
             c->mode = BBU_MODE_TPO_ONLY;
             c->mode_s = 0;
         }
     } else if (c->mode == BBU_MODE_TPO_ONLY) {
-        c->mode = BBU_MODE_NORMAL;
+        c->mode = BBU_MODE_AUTO;
         c->mode_s = 0;
     }
 
-    if (c->mode != BBU_MODE_NORMAL && c->mode != BBU_MODE_TPO_ONLY) {
+    if (c->mode != BBU_MODE_AUTO && c->mode != BBU_MODE_TPO_ONLY) {
         goto done;
     }
 

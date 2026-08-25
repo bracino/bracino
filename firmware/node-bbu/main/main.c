@@ -1,7 +1,7 @@
 /*
  * node-bbu: local BBU pump loop + serial bring-up.
  *
- * Boots MANUAL / coil OFF. `auto` runs DESIGN_NOTE_002.
+ * Boots MANUAL / coil OFF. `auto` runs DESIGN_NOTE_002 (Auto).
  * A1=TPO, A2=TPU, A3=AMB (print only). β=3950. CT is boolean.
  * Do not put the real BBU pump on this image until 009 is proven.
  *
@@ -24,6 +24,7 @@
 #include "control.h"
 #include "ntc.h"
 #include "params.h"
+#include "ui.h"
 
 #define PIN_RELAY          GPIO_NUM_10
 #define PIN_HEART          GPIO_NUM_8
@@ -199,8 +200,8 @@ static void print_help(void)
 {
     printf(
         "commands:\n"
-        "  on / off / t     relay (forces MANUAL)\n"
-        "  auto / manual / test\n"
+        "  on / off / t     relay (forces Manual)\n"
+        "  auto / manual / test / halt\n"
         "  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)\n"
         "  s / s0..s3       64-sample burst\n"
         "  sim              show overrides\n"
@@ -209,7 +210,7 @@ static void print_help(void)
         "  sim clear        use real NTCs again\n"
         "  prog / st / scan / h\n"
         "GPIO8: idle 100/900, RUNNING steady, alert 300/300.\n"
-        "Boots MANUAL. CT is loaded/not. Do not hang the real BBU pump.\n");
+        "Boots Manual. CT is loaded/not. Do not hang the real BBU pump.\n");
 }
 
 static void cmd_scan(i2c_master_bus_handle_t bus)
@@ -316,8 +317,9 @@ static void cmd_burst(int ch)
 static void cmd_status(void)
 {
     xSemaphoreTake(s_mu, portMAX_DELAY);
-    printf("mode=%s cycle=%s relay=%s led=%s run=%lus cycle=%lus\n",
+    printf("mode=%s user=%s cycle=%s relay=%s led=%s run=%lus cycle=%lus\n",
            bbu_mode_name(s_ctrl.mode),
+           bbu_mode_name(s_ctrl.user_mode),
            bbu_cycle_name(s_ctrl.cycle),
            s_ctrl.relay_on ? "ON" : "OFF",
            s_led_pat == LED_ALERT ? "alert" :
@@ -478,19 +480,19 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
         bbu_ctrl_manual_relay(&s_ctrl, true);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("relay ON  mode=MANUAL\n");
+        printf("relay ON  mode=Manual\n");
     } else if (strcmp(line, "off") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
         bbu_ctrl_manual_relay(&s_ctrl, false);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("relay OFF  mode=MANUAL\n");
+        printf("relay OFF  mode=Manual\n");
     } else if (strcmp(line, "t") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
         bbu_ctrl_manual_relay(&s_ctrl, !s_ctrl.relay_on);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("relay %s  mode=MANUAL\n", s_hw_relay ? "ON" : "OFF");
+        printf("relay %s  mode=Manual\n", s_hw_relay ? "ON" : "OFF");
     } else if (strcmp(line, "r") == 0) {
         cmd_read_all();
     } else if ((ch = parse_ch_suffix(line, 'r')) >= 0) {
@@ -505,22 +507,28 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
         cmd_status();
     } else if (strcmp(line, "auto") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
-        bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_NORMAL);
+        bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_AUTO);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("mode NORMAL (coil OFF, min_off then start if TPO cold)\n");
+        printf("mode Auto (coil OFF, min_off then start if TPO cold)\n");
     } else if (strcmp(line, "manual") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
         bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_MANUAL);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("mode MANUAL\n");
+        printf("mode Manual\n");
     } else if (strcmp(line, "test") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
         bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_TESTING);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("mode TESTING (15 min then NORMAL)\n");
+        printf("mode Test (15 min then Auto)\n");
+    } else if (strcmp(line, "halt") == 0) {
+        xSemaphoreTake(s_mu, portMAX_DELAY);
+        bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_OFF);
+        apply_ctrl();
+        xSemaphoreGive(s_mu);
+        printf("mode Off (coil stays OFF until mode changes)\n");
     } else if (strncmp(line, "sim", 3) == 0) {
         cmd_sim(line);
     } else if (strcmp(line, "prog") == 0) {
@@ -537,7 +545,7 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
 static void log_events(uint32_t ev)
 {
     if (ev & BBU_EVT_TEST_END) {
-        printf("TESTING expired → NORMAL\n");
+        printf("Test expired → Auto\n");
     }
     if (ev & BBU_EVT_MODE) {
         printf("mode %s\n", bbu_mode_name(s_ctrl.mode));
@@ -592,6 +600,8 @@ static void monitor_task(void *arg)
         };
         uint32_t ev = bbu_ctrl_tick(&s_ctrl, &sense, params_get());
         apply_ctrl();
+        ui_live_t live = { .tpo = tpo, .tpu = tpu, .ct_present = ct_on };
+        ui_set_live(&live);
         bool alert = s_ctrl.warn_stuck || s_ctrl.warn_maxrun ||
                      s_ctrl.warn_noct ||
                      (s_ctrl.mode == BBU_MODE_FAULT) ||
@@ -652,12 +662,14 @@ void app_main(void)
     };
     ESP_ERROR_CHECK(i2c_master_bus_add_device(bus, &dev_cfg, &s_ads));
 
-    printf("\n# node-bbu  mode=MANUAL  loop=DESIGN_NOTE_002  beta=3950  "
+    printf("\n# node-bbu  mode=Manual  loop=DESIGN_NOTE_002  beta=3950  "
            "relay=GPIO%d heart=GPIO%d\n",
            (int)PIN_RELAY, (int)PIN_HEART);
     cmd_scan(bus);
     params_print();
     print_help();
+    ui_init(s_mu, &s_ctrl, params_get, apply_ctrl);
+    xTaskCreate(ui_task, "ui", 4096, NULL, 1, NULL);
     xTaskCreate(monitor_task, "mon", 4096, NULL, 2, NULL);
     printf("> ");
     fflush(stdout);

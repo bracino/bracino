@@ -12,11 +12,18 @@
 
 typedef enum {
     BBU_MODE_MANUAL = 0,
-    BBU_MODE_NORMAL,
-    BBU_MODE_TPO_ONLY,
+    BBU_MODE_AUTO,
+    BBU_MODE_TPO_ONLY, /* Auto with TPU ignored — not a user mode */
     BBU_MODE_TESTING,
-    BBU_MODE_FAULT,
+    BBU_MODE_FAULT,    /* TPO unusable — not a user mode */
+    BBU_MODE_OFF,
 } bbu_mode_t;
+
+enum {
+    BBU_LAST_NONE = 0,
+    BBU_LAST_TPO  = 1,
+    BBU_LAST_TPU  = 2,
+};
 
 typedef enum {
     BBU_CYCLE_IDLE = 0,
@@ -41,6 +48,7 @@ typedef struct {
 
 typedef struct {
     bbu_mode_t mode;
+    bbu_mode_t user_mode; /* Auto / Manual / Test / Off only */
     bbu_cycle_t cycle;
     bool relay_on;
     bool warn_stuck;
@@ -49,17 +57,21 @@ typedef struct {
     uint32_t mode_s;
     uint32_t cycle_s;
     uint32_t run_s;
+    uint32_t total_run_s;
+    uint32_t starts;
     uint32_t stuck_s;
     uint8_t tpo_only_src; /* bit0 TPU (TPO_ONLY). CT is warn-only. */
+    uint8_t last_fault;
 } bbu_ctrl_t;
 
 void bbu_ctrl_init(bbu_ctrl_t *c);
 const char *bbu_mode_name(bbu_mode_t m);
 const char *bbu_cycle_name(bbu_cycle_t cy);
 
-/* User commands. MANUAL/TESTING keep the coil; auto modes start IDLE / OFF. */
+/* User commands. Manual/Test keep the coil; Auto/Off start IDLE. */
 void bbu_ctrl_request_mode(bbu_ctrl_t *c, bbu_mode_t mode);
 void bbu_ctrl_manual_relay(bbu_ctrl_t *c, bool on);
+void bbu_ctrl_clear_stats(bbu_ctrl_t *c);
 
 /* One control tick. Returns a bitmask of BBU_EVT_*. */
 uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *p);

@@ -13,7 +13,7 @@ Control law: [DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md). 
 
 ## Expected
 
-On-node: NTC mV → °C with open/short as **fault**; CT as running / not; `NORMAL` IDLE/RUNNING; `FAULT` / `TPO_ONLY` / `MANUAL` / `TESTING`. Serial debug / mode override. No ESP-NOW, MQTT, or webserver.
+On-node: NTC mV → °C with open/short as **fault**; CT as running / not; **Auto** IDLE/RUNNING; user modes Auto / Manual / Test / Off; overlays `FAULT` / `TPO_ONLY`. Serial debug / mode override. No ESP-NOW, MQTT, or webserver.
 
 ## Proposal
 

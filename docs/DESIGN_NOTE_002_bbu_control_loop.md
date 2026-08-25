@@ -3,7 +3,7 @@
 **Status:** Implemented. Desk `sim` walk-through passed (2026-08-22). Dummy AC load validated (2026-08-25). Thermometer / plant proof still open.  
 **Date:** 2026-08-22 (CT warn-only 2026-08-25)  
 **Applies to:** `firmware/node-bbu` local loop on the v0.08 protoboard  
-**Does not apply to:** gateway, MQTT, UI encoder, or a later ACS node
+**Does not apply to:** gateway, MQTT, or a later ACS node. Local TFT/encoder is on-node I/O (not the network path).
 
 ## What we are emulating
 
@@ -13,7 +13,7 @@ The old box had a pump relay and two tank wells. It did **not** have a current s
 
 ## Sensors
 
-| Name | Well / role | Hardware (assumed) | In NORMAL? |
+| Name | Well / role | Hardware (assumed) | In Auto? |
 |------|-------------|--------------------|------------|
 | **TPO** | Top of tank (NTC1) | TH1 → ADS1115 A1 | Start / stop |
 | **TPU** | Bottom of tank (NTC2) | TH2 → ADS1115 A2 | Stop (thermocline); inversion check |
@@ -57,17 +57,27 @@ The boiler may drop out on its own jacket long before that. The pump can still r
 
 **Mode** is how the box is being used. **State** is the pump cycle inside a mode that is allowed to run.
 
+**User modes** (what the operator picks — serial `auto` / `manual` / `test` / `halt`, or Control Program on the TFT):
+
 | Mode | Who selects | Pump |
 |------|-------------|------|
-| `NORMAL` | Default | IDLE / RUNNING machine below |
-| `TPO_ONLY` | Automatic on a **severe** fault | Same machine, TPU and delta ignored |
-| `MANUAL` | User | On/off as commanded; no auto start/stop |
-| `TESTING` | User | On/off as commanded; **15 min** then back to `NORMAL` |
-| `FAULT` | Automatic on a **critical** fault | Forced **OFF** |
+| **Auto** | User | IDLE / RUNNING machine below |
+| **Manual** | User | On/off as commanded; no auto start/stop |
+| **Test** | User | On/off as commanded; **15 min** then back to Auto |
+| **Off** | User | Forced **OFF** until the mode is changed. No frost protection yet |
 
-`TPO_ONLY` and `FAULT` return to `NORMAL` when the raising fault is gone. `TESTING` expires to `NORMAL`. `MANUAL` stays until the user leaves it.
+There is **no** mode called Normal. Serial `auto` enters Auto. `on` / `off` / `t` still force **Manual** coil commands (bench). Off mode is `halt`.
 
-Inside `NORMAL` (and `TPO_ONLY`):
+**Internal overlays** (not user-selectable):
+
+| Overlay | When | Pump |
+|---------|------|------|
+| `TPO_ONLY` (display **Auto***) | TPU unusable / inverted while Auto | Same machine, TPU and delta ignored |
+| `FAULT` (display **Fault**) | TPO unusable | Forced **OFF**. `user_mode` is remembered |
+
+`FAULT` returns to the **remembered user mode** when TPO is good again (Off stays Off). `TPO_ONLY` returns to Auto when TPU is good. Test expires to Auto. Manual stays until the user leaves it.
+
+Inside Auto (and Auto*):
 
 ```text
 IDLE --(TPO ≤ tpo_on_threshold && off-timer expired)──► RUNNING
@@ -80,7 +90,7 @@ IDLE --(TPO ≤ tpo_on_threshold && off-timer expired)──► RUNNING
 
 In `TPO_ONLY` the stop line is only `min_on_time` done **and** `TPO ≥ tpo_off_threshold`.
 
-Bring-up firmware **boots `MANUAL` / coil OFF** so CT and load tests are not seized. `auto` enters `NORMAL`. Production default can become `NORMAL` once the loop is proven.
+Bring-up firmware **boots Manual / coil OFF** so CT and load tests are not seized. `auto` enters Auto. Production default can become Auto once the loop is proven.
 
 GPIO8: idle = 100 ms on / 900 ms off; RUNNING = steady on; any warning (including no-CT) / `FAULT` / `TPO_ONLY` / TPO unusable = 300 ms on/off.
 
@@ -115,7 +125,7 @@ Cool TPU water into the jacket is what makes the boiler fire. No network in this
 ## Out of scope for the first loop
 
 - AMB in the start/stop decision (print only)
-- Encoder / TFT setpoints (`prog` + NVS first)
+- Encoder / TFT **edits** of setpoints (`prog` + NVS first; menus are live/read for now except mode and Manual/Test pump)
 - ESP-NOW / MQTT reporting of warnings/faults
 - Real BBU pump on the bench sketch until 009 has thermometer proof and a plant checklist
 - CT overcurrent / ampere field (closed: binary only; no-CT is warn only)

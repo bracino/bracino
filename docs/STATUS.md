@@ -1,6 +1,6 @@
 # Status
 
-**As of:** 2026-08-25  
+**As of:** 2026-08-25 (UI breadboard in tree)  
 **Phase:** 1 — prototype (BBU control node + WiFi gateway)  
 **Repo:** https://github.com/bracino/bracino
 
@@ -20,7 +20,7 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | Root README / AGENTS / MIT license | Solid |
 | STATUS / ROADMAP / issues notebook | Process solid; this file tracks bench reality |
 | Control-node HW definition | **Settled for the module proto** — ADR 001 + KiCad **v0.08**. Protoboard built |
-| `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002 in `control.c`. Desk `sim` passed. Image **flashed and working** (human, 2026-08-25). Dummy AC load OK. Boots MANUAL. Not plant-proven |
+| `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002 in `control.c`. User modes **Auto / Manual / Test / Off** (no Normal). Desk `sim` passed. Image **flashed and working** (human, 2026-08-25, pre-UI). Dummy AC load OK. Boots Manual. TFT+encoder menus in tree, not bench-proven |
 | `gateway` firmware | **Not started** |
 | MQTT topic + payload schema | **Not decided** |
 | ESP-NOW payload schema | **Not decided** |
@@ -63,7 +63,7 @@ KiCad **v0.08** BOM / netlist (do not treat `.kicad_sch` as the agent-readable s
 
 Human-reported (2026-08-25): current image flashed and working; dummy AC load on the relay validated (CT still binary, reliable for running/not); NTC cables built and tested good; sensors potted, now curing; USB safety block fabricated. Temperature calibration deferred until the potting is done.
 
-Still open on the protoboard: connector / jumper labels, PPTC when stock arrives. UI (TFT + encoder) not on this board yet. °C vs thermometer still open. Do not put the real BBU pump on this image yet.
+Still open on the protoboard: connector / jumper labels, PPTC when stock arrives. UI (TFT + encoder) is on a **breadboard** for validation ([010](../issues/open/010-tft-encoder-menu.md)); not on the protoboard yet. °C vs thermometer still open. Do not put the real BBU pump on this image yet.
 
 Shared ESP-IDF is under `~/projects/share/lib/esp/esp-idf`.
 

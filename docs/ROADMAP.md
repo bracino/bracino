@@ -27,6 +27,7 @@ Preferred order when something has to wait:
 - [x] Desk `sim` walk-through of start / stay-running / stop / FAULT (human, 2026-08-22)
 - [x] Dummy AC load on the relay (human, 2026-08-25); CT still binary, reliable for that
 - [ ] °C vs thermometer (sensors potted, curing; cal deferred); gateway still empty
+- [ ] TFT + encoder breadboard validation (issue 010); menus roughed in
 - [ ] Node-RED flow structure + first useful views
 - [ ] InfluxDB backup/retention (NAS + cloud) — policy before years of data matter
 
@@ -45,6 +46,7 @@ Preferred order when something has to wait:
 - [x] Pump on/off logic on desk `sim` (setpoint / hysteresis / TPU hold)
 - [x] Same loop on dummy AC load (human, 2026-08-25); no real BBU pump yet
 - [ ] °C vs thermometer on the potted NTCs; then plant install
+- [ ] TFT + encoder on breadboard (Home / Selection / Control Program); then UI protoboard
 - [ ] Gateway builds; ESP-NOW bring-up with control node
 - [ ] MQTT publish path + retained state / LWT
 - [ ] `server/docker-compose.yml` + Mosquitto config in git

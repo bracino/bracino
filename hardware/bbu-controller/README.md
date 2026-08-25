@@ -10,7 +10,7 @@ Project lives here, next to the notes: `bbu_controller_prototype_kicad/` (`.kica
 
 **Agents:** describe the circuit from the BOM / netlist / ERC, not from `.kicad_sch`.
 
-Module board: ESP32-C3-ZERO, ADS1115, ZMCT103C, JQC-3FE-S-Z relay + Q1 2N3904 + snubber, three NTC 10 kΩ dividers, 12 V → 5 V buck, 1.8″ TFT + encoder (UI not on the protoboard yet). First article is a 12×7 cm protoboard soldered to this schematic.
+Module board: ESP32-C3-ZERO, ADS1115, ZMCT103C, JQC-3FE-S-Z relay + Q1 2N3904 + snubber, three NTC 10 kΩ dividers, 12 V → 5 V buck, 1.8″ TFT + encoder (UI on breadboard for 010; not on the protoboard yet). First article is a 12×7 cm protoboard soldered to this schematic.
 
 Relay drive (v0.08 netlist): GPIO10 (`RELAY`) → R1 2 kΩ → Q1 base; Q1 collector = module `IN`; Q1 emitter = GND. Module VCC = **5 V**. GPIO10 high sinks IN (coil ON). Direct GPIO10 → IN does not work (5 V pull-up). Firmware matches that polarity (boot holds GPIO10 low). See STATUS.
 
