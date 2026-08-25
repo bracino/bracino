@@ -1,12 +1,12 @@
 # Status
 
-**As of:** 2026-08-25 (UI breadboard in tree)  
+**As of:** 2026-08-25  
 **Phase:** 1 — prototype (BBU control node + WiFi gateway)  
 **Repo:** https://github.com/bracino/bracino
 
 ## Summary
 
-Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08**). The **protoboard is soldered to v0.08** and has passed the same I/O tests as the breadboard. `firmware/node-bbu` runs the offline loop ([DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md)): boots MANUAL, `auto` / `sim` on the desk. Human-reported **desk `sim` walk-through passed** (2026-08-22). Human-reported (2026-08-25): current image **flashed and working**; dummy **AC load** on the relay validated (CT still binary, reliable for that); NTC cables built and good; sensors potted; USB safety block fabricated. Ice-water / boiling two-point on the potted NTCs (see below). Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
+Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08**). The **protoboard is soldered to v0.08** and has passed the same I/O tests as the breadboard. `firmware/node-bbu` runs the offline loop ([DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md)): boots **Manual**, `auto` / `sim` / `halt` on the desk. Human-reported **desk `sim` walk-through passed** (2026-08-22). Human-reported (2026-08-25): dummy **AC load** validated; NTC ice/boil two-point; USB safety block fabricated; TFT+encoder on breadboard (glyphs/flicker fixed; encoder works but bouncy). Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
 
 CT no-current / unusable is **warning only** — stay on the standard algorithm (same blindness as the old MES-BBU, plus a notice). `TPO_ONLY` is for TPU faults only.
 
@@ -20,7 +20,7 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | Root README / AGENTS / MIT license | Solid |
 | STATUS / ROADMAP / issues notebook | Process solid; this file tracks bench reality |
 | Control-node HW definition | **Settled for the module proto** — ADR 001 + KiCad **v0.08**. Protoboard built |
-| `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002 in `control.c`. User modes **Auto / Manual / Test / Off** (no Normal). Desk `sim` passed. Image **flashed and working** (human, 2026-08-25, pre-UI). Dummy AC load OK. Boots Manual. TFT+encoder menus in tree, not bench-proven |
+| `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002. User modes **Auto / Manual / Test / Off**. Dummy AC load OK. Ice/boil NTCs OK (conversion −5–110 °C). TFT Home/menus on breadboard; encoder **bouncy** (trying another module). Boots Manual |
 | `gateway` firmware | **Not started** |
 | MQTT topic + payload schema | **Not decided** |
 | ESP-NOW payload schema | **Not decided** |

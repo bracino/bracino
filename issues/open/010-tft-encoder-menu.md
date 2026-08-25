@@ -29,8 +29,8 @@ Bench 2026-08-25: glyphs were Y-mirrored (ST7735 MY vs char RAM order); 2 Hz dar
 
 ## Verify
 
-- [ ] Splash then Home on the breadboard TFT
-- [ ] Encoder rotate moves `>` ; click enters; hold ~0.8 s returns Home
+- [x] Splash then Home on the breadboard TFT (human, 2026-08-25; after glyph + flicker fix)
+- [x] Encoder rotate is detected; click enters. **Bouncy** — trying another module before more firmware debounce
 - [ ] Control Program cycles Auto / Manual / Test / Off; pump toggle only in Manual/Test
 - [ ] Loop still ticks with the panel disconnected (serial `st`)
 - [ ] Real BBU pump — still out of scope
