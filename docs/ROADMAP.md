@@ -25,7 +25,8 @@ Preferred order when something has to wait:
 - [x] Offline BBU control law written — [DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md)
 - [x] v0 firmware: implement that loop on `node-bbu` (boots MANUAL; `auto` / `sim`)
 - [x] Desk `sim` walk-through of start / stay-running / stop / FAULT (human, 2026-08-22)
-- [ ] Dummy-load / thermometer check; gateway still empty
+- [x] Dummy AC load on the relay (human, 2026-08-25); CT still binary, reliable for that
+- [ ] °C vs thermometer (sensors potted, curing; cal deferred); gateway still empty
 - [ ] Node-RED flow structure + first useful views
 - [ ] InfluxDB backup/retention (NAS + cloud) — policy before years of data matter
 
@@ -42,7 +43,8 @@ Preferred order when something has to wait:
 - [x] NTC open/short on A3 (open ≈ 13 mV, short ≈ 3283 mV, 28 °C ≈ 1760 mV)
 - [x] NTC °C conversion; treat near-0 / near-rail as fault (β=3950)
 - [x] Pump on/off logic on desk `sim` (setpoint / hysteresis / TPU hold)
-- [ ] Same loop on dummy AC load + real NTCs; no real BBU pump yet
+- [x] Same loop on dummy AC load (human, 2026-08-25); no real BBU pump yet
+- [ ] °C vs thermometer on the potted NTCs; then plant install
 - [ ] Gateway builds; ESP-NOW bring-up with control node
 - [ ] MQTT publish path + retained state / LWT
 - [ ] `server/docker-compose.yml` + Mosquitto config in git

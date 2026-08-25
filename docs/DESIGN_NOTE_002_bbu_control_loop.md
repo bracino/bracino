@@ -1,7 +1,7 @@
 # Design note 002 — BBU offline control loop (emulate MES-BBU)
 
-**Status:** Implemented. Desk `sim` walk-through passed (2026-08-22). Dummy-load / plant proof still open.  
-**Date:** 2026-08-22  
+**Status:** Implemented. Desk `sim` walk-through passed (2026-08-22). Dummy AC load validated (2026-08-25). Thermometer / plant proof still open.  
+**Date:** 2026-08-22 (CT warn-only 2026-08-25)  
 **Applies to:** `firmware/node-bbu` local loop on the v0.08 protoboard  
 **Does not apply to:** gateway, MQTT, UI encoder, or a later ACS node
 
@@ -36,7 +36,7 @@ Tune on site. Values below are starting guesses (old-controller memory plus new 
 | `hysteresis_c` | 3.0 | Band around the setpoint |
 | `min_on_time_s` | 180 | Anti-short-cycle once RUNNING |
 | `min_off_time_s` | 60 | Anti-short-cycle once IDLE |
-| `ct_confirm_s` | 10 | After command ON, time allowed for CT = present |
+| `ct_confirm_s` | 10 | After command ON, time allowed before posting a no-CT **warning** (does not change mode) |
 | `min_tpo_tpu_delta_c` | 5.0 | Small top−bottom gap means the tank is largely charged |
 | `max_run_time_min` | 60 | Longest normal load; **warning only**, pump keeps its state |
 
@@ -82,7 +82,7 @@ In `TPO_ONLY` the stop line is only `min_on_time` done **and** `TPO ≥ tpo_off_
 
 Bring-up firmware **boots `MANUAL` / coil OFF** so CT and load tests are not seized. `auto` enters `NORMAL`. Production default can become `NORMAL` once the loop is proven.
 
-GPIO8: idle = 100 ms on / 900 ms off; RUNNING = steady on; any warning / `FAULT` / `TPO_ONLY` / TPO unusable = 300 ms on/off.
+GPIO8: idle = 100 ms on / 900 ms off; RUNNING = steady on; any warning (including no-CT) / `FAULT` / `TPO_ONLY` / TPO unusable = 300 ms on/off.
 
 The loop must run with USB, gateway, and broker absent.
 
@@ -91,11 +91,12 @@ The loop must run with USB, gateway, and broker absent.
 | Condition | Class | Mode |
 |-----------|-------|------|
 | TPO open, short, or not in 0–95 °C | **Critical** | `FAULT` (pump OFF) |
-| CT **present** is not required here as critical | — | — |
 | TPU open, short, not in 0–95 °C, or TPU > TPO | **Severe** | `TPO_ONLY` |
-| CT = none while RUNNING, after `ct_confirm_s` | **Severe** | `TPO_ONLY` |
+| CT = none while RUNNING, after `ct_confirm_s` | **Warning** | stay on the standard algorithm (no `TPO_ONLY`) |
+| CT sample unusable / not a clean running-vs-not | **Warning** | same — do not change start/stop |
+| CT present while relay OFF | **Warning** | no mode change |
 
-No overcurrent / stall class. Protoboard retest (2026-08-22) confirmed DESIGN_NOTE_001: loaded vs not only. The CT **is** used for “commanded ON but no current after `ct_confirm_s`” (severe → `TPO_ONLY`) and “CT present while relay OFF” (**warning only**, no mode change; same blindness the old box had, plus a notice).
+No overcurrent / stall class. Protoboard retest (2026-08-22) and dummy AC load (2026-08-25) confirmed DESIGN_NOTE_001: loaded vs not only; magnitude is not judged. The old MES-BBU had **no** current sensor and ran the TPO/TPU loop blind to pump current. Bracino keeps that: missing or unreasonable CT is a **notice**, not a control-law change. “CT present while relay OFF” is the same class (warning only). `TPO_ONLY` is **TPU faults only**.
 
 `max_run_time_min` exceeded is a **warning only**.
 
@@ -116,8 +117,8 @@ Cool TPU water into the jacket is what makes the boiler fire. No network in this
 - AMB in the start/stop decision (print only)
 - Encoder / TFT setpoints (`prog` + NVS first)
 - ESP-NOW / MQTT reporting of warnings/faults
-- Real BBU pump on the bench sketch until 009 is proven on dummy loads
-- CT overcurrent / ampere field (closed: binary only)
+- Real BBU pump on the bench sketch until 009 has thermometer proof and a plant checklist
+- CT overcurrent / ampere field (closed: binary only; no-CT is warn only)
 
 ## Related
 

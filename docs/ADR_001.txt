@@ -35,7 +35,7 @@ Adopt a module-centric prototype architecture on a single board (KiCad schematic
 - **Power:** External 12 V → PPTC (60 V / 0.4 A) → Schottky (1N5819) → bulk capacitor → adjustable buck module set to 5 V. 3.3 V taken from the ESP32-C3-ZERO regulator. Local decoupling capacitors on the rails.
 - **Pull-ups:** Rely on MCU internal pull-ups wherever possible (encoder A/B/SW, etc.) to minimise discrete parts.
 - **GPIO policy:** No further functional expansion expected. Several pins are strapping or USB-related and treated as off-limits. GPIO10 (relay) also drives the on-board WS2812; that LED stays unused (bench: dark regardless of coil). GPIO8 (strapping don’t-care at SPI boot) is the heartbeat LED (D1 + R7).
-- **USB vs plant 5 V:** J7 is a 2-pin jumper on the 5 V rail only (buck VO ↔ board +5 V, including the C3 5 V pin). Jumper out isolates the buck even if 12 V remains on the inlet; USB is then free. Do not parallel USB VBUS and buck VO. A mechanical USB-blocking holder is planned, not built. ADS1115 ADDR and ALRT are not brought to the protoboard (module onboard pulls). F1 PPTC is in the schematic; first article built without it, space left.
+- **USB vs plant 5 V:** J7 is a 2-pin jumper on the 5 V rail only (buck VO ↔ board +5 V, including the C3 5 V pin). Jumper out isolates the buck even if 12 V remains on the inlet; USB is then free. Do not parallel USB VBUS and buck VO. A mechanical USB-blocking holder is **fabricated** (2026-08-25). ADS1115 ADDR and ALRT are not brought to the protoboard (module onboard pulls). F1 PPTC is in the schematic; first article built without it, space left.
 - **Design principle:** The control node is fully autonomous. Network features are supervisory only.
 
 Bring-up order (safety-first):

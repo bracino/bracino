@@ -29,6 +29,7 @@ enum {
     BBU_EVT_WARN_STUCK = 1u << 2,
     BBU_EVT_WARN_MAX   = 1u << 3,
     BBU_EVT_TEST_END   = 1u << 4,
+    BBU_EVT_WARN_NOCT  = 1u << 5,
 };
 
 typedef struct {
@@ -44,11 +45,12 @@ typedef struct {
     bool relay_on;
     bool warn_stuck;
     bool warn_maxrun;
+    bool warn_noct;
     uint32_t mode_s;
     uint32_t cycle_s;
     uint32_t run_s;
     uint32_t stuck_s;
-    uint8_t tpo_only_src; /* bit0 TPU, bit1 no-CT */
+    uint8_t tpo_only_src; /* bit0 TPU (TPO_ONLY). CT is warn-only. */
 } bbu_ctrl_t;
 
 void bbu_ctrl_init(bbu_ctrl_t *c);

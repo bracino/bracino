@@ -330,6 +330,9 @@ static void cmd_status(void)
     if (s_ctrl.warn_maxrun) {
         printf("WARN max_run_time_min exceeded\n");
     }
+    if (s_ctrl.warn_noct) {
+        printf("WARN no CT (commanded ON, no current) — loop unchanged\n");
+    }
     if (s_sim_tpo || s_sim_tpu) {
         printf("sim");
         if (s_sim_tpo) {
@@ -550,6 +553,9 @@ static void log_events(uint32_t ev)
     if (ev & BBU_EVT_WARN_MAX) {
         printf("WARN max_run_time_min exceeded (still running)\n");
     }
+    if (ev & BBU_EVT_WARN_NOCT) {
+        printf("WARN no CT (commanded ON, no current) — loop unchanged\n");
+    }
 }
 
 static void monitor_task(void *arg)
@@ -587,6 +593,7 @@ static void monitor_task(void *arg)
         uint32_t ev = bbu_ctrl_tick(&s_ctrl, &sense, params_get());
         apply_ctrl();
         bool alert = s_ctrl.warn_stuck || s_ctrl.warn_maxrun ||
+                     s_ctrl.warn_noct ||
                      (s_ctrl.mode == BBU_MODE_FAULT) ||
                      (s_ctrl.mode == BBU_MODE_TPO_ONLY) ||
                      !tpo.ok;

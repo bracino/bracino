@@ -87,6 +87,7 @@ uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *
     bbu_cycle_t cy0 = c->cycle;
     bool stuck0 = c->warn_stuck;
     bool max0 = c->warn_maxrun;
+    bool noct0 = c->warn_noct;
 
     uint32_t dt = s->dt_s ? s->dt_s : 1;
     c->mode_s += dt;
@@ -125,6 +126,7 @@ uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *
     bool no_ct = (c->cycle == BBU_CYCLE_RUNNING) &&
                  (c->cycle_s >= p->ct_confirm_s) &&
                  !s->ct_present;
+    c->warn_noct = no_ct;
 
     if (tpo_bad) {
         if (c->mode != BBU_MODE_FAULT) {
@@ -150,11 +152,6 @@ uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *
         c->tpo_only_src |= 1u;
     } else {
         c->tpo_only_src &= ~1u;
-    }
-    if (no_ct) {
-        c->tpo_only_src |= 2u;
-    } else {
-        c->tpo_only_src &= ~2u;
     }
 
     if (c->tpo_only_src) {
@@ -197,6 +194,9 @@ done:
     }
     if (c->warn_maxrun && !max0) {
         ev |= BBU_EVT_WARN_MAX;
+    }
+    if (c->warn_noct && !noct0) {
+        ev |= BBU_EVT_WARN_NOCT;
     }
     return ev;
 }

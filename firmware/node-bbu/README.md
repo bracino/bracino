@@ -22,7 +22,7 @@ Pins match schematic v0.08 (`hardware/bbu-controller/bbu_controller_prototype_ki
 | A1–A3 | ADS1115 AIN1–3 | TH1/R4, TH2/R5, TH3/R6 (10 kΩ NTC + 10 kΩ to GND) |
 | I2C addr | 0x48 | Module ADDR pulled low |
 
-Bench (2026-08-15 breadboard, repeated 2026-08-22 on the v0.08 protoboard): coil toggles as commanded and holds; protoboard also switches bench loads. Lab **28 °C**: A1–A3 mid ~1760 mV, rms 0; warming raises mid, cooling lowers it. A3 open → 13 mV; A3 short → 3283 mV. CT ~0.13 A ≈ 170 mV rms vs ~37 mV contacts-closed / no load. Heartbeat confirmed on external 5 V (USB unplugged). Do not put the real BBU pump on this sketch.
+Bench (2026-08-15 breadboard, repeated 2026-08-22 on the v0.08 protoboard): coil toggles as commanded and holds; protoboard also switches bench loads. Lab **28 °C**: A1–A3 mid ~1760 mV, rms 0; warming raises mid, cooling lowers it. A3 open → 13 mV; A3 short → 3283 mV. CT ~0.13 A ≈ 170 mV rms vs ~37 mV contacts-closed / no load. Heartbeat confirmed on external 5 V (USB unplugged). Human (2026-08-25): current image flashed and working; dummy AC load on the relay validated (CT still binary, reliable for running/not); NTC cables built; sensors potted, curing. Do not put the real BBU pump on this sketch.
 
 ### Build / flash
 
@@ -54,11 +54,11 @@ If `set-target` was already run for another chip, `idf.py fullclean` first.
 | `scan` | I2C probe |
 | `h` | Help |
 
-CT on this prototype is **on/off only** ([DESIGN_NOTE_001](../../docs/DESIGN_NOTE_001_ct_binary_only.md)). At pot = 2 CCW, 3.3 V: relay off ≈ 0 mV rms; contacts closed / no motor ≈ 37 mV; ~0.15 A fan ≈ 175 mV. A threshold around 80–100 mV is the intended discriminator. On A0, `mid` is bias, not current; it walks after large loads.
+CT on this prototype is **on/off only** ([DESIGN_NOTE_001](../../docs/DESIGN_NOTE_001_ct_binary_only.md)). At pot = 2 CCW, 3.3 V: relay off ≈ 0 mV rms; contacts closed / no motor ≈ 37 mV; ~0.15 A fan ≈ 175 mV. A threshold around 80–100 mV is the intended discriminator. On A0, `mid` is bias, not current; it walks after large loads. Missing or unusable CT after `ct_confirm_s` is a **warning only** — the TPO/TPU loop keeps running ([DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md)).
 
 Free-text lines (`ambient`, `open`, …) are not commands; the sketch prints `unknown`.
 
-GPIO8: idle flash, steady when the relay is on, rapid if a warning/fault is latched (stuck-on, max run time, TPO bad, TPO_ONLY, FAULT). Flash over USB with **J7 out**. Do not plug USB while J7 is in.
+GPIO8: idle flash, steady when the relay is on, rapid if a warning/fault is latched (stuck-on, no-CT, max run time, TPO bad, TPO_ONLY, FAULT). Flash over USB with **J7 out**. Do not plug USB while J7 is in.
 
 `prog` names: `tpo_setpoint_c`, `hysteresis_c`, `min_on_time_s`, `min_off_time_s`, `ct_confirm_s`, `min_tpo_tpu_delta_c`, `max_run_time_min`. `save` writes NVS.
 

@@ -39,6 +39,8 @@ Repeated on the **v0.08 protoboard** (2026-08-22), relay ON, same pot seat, `s` 
 
 Loaded vs not is a wide, repeatable gap (≈38 mV vs ≥168 mV). Above ~0.13 A the rms is **not** a usable ampere scale: 2.0 A sits **below** 0.13 A and 0.86 A; 3.6 A reads a bit above 4.1 A; `mid` walks. There is some rise at 4 A+ vs the 0.13–2 A cluster, but not enough to call overcurrent or stall. **Stay boolean.** The 80–100 mV rms threshold is unchanged.
 
+Dummy **AC load** on the v0.08 protoboard relay (human, 2026-08-25): still binary only, and **reliable for that**. No ampere field. Control-loop use of this boolean is warn-only (no `TPO_ONLY`) — [DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md).
+
 The 3.3 V rail was a deliberate match to the ADC (A0 must stay ≤ 3.6 V). A 5 V ZMCT supply might recover some swing; it was not adopted for this prototype. Even then, half-wave / phase-controlled heater modes on the dryer already invert indicated vs clamp-meter amps — this board is not a wattmeter.
 
 ## Firmware contract (prototype)

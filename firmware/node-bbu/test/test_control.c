@@ -118,7 +118,7 @@ int main(void)
     tick_n(&c, s, &p, 1);
     expect(c.mode == BBU_MODE_NORMAL && c.relay_on, "TPU recover keeps RUNNING");
 
-    /* no CT after confirm → TPO_ONLY, does not flap */
+    /* no CT after confirm → warn, stay NORMAL (old box was blind to current) */
     bbu_ctrl_init(&c);
     bbu_ctrl_request_mode(&c, BBU_MODE_NORMAL);
     s.tpo = ok_c(50.0f);
@@ -127,12 +127,12 @@ int main(void)
     tick_n(&c, s, &p, 61);
     expect(c.cycle == BBU_CYCLE_RUNNING, "started");
     tick_n(&c, s, &p, 12);
-    expect(c.mode == BBU_MODE_TPO_ONLY, "no CT → TPO_ONLY");
+    expect(c.mode == BBU_MODE_NORMAL && c.warn_noct, "no CT → warn, stay NORMAL");
     tick_n(&c, s, &p, 5);
-    expect(c.mode == BBU_MODE_TPO_ONLY, "no flap while CT still missing");
+    expect(c.mode == BBU_MODE_NORMAL && c.warn_noct, "no flap while CT still missing");
     s.ct_present = true;
     tick_n(&c, s, &p, 1);
-    expect(c.mode == BBU_MODE_NORMAL, "CT back → NORMAL");
+    expect(c.mode == BBU_MODE_NORMAL && !c.warn_noct, "CT back clears no-CT warn");
 
     /* TPO_ONLY stop does not need TPU delta */
     bbu_ctrl_init(&c);

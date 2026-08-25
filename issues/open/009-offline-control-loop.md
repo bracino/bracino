@@ -9,7 +9,7 @@
 
 Protoboard I/O is good enough to write against. The plant needs a local loop that runs with gateway / broker / USB unplugged.
 
-Control law: [DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md). TPO = TH1/A1, TPU = TH2/A2, AMB = TH3/A3 (print only). CT is confirm-running only.
+Control law: [DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md). TPO = TH1/A1, TPU = TH2/A2, AMB = TH3/A3 (print only). CT is confirm-running only, and **warning only** (2026-08-25): no-current / unusable CT does **not** enter `TPO_ONLY` — stay on the standard TPO/TPU algorithm, same blindness as the old MES-BBU, plus a notice.
 
 ## Expected
 
@@ -17,7 +17,7 @@ On-node: NTC mV → °C with open/short as **fault**; CT as running / not; `NORM
 
 ## Proposal
 
-`control.c` implements the note. Boots MANUAL. `auto` / `sim` for desk proof.
+`control.c` implements the note. Boots MANUAL. `auto` / `sim` for desk proof. Human (2026-08-25): current image flashed and working; dummy AC load validated.
 
 ## Fix
 
@@ -27,6 +27,6 @@ On-node: NTC mV → °C with open/short as **fault**; CT as running / not; `NORM
 
 - [x] Host unit tests (`gcc` on `test_control.c`)
 - [x] Desk `sim` walk-through on the protoboard (human, 2026-08-22): start, stay RUNNING with hot top / cold bottom, stop when charged, FAULT on bad TPO
-- [ ] °C vs a thermometer
-- [ ] Dummy AC load on the relay (not the real BBU pump)
+- [x] Dummy AC load on the relay (human, 2026-08-25; not the real BBU pump). CT still binary, reliable for that
+- [ ] °C vs a thermometer (sensors potted, curing; cal deferred)
 - [ ] Real BBU pump — out of scope until the above
