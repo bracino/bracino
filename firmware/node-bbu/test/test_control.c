@@ -62,6 +62,10 @@ int main(void)
     expect(n.ok && n.c > 27.0f && n.c < 29.0f, "ntc 1760mV ~ 28C");
     expect(!ntc_from_mv(13).ok, "ntc open is fault");
     expect(!ntc_from_mv(3283).ok, "ntc short is fault");
+    n = ntc_from_mv(770);
+    expect(n.ok && n.c > -0.5f && n.c < 1.5f, "ntc 770mV ~ ice");
+    n = ntc_from_mv(3083);
+    expect(n.ok && n.c > 98.0f && n.c < 102.0f, "ntc 3083mV ~ boil");
 
     bbu_ctrl_init(&c);
     expect(c.mode == BBU_MODE_MANUAL && !c.relay_on, "boot MANUAL off");

@@ -22,9 +22,17 @@ The old box had a pump relay and two tank wells. It did **not** have a current s
 
 Correct this table if the physical wells are on different TH pads.
 
-Valid converted range for TPO/TPU: **0–95 °C**. Open, short, or out of that range is a fault, not a temperature. (Hardware rails from bench: open ≈ 13 mV, short ≈ 3283 mV; treat mid ≲ 50 mV or ≳ 3200 mV as unusable before conversion.)
+Valid converted range for TPO/TPU: **−5–110 °C**. Open, short, or out of that range is a fault, not a temperature. Tank **operating** range is still ~18–95 °C; 95 °C is not a sensor ceiling. (Hardware rails from bench: open ≈ 13 mV, short ≈ 3283 mV; treat mid ≲ 50 mV or ≳ 3200 mV as unusable before conversion.)
 
-NTC model: **β = 3950**, R25 = 10 kΩ (assumed NRBE 10 k / 3950; 28 °C ≈ 1760 mV matches this). AMB uses the same conversion for the serial print.
+NTC model: **β = 3950**, R25 = 10 kΩ (NRBE 10 k / 3950). Two-point check on potted sensors (human, 2026-08-25):
+
+| Bath | Typical mid | Firmware °C | Notes |
+|------|-------------|-------------|--------|
+| Ice water | 760–776 mV | 0.2–0.6 °C | All three wells; β is fine at the cold end |
+| Room | ~1500 mV | ~21 °C | While the other well was in the boil |
+| Rolling boil | 3053–3083 mV | 94.8 °C then **FAULT** on the old 0–95 cap | 3083 mV **is** ~100 °C; not a short (short ≈ 3283 mV) |
+
+AMB uses the same conversion for the serial print. No offset applied.
 
 ## Parameters
 
@@ -100,8 +108,8 @@ The loop must run with USB, gateway, and broker absent.
 
 | Condition | Class | Mode |
 |-----------|-------|------|
-| TPO open, short, or not in 0–95 °C | **Critical** | `FAULT` (pump OFF) |
-| TPU open, short, not in 0–95 °C, or TPU > TPO | **Severe** | `TPO_ONLY` |
+| TPO open, short, or not in −5–110 °C | **Critical** | `FAULT` (pump OFF) |
+| TPU open, short, not in −5–110 °C, or TPU > TPO | **Severe** | `TPO_ONLY` |
 | CT = none while RUNNING, after `ct_confirm_s` | **Warning** | stay on the standard algorithm (no `TPO_ONLY`) |
 | CT sample unusable / not a clean running-vs-not | **Warning** | same — do not change start/stop |
 | CT present while relay OFF | **Warning** | no mode change |
@@ -127,7 +135,7 @@ Cool TPU water into the jacket is what makes the boiler fire. No network in this
 - AMB in the start/stop decision (print only)
 - Encoder / TFT **edits** of setpoints (`prog` + NVS first; menus are live/read for now except mode and Manual/Test pump)
 - ESP-NOW / MQTT reporting of warnings/faults
-- Real BBU pump on the bench sketch until 009 has thermometer proof and a plant checklist
+- Real BBU pump on the bench sketch until 009 has a plant checklist
 - CT overcurrent / ampere field (closed: binary only; no-CT is warn only)
 
 ## Related

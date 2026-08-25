@@ -29,7 +29,7 @@ Pins match schematic v0.08 (`hardware/bbu-controller/bbu_controller_prototype_ki
 | A1–A3 | ADS1115 AIN1–3 | TH1/R4, TH2/R5, TH3/R6 (10 kΩ NTC + 10 kΩ to GND) |
 | I2C addr | 0x48 | Module ADDR pulled low |
 
-Bench (2026-08-15 breadboard, repeated 2026-08-22 on the v0.08 protoboard): coil toggles as commanded and holds; protoboard also switches bench loads. Lab **28 °C**: A1–A3 mid ~1760 mV, rms 0; warming raises mid, cooling lowers it. A3 open → 13 mV; A3 short → 3283 mV. CT ~0.13 A ≈ 170 mV rms vs ~37 mV contacts-closed / no load. Heartbeat confirmed on external 5 V (USB unplugged). Human (2026-08-25): current image flashed and working; dummy AC load on the relay validated (CT still binary, reliable for running/not); NTC cables built; sensors potted, curing. Do not put the real BBU pump on this sketch.
+Bench (2026-08-15 breadboard, repeated 2026-08-22 on the v0.08 protoboard): coil toggles as commanded and holds; protoboard also switches bench loads. Lab **28 °C**: A1–A3 mid ~1760 mV, rms 0; warming raises mid, cooling lowers it. A3 open → 13 mV; A3 short → 3283 mV. CT ~0.13 A ≈ 170 mV rms vs ~37 mV contacts-closed / no load. Heartbeat confirmed on external 5 V (USB unplugged). Human (2026-08-25): current image flashed and working; dummy AC load on the relay validated (CT still binary, reliable for running/not); NTC cables built; sensors potted. Ice water ~0.4 °C (770 mV); boiling ~100 °C (3083 mV). Conversion range **−5–110 °C** so boil is a temperature, not FAULT. Do not put the real BBU pump on this sketch.
 
 ### Build / flash
 

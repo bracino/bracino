@@ -23,7 +23,7 @@ Breadboard (2026-08-14 / 15): rails OK; I2C 0x48; CT pot 2 CCW — idle vs ~0.15
 
 Protoboard (human-reported 2026-08-22): same suite passed — heartbeat on external 5 V, relay switches loads, coil and NTCs reasonable.
 
-Desk `sim` of the loop passed (2026-08-22). Dummy **AC load** on the relay validated (human, 2026-08-25): CT still binary, reliable for running/not. NTC cables built and good; sensors potted, curing. Still needed: °C vs thermometer (deferred until potting is done); **server/gateway down** still correct; plant checklist before an unattended real BBU pump. Do not hang the real pump on this image yet.
+Desk `sim` of the loop passed (2026-08-22). Dummy **AC load** on the relay validated (human, 2026-08-25): CT still binary, reliable for running/not. NTC cables built and good; sensors potted. Ice / boil two-point (2026-08-25): ice ~0.4 °C; boil ~100 °C was FAULT on the 95 °C cap. Still needed: **server/gateway down** still correct; plant checklist before an unattended real BBU pump. Do not hang the real pump on this image yet.
 
 ## Fix
 
