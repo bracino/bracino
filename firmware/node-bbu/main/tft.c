@@ -3,38 +3,28 @@
 #include <string.h>
 
 #include "driver/gpio.h"
+#include "driver/spi_master.h"
+#include "esp_err.h"
+#include "esp_lcd_panel_commands.h"
+#include "esp_lcd_panel_io.h"
+#include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#define ST7735_SWRESET 0x01
-#define ST7735_SLPOUT  0x11
-#define ST7735_NORON   0x13
-#define ST7735_INVOFF  0x20
-#define ST7735_DISPON  0x29
-#define ST7735_CASET   0x2A
-#define ST7735_RASET   0x2B
-#define ST7735_RAMWR   0x2C
-#define ST7735_MADCTL  0x36
-#define ST7735_COLMOD  0x3A
-#define ST7735_FRMCTR1 0xB1
-#define ST7735_FRMCTR2 0xB2
-#define ST7735_FRMCTR3 0xB3
-#define ST7735_INVCTR  0xB4
-#define ST7735_PWCTR1  0xC0
-#define ST7735_PWCTR2  0xC1
-#define ST7735_PWCTR3  0xC2
-#define ST7735_PWCTR4  0xC3
-#define ST7735_PWCTR5  0xC4
-#define ST7735_VMCTR1  0xC5
-#define ST7735_GMCTRP1 0xE0
-#define ST7735_GMCTRN1 0xE1
+#define TAG "tft"
 
-/* Many MSP1803 / “green tab” 128x160 panels. */
-#define XSTART 2
-#define YSTART 1
+/*
+ * Green-tab 128x160 (MSP1803). Portrait was MADCTL 0xC8, gap 2/1.
+ * Landscape = Adafruit ST7735 rotation 1 + BGR: MY|MV|BGR, gaps swapped.
+ * First pixel is written in logical raster order; retune MADCTL/gaps on bench
+ * if the image is mirrored or shifted.
+ */
+#define XSTART 1
+#define YSTART 2
+#define MADCTL_LAND  (LCD_CMD_MY_BIT | LCD_CMD_MV_BIT | LCD_CMD_BGR_BIT)
 
-#define ROW_H  16
-#define CHAR_W 6
+#define STRIP_H  16
+#define SPI_HZ   (10 * 1000 * 1000)
 
 static const uint8_t FONT5X7[95][5] = {
     {0x00, 0x00, 0x00, 0x00, 0x00},
@@ -134,30 +124,27 @@ static const uint8_t FONT5X7[95][5] = {
     {0x2A, 0x55, 0x2A, 0x55, 0x2A},
 };
 
-static void wr_gpio(gpio_num_t pin, int v)
+static esp_lcd_panel_io_handle_t s_io;
+static uint16_t s_strip[TFT_W * STRIP_H];
+static uint16_t s_glyph[TFT_CHAR_W * TFT_CHAR_H];
+
+static uint16_t be16(uint16_t c)
 {
-    gpio_set_level(pin, v);
+    return (uint16_t)((c << 8) | (c >> 8));
 }
 
-static void spi_byte(uint8_t b)
+static void cmd(int c)
 {
-    for (int i = 7; i >= 0; i--) {
-        wr_gpio(TFT_PIN_SDA, (b >> i) & 1);
-        wr_gpio(TFT_PIN_SCK, 1);
-        wr_gpio(TFT_PIN_SCK, 0);
+    if (s_io) {
+        esp_lcd_panel_io_tx_param(s_io, c, NULL, 0);
     }
 }
 
-static void cmd(uint8_t c)
+static void cmd_data(int c, const uint8_t *d, size_t n)
 {
-    wr_gpio(TFT_PIN_DC, 0);
-    spi_byte(c);
-}
-
-static void data(uint8_t d)
-{
-    wr_gpio(TFT_PIN_DC, 1);
-    spi_byte(d);
+    if (s_io) {
+        esp_lcd_panel_io_tx_param(s_io, c, d, n);
+    }
 }
 
 static void window(int x, int y, int w, int h)
@@ -166,22 +153,23 @@ static void window(int x, int y, int w, int h)
     int x1 = x + w - 1 + XSTART;
     int y0 = y + YSTART;
     int y1 = y + h - 1 + YSTART;
-    cmd(ST7735_CASET);
-    data(0);
-    data((uint8_t)x0);
-    data(0);
-    data((uint8_t)x1);
-    cmd(ST7735_RASET);
-    data(0);
-    data((uint8_t)y0);
-    data(0);
-    data((uint8_t)y1);
-    cmd(ST7735_RAMWR);
+    uint8_t caset[4] = {0, (uint8_t)x0, 0, (uint8_t)x1};
+    uint8_t raset[4] = {0, (uint8_t)y0, 0, (uint8_t)y1};
+    cmd_data(LCD_CMD_CASET, caset, 4);
+    cmd_data(LCD_CMD_RASET, raset, 4);
+}
+
+static void send_color(const uint16_t *buf, size_t nbytes)
+{
+    if (!s_io || nbytes == 0) {
+        return;
+    }
+    esp_lcd_panel_io_tx_color(s_io, LCD_CMD_RAMWR, buf, nbytes);
 }
 
 void tft_fill_rect(int x, int y, int w, int h, uint16_t color)
 {
-    if (w <= 0 || h <= 0) {
+    if (!s_io || w <= 0 || h <= 0) {
         return;
     }
     if (x < 0) {
@@ -201,12 +189,18 @@ void tft_fill_rect(int x, int y, int w, int h, uint16_t color)
     if (w <= 0 || h <= 0) {
         return;
     }
-    window(x, y, w, h);
-    wr_gpio(TFT_PIN_DC, 1);
-    uint32_t n = (uint32_t)w * (uint32_t)h;
-    for (uint32_t i = 0; i < n; i++) {
-        spi_byte((uint8_t)(color >> 8));
-        spi_byte((uint8_t)(color & 0xFF));
+
+    uint16_t px = be16(color);
+    while (h > 0) {
+        int rows = h < STRIP_H ? h : STRIP_H;
+        int n = w * rows;
+        window(x, y, w, rows);
+        for (int i = 0; i < n; i++) {
+            s_strip[i] = px;
+        }
+        send_color(s_strip, (size_t)n * 2);
+        y += rows;
+        h -= rows;
     }
 }
 
@@ -217,113 +211,163 @@ void tft_fill(uint16_t color)
 
 void tft_char(int x, int y, char c, uint16_t fg, uint16_t bg)
 {
+    if (!s_io) {
+        return;
+    }
     unsigned idx = (unsigned)(uint8_t)c;
     if (idx < 0x20 || idx > 0x7E) {
         idx = (unsigned)'?';
     }
     const uint8_t *g = FONT5X7[idx - 0x20];
-    window(x, y, 6, 8);
-    wr_gpio(TFT_PIN_DC, 1);
-    /* MY makes the first RAM write land at the bottom of the window, so
-     * send font rows bottom-first (bit0 = top of glyph). */
-    for (int row = 0; row < 8; row++) {
-        int bit = 6 - row;
-        for (int col = 0; col < 6; col++) {
-            uint16_t px = bg;
-            if (col < 5 && bit >= 0 && (g[col] & (1u << bit))) {
-                px = fg;
+    uint16_t fgbe = be16(fg);
+    uint16_t bgbe = be16(bg);
+
+    for (int fr = 0; fr < 8; fr++) {
+        for (int fc = 0; fc < 6; fc++) {
+            uint16_t px = bgbe;
+            if (fc < 5 && (g[fc] & (1u << fr))) {
+                px = fgbe;
             }
-            spi_byte((uint8_t)(px >> 8));
-            spi_byte((uint8_t)(px & 0xFF));
+            int xx = fc * 2;
+            int yy = fr * 2;
+            s_glyph[yy * TFT_CHAR_W + xx] = px;
+            s_glyph[yy * TFT_CHAR_W + xx + 1] = px;
+            s_glyph[(yy + 1) * TFT_CHAR_W + xx] = px;
+            s_glyph[(yy + 1) * TFT_CHAR_W + xx + 1] = px;
         }
     }
+    window(x, y, TFT_CHAR_W, TFT_CHAR_H);
+    send_color(s_glyph, sizeof(s_glyph));
 }
 
 void tft_text(int x, int y, const char *s, uint16_t fg, uint16_t bg)
 {
-    while (*s && x <= TFT_W - 6) {
+    while (*s && x <= TFT_W - TFT_CHAR_W) {
         tft_char(x, y, *s++, fg, bg);
-        x += CHAR_W;
+        x += TFT_CHAR_W;
     }
 }
 
 void tft_text_row(int row, const char *s, uint16_t fg, uint16_t bg)
 {
-    char buf[22];
-    memset(buf, ' ', 21);
-    buf[21] = '\0';
-    size_t n = strlen(s);
-    if (n > 21) {
-        n = 21;
+    char buf[TFT_COLS + 1];
+    memset(buf, ' ', TFT_COLS);
+    buf[TFT_COLS] = '\0';
+    if (s) {
+        size_t n = strlen(s);
+        if (n > TFT_COLS) {
+            n = TFT_COLS;
+        }
+        memcpy(buf, s, n);
     }
-    memcpy(buf, s, n);
-    tft_text(2, row * ROW_H + 4, buf, fg, bg);
+    if (row < 0) {
+        row = 0;
+    }
+    if (row >= TFT_ROWS) {
+        row = TFT_ROWS - 1;
+    }
+    tft_text(TFT_TEXT_X, row * TFT_CHAR_H, buf, fg, bg);
 }
 
-void tft_init(void)
+static void hw_reset(void)
 {
     gpio_config_t io = {
-        .pin_bit_mask = (1ULL << TFT_PIN_SCK) | (1ULL << TFT_PIN_SDA) |
-                        (1ULL << TFT_PIN_DC) | (1ULL << TFT_PIN_RST),
+        .pin_bit_mask = 1ULL << TFT_PIN_RST,
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE,
     };
     gpio_config(&io);
-    wr_gpio(TFT_PIN_SCK, 0);
-    wr_gpio(TFT_PIN_SDA, 0);
-    wr_gpio(TFT_PIN_DC, 0);
-    wr_gpio(TFT_PIN_RST, 1);
+    gpio_set_level(TFT_PIN_RST, 1);
     vTaskDelay(pdMS_TO_TICKS(10));
-    wr_gpio(TFT_PIN_RST, 0);
+    gpio_set_level(TFT_PIN_RST, 0);
     vTaskDelay(pdMS_TO_TICKS(20));
-    wr_gpio(TFT_PIN_RST, 1);
+    gpio_set_level(TFT_PIN_RST, 1);
     vTaskDelay(pdMS_TO_TICKS(120));
+}
 
-    cmd(ST7735_SWRESET);
+static void panel_init_cmds(void)
+{
+    cmd(LCD_CMD_SWRESET);
     vTaskDelay(pdMS_TO_TICKS(150));
-    cmd(ST7735_SLPOUT);
+    cmd(LCD_CMD_SLPOUT);
     vTaskDelay(pdMS_TO_TICKS(150));
 
-    cmd(ST7735_FRMCTR1); data(0x01); data(0x2C); data(0x2D);
-    cmd(ST7735_FRMCTR2); data(0x01); data(0x2C); data(0x2D);
-    cmd(ST7735_FRMCTR3);
-    data(0x01); data(0x2C); data(0x2D);
-    data(0x01); data(0x2C); data(0x2D);
-    cmd(ST7735_INVCTR); data(0x07);
-    cmd(ST7735_PWCTR1); data(0xA2); data(0x02); data(0x84);
-    cmd(ST7735_PWCTR2); data(0xC5);
-    cmd(ST7735_PWCTR3); data(0x0A); data(0x00);
-    cmd(ST7735_PWCTR4); data(0x8A); data(0x2A);
-    cmd(ST7735_PWCTR5); data(0x8A); data(0xEE);
-    cmd(ST7735_VMCTR1); data(0x0E);
-    cmd(ST7735_INVOFF);
-    cmd(ST7735_MADCTL); data(0xC8); /* MX | MY | BGR */
-    cmd(ST7735_COLMOD); data(0x05);
-    cmd(ST7735_GMCTRP1);
-    {
-        static const uint8_t gp[] = {
-            0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D,
-            0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10
-        };
-        for (unsigned i = 0; i < sizeof(gp); i++) {
-            data(gp[i]);
-        }
-    }
-    cmd(ST7735_GMCTRN1);
-    {
-        static const uint8_t gn[] = {
-            0x03, 0x1D, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D,
-            0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10
-        };
-        for (unsigned i = 0; i < sizeof(gn); i++) {
-            data(gn[i]);
-        }
-    }
-    cmd(ST7735_NORON);
+    const uint8_t frm1[] = {0x01, 0x2C, 0x2D};
+    const uint8_t frm3[] = {0x01, 0x2C, 0x2D, 0x01, 0x2C, 0x2D};
+    cmd_data(0xB1, frm1, sizeof(frm1));
+    cmd_data(0xB2, frm1, sizeof(frm1));
+    cmd_data(0xB3, frm3, sizeof(frm3));
+    const uint8_t invctr = 0x07;
+    cmd_data(0xB4, &invctr, 1);
+    const uint8_t pw1[] = {0xA2, 0x02, 0x84};
+    const uint8_t pw2 = 0xC5;
+    const uint8_t pw3[] = {0x0A, 0x00};
+    const uint8_t pw4[] = {0x8A, 0x2A};
+    const uint8_t pw5[] = {0x8A, 0xEE};
+    const uint8_t vm = 0x0E;
+    cmd_data(0xC0, pw1, sizeof(pw1));
+    cmd_data(0xC1, &pw2, 1);
+    cmd_data(0xC2, pw3, sizeof(pw3));
+    cmd_data(0xC3, pw4, sizeof(pw4));
+    cmd_data(0xC4, pw5, sizeof(pw5));
+    cmd_data(0xC5, &vm, 1);
+    cmd(LCD_CMD_INVOFF);
+    const uint8_t madctl = MADCTL_LAND;
+    cmd_data(LCD_CMD_MADCTL, &madctl, 1);
+    const uint8_t colmod = 0x05;
+    cmd_data(LCD_CMD_COLMOD, &colmod, 1);
+    static const uint8_t gp[] = {
+        0x02, 0x1C, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2D,
+        0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10
+    };
+    static const uint8_t gn[] = {
+        0x03, 0x1D, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D,
+        0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10
+    };
+    cmd_data(0xE0, gp, sizeof(gp));
+    cmd_data(0xE1, gn, sizeof(gn));
+    cmd(LCD_CMD_NORON);
     vTaskDelay(pdMS_TO_TICKS(10));
-    cmd(ST7735_DISPON);
+    cmd(LCD_CMD_DISPON);
     vTaskDelay(pdMS_TO_TICKS(100));
+}
+
+void tft_init(void)
+{
+    spi_bus_config_t bus = {
+        .sclk_io_num = TFT_PIN_SCK,
+        .mosi_io_num = TFT_PIN_SDA,
+        .miso_io_num = -1,
+        .quadwp_io_num = -1,
+        .quadhd_io_num = -1,
+        .max_transfer_sz = TFT_W * STRIP_H * 2 + 8,
+    };
+    esp_err_t err = spi_bus_initialize(SPI2_HOST, &bus, SPI_DMA_CH_AUTO);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "spi bus %s", esp_err_to_name(err));
+        return;
+    }
+
+    esp_lcd_panel_io_spi_config_t io_cfg = {
+        .cs_gpio_num = -1,
+        .dc_gpio_num = TFT_PIN_DC,
+        .spi_mode = 0,
+        .pclk_hz = SPI_HZ,
+        .trans_queue_depth = 4,
+        .lcd_cmd_bits = 8,
+        .lcd_param_bits = 8,
+    };
+    err = esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)SPI2_HOST,
+                                   &io_cfg, &s_io);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "panel io %s", esp_err_to_name(err));
+        s_io = NULL;
+        return;
+    }
+
+    hw_reset();
+    panel_init_cmds();
     tft_fill(COL_BG);
 }

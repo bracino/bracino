@@ -675,7 +675,7 @@ void app_main(void)
     params_print();
     print_help();
     ui_init(s_mu, &s_ctrl, params_get, apply_ctrl);
-    xTaskCreate(ui_task, "ui", 4096, NULL, 1, NULL);
+    xTaskCreate(ui_task, "ui", 8192, NULL, 1, NULL);
     xTaskCreate(monitor_task, "mon", 4096, NULL, 2, NULL);
     printf("> ");
     fflush(stdout);

@@ -2,19 +2,28 @@
 
 #include <stdint.h>
 
-/* v0.08 netlist: bit-bang ST7735S, CS tied to GND. LED always on via R3. */
+/* v0.08 netlist: ST7735S on SPI2. CS tied to GND. LED always on via R3. */
 #define TFT_PIN_SCK   9
 #define TFT_PIN_SDA   4
 #define TFT_PIN_DC    3
 #define TFT_PIN_RST   2
 
-#define TFT_W         128
-#define TFT_H         160
+/* Landscape 160x128. 12x16 cells → 13 columns, 8 rows. */
+#define TFT_W         160
+#define TFT_H         128
+#define TFT_COLS      13
+#define TFT_ROWS      8
+#define TFT_CHAR_W    12
+#define TFT_CHAR_H    16
+#define TFT_TEXT_X    2
 
 #define COL_BG        0x0000
 #define COL_FG        0xFFFF
+#define COL_HEADER    0x07FF
+#define COL_FOOTER    0x07FF
+#define COL_FOCUS     0xFFE0
+#define COL_EDIT      0xFD20
 #define COL_DIM       0x8410
-#define COL_ACCENT    0xFFE0
 #define COL_OK        0x07E0
 #define COL_WARN      0xFD20
 #define COL_BAD       0xF800

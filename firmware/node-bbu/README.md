@@ -10,7 +10,7 @@ See root `README.md`, `AGENTS.md`. Kickoff history (stale OK): `docs/project_slu
 
 Local loop lives in `control.c` ([DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md)). **Boots Manual** / coil OFF. User modes: **Auto** / **Manual** / **Test** / **Off** (there is no Normal). `auto` runs the TPO/TPU loop. `halt` is Off. A1=TPO, A2=TPU, A3=AMB (printed, never used for control). NTC β=**3950**. CT is loaded / not.
 
-TFT + encoder (breadboard, issue 010): bit-bang ST7735S on GPIO9 SCK / GPIO4 SDA / GPIO3 DC / GPIO2 RESET (CS tied GND). Encoder A/B/SW = GPIO0 / GPIO1 / GPIO5, internal pull-ups. Click enters; hold ~0.8 s returns Home. Home shows `enc N` while you turn; serial `enc` prints A/B/SW.
+TFT + encoder (breadboard, issue 010): ST7735S on hardware SPI2 + DMA (GPIO9 SCK / GPIO4 SDA / GPIO3 DC / GPIO2 RESET, CS tied GND). Landscape 160×128, 12×16 cells. Encoder A/B/SW = GPIO0 / GPIO1 / GPIO5; A/B are a GPIO ISR gray-code decoder (C3 has no PCNT), SW is polled. Click enters; hold ~0.8 s returns Home. Serial `enc` prints A/B/SW.
 
 Pins match schematic v0.08 (`hardware/bbu-controller/bbu_controller_prototype_kicad/` — use the BOM/netlist, not `.kicad_sch`):
 
@@ -18,7 +18,7 @@ Pins match schematic v0.08 (`hardware/bbu-controller/bbu_controller_prototype_ki
 |-----|-----|--------|
 | RELAY | GPIO10 | Via Q1 2N3904 (R1 2 kΩ base): GPIO10 **high** = coil ON. Boot holds the pad **low**. On-board WS2812 unused (stays dark). |
 | HEART | GPIO8 | Idle 100 ms on / 900 ms off; RUNNING steady; alert 300/300 ms. |
-| TFT_SCK | GPIO9 | ST7735S SCK (bit-bang). Also BOOT strap — idle high after reset. |
+| TFT_SCK | GPIO9 | ST7735S SCK (SPI2). Also BOOT strap — idle high after reset. |
 | TFT_SDA | GPIO4 | ST7735S MOSI |
 | TFT_AO | GPIO3 | ST7735S DC (A0) |
 | TFT_RESET | GPIO2 | ST7735S RESET; 4.7 kΩ pull-up. CS tied GND. LED always on. |
