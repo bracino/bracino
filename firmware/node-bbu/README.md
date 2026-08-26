@@ -10,7 +10,7 @@ See root `README.md`, `AGENTS.md`. Kickoff history (stale OK): `docs/project_slu
 
 Local loop lives in `control.c` ([DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md)). **Boots Manual** / coil OFF. User modes: **Auto** / **Manual** / **Test** / **Off** (there is no Normal). `auto` runs the TPO/TPU loop. `halt` is Off. A1=TPO, A2=TPU, A3=AMB (printed, never used for control). NTC β=**3950**. CT is loaded / not.
 
-TFT + encoder (breadboard, issue 010): ST7735S on hardware SPI2 + DMA (GPIO9 SCK / GPIO4 SDA / GPIO3 DC / GPIO2 RESET, CS tied GND). Landscape 160×128, 12×16 cells. Encoder A/B/SW = GPIO0 / GPIO1 / GPIO5; A/B are a GPIO ISR gray-code decoder (C3 has no PCNT), SW is polled. Click enters; hold ~0.8 s returns Home. Serial `enc` prints A/B/SW.
+TFT + encoder (breadboard, issue 010): ST7735S on hardware SPI2 + DMA (GPIO9 SCK / GPIO4 SDA / GPIO3 DC / GPIO2 RESET, CS tied GND). Landscape 160×128, 8-row grid. Encoder A/B/SW = GPIO0 / GPIO1 / GPIO5; A/B are a GPIO ISR gray-code decoder (C3 has no PCNT), SW is polled. Click enters; hold ~0.8 s returns Home. Serial `enc` prints A/B/SW. Human (2026-08-26): image runs, encoder much better; doubled 6×8 font is rejected — next is a real 12×16 bitmap.
 
 Pins match schematic v0.08 (`hardware/bbu-controller/bbu_controller_prototype_kicad/` — use the BOM/netlist, not `.kicad_sch`):
 

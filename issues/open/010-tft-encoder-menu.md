@@ -13,7 +13,7 @@ User modes (no “Normal”): **Auto** (TPO/TPU loop), **Manual** (user coil), *
 
 ## Expected
 
-Landscape 160×128, 12×16 cells (13×8). Header (row 0) and footer (row 7) fixed; rows 1–6 are a scrolling viewport (`topIndex` follows cursor). Dark theme: black / cyan frame / white / yellow focus / amber edit (edit unused this pass).
+Landscape 160×128, 8-row grid (header / 6-row window / footer). Dark theme: black / cyan frame / white / yellow focus / amber edit (edit unused this pass). Font: a **real** 12×16 bitmap (13 columns) — doubled 6×8 was rejected on the bench.
 
 Hardware SPI2 + DMA via `esp_lcd` panel IO (CS tied GND → `cs_gpio_num = -1`). Encoder is GPIO ISR + gray-code table (C3 has no PCNT); switch stays software debounce. Control loop must keep running if the panel is unplugged or garbled.
 
@@ -29,16 +29,18 @@ C3 has no `pulse_cnt`. Do not add LVGL. Do not use in-tree `esp_lcd_new_panel_st
 
 `firmware/node-bbu/main/{tft,enc,ui}.c`. Modes in `control.c`.
 
-Bench 2026-08-25: glyphs were Y-mirrored (ST7735 MY vs char RAM order); 2 Hz dark bar was full-row `fill_rect` at 500 ms; Home had only one cursor item so rotation looked dead. Glyphs sent bottom-first; live lines are cached (no row wipe); Home shows `enc N`; decoder is debounced A-edge. Serial `enc` prints A/B/SW. Gamma tables added. Human: LED brighter with **R3 = 100 Ω** (was 220). Encoder **works but bouncy** — human later confirmed the module is fine; bounce is software (5 ms A-edge poll).
+Bench 2026-08-25: glyphs were Y-mirrored (ST7735 MY vs char RAM order); 2 Hz dark bar was full-row `fill_rect` at 500 ms; Home had only one cursor item so rotation looked dead. Glyphs sent bottom-first; live lines are cached (no row wipe). Serial `enc` prints A/B/SW. Gamma tables added. Human: LED brighter with **R3 = 100 Ω** (was 220). Old A-edge poll was bouncy; module is fine.
 
-In tree, not bench-checked: landscape + 12×16 (6×8 doubled), SPI2 DMA, ISR quadrature (÷4 detents), 8-row header/window/footer.
+Human 2026-08-26: `c9ca914` loads and runs. ISR quadrature encoder is **much better**. Doubled 6×8 font is **unacceptable** — replace before more menu polish.
 
 ## Verify
 
 - [x] Splash then Home on the breadboard TFT (human, 2026-08-25; after glyph + flicker fix)
-- [x] Encoder rotate is detected; click enters. **Bouncy** on the old A-edge poll — module is fine
-- [ ] Landscape 12×16 Home + menus look right (MADCTL/gaps may need a one-line tweak)
-- [ ] Encoder: one detent per menu step, no extra counts
+- [x] Encoder rotate is detected; click enters (2026-08-25)
+- [x] ISR gray-code encoder is usable (human, 2026-08-26 — “much better”)
+- [x] Landscape rewrite loads and runs (human, 2026-08-26)
+- [ ] Replace doubled 6×8 with a real 12×16 bitmap (human: current font unacceptable)
+- [ ] MADCTL/gaps if the image is shifted or mirrored
 - [ ] System Data (8 items) scrolls the 6-row window
 - [ ] Control Program cycles Auto / Manual / Test / Off; pump toggle only in Manual/Test
 - [ ] Loop still ticks with the panel disconnected (serial `st`)

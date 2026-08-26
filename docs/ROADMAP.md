@@ -28,7 +28,7 @@ Preferred order when something has to wait:
 - [x] Dummy AC load on the relay (human, 2026-08-25); CT still binary, reliable for that
 - [x] Ice / boil two-point on potted NTCs (human, 2026-08-25); β=3950 holds; 95 °C cap was too tight
 - [ ] Gateway still empty
-- [ ] TFT + encoder breadboard (010): landscape 12×16 + ISR encoder in tree; needs a flash to confirm MADCTL and one-detent-per-step
+- [ ] TFT + encoder breadboard (010): landscape + ISR encoder **runs** (2026-08-26); replace doubled 6×8 font, then remaining menu checks
 - [ ] Node-RED flow structure + first useful views
 - [ ] InfluxDB backup/retention (NAS + cloud) — policy before years of data matter
 
@@ -48,7 +48,7 @@ Preferred order when something has to wait:
 - [x] Same loop on dummy AC load (human, 2026-08-25); no real BBU pump yet
 - [x] Ice / boil two-point on the potted NTCs (human, 2026-08-25)
 - [ ] Plant install (no real BBU pump yet)
-- [ ] TFT + encoder: bench the landscape/ISR rewrite, then UI protoboard
+- [ ] TFT + encoder: real 12×16 font (010), then UI protoboard
 - [ ] Gateway builds; ESP-NOW bring-up with control node
 - [ ] MQTT publish path + retained state / LWT
 - [ ] `server/docker-compose.yml` + Mosquitto config in git
