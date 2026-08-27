@@ -337,7 +337,7 @@ static void draw_diag(const bbu_ctrl_t *c, const ui_live_t *lv)
     }
     cell(items[1], sizeof(items[1]), "Pump CT  %4s", ct);
     cell(items[2], sizeof(items[2]), "Last   %6s", fault_txt(c->last_fault));
-    cell(items[3], sizeof(items[3]), "FW   12x16 UI");
+    cell(items[3], sizeof(items[3]), "FW    8x16 UI");
     cell(items[4], sizeof(items[4]), "Back");
     for (int i = 0; i < 5; i++) {
         pitems[i] = items[i];
