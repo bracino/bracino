@@ -1,12 +1,12 @@
 # Status
 
-**As of:** 2026-08-26  
+**As of:** 2026-08-27  
 **Phase:** 1 — prototype (BBU control node + WiFi gateway)  
 **Repo:** https://github.com/bracino/bracino
 
 ## Summary
 
-Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08**). The **protoboard is soldered to v0.08** and has passed the same I/O tests as the breadboard. `firmware/node-bbu` runs the offline loop ([DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md)): boots **Manual**, `auto` / `sim` / `halt` on the desk. Human-reported **desk `sim` walk-through passed** (2026-08-22). Human-reported (2026-08-25): dummy **AC load** validated; NTC ice/boil two-point; USB safety block fabricated; TFT+encoder on breadboard (glyphs/flicker fixed). Human-reported (2026-08-26): landscape/SPI2/ISR image **loads and runs**; encoder is **much better**; doubled 6×8 font is **unacceptable**. Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
+Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08**). The **protoboard is soldered to v0.08** and has passed the same I/O tests as the breadboard. `firmware/node-bbu` runs the offline loop ([DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md)): boots **Manual**, `auto` / `sim` / `halt` on the desk. Human-reported **desk `sim` walk-through passed** (2026-08-22). Human-reported (2026-08-25): dummy **AC load** validated; NTC ice/boil two-point; USB safety block fabricated; TFT+encoder on breadboard (glyphs/flicker fixed). Human-reported (2026-08-26): landscape/SPI2/ISR image **loads and runs**; encoder is **much better**; doubled 6×8 font is **unacceptable**. Human-reported (2026-08-27): TFT+encoder **on the protoboard**; Modern DOS 8×16 is **readable**; first column visible (col 0 blank); no junk column. Encoder rotate still flaky; switch double-fires. Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
 
 CT no-current / unusable is **warning only** — stay on the standard algorithm (same blindness as the old MES-BBU, plus a notice). `TPO_ONLY` is for TPU faults only.
 
@@ -20,7 +20,7 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | Root README / AGENTS / MIT license | Solid |
 | STATUS / ROADMAP / issues notebook | Process solid; this file tracks bench reality |
 | Control-node HW definition | **Settled for the module proto** — ADR 001 + KiCad **v0.08**. Protoboard built |
-| `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002. User modes **Auto / Manual / Test / Off**. Dummy AC load OK. Ice/boil NTCs OK (conversion −5–110 °C). TFT landscape + SPI2 DMA **runs** (2026-08-26). ISR encoder **much better**. Font (6×8 doubled) **rejected**. Boots Manual |
+| `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002. User modes **Auto / Manual / Test / Off**. Dummy AC load OK. Ice/boil NTCs OK (conversion −5–110 °C). TFT landscape + SPI2 DMA + Modern DOS 8×16 **readable on protoboard** (2026-08-27). ISR encoder rotate **flaky**; switch **double-clicks**. Boots Manual |
 | `gateway` firmware | **Not started** |
 | MQTT topic + payload schema | **Not decided** |
 | ESP-NOW payload schema | **Not decided** |
@@ -61,9 +61,11 @@ KiCad **v0.08** BOM / netlist (do not treat `.kicad_sch` as the agent-readable s
 - **J7**: 2-pin jumper, **5 V only**. **In** = buck VO (`+5V_VO`) → board `+5 V` (C3 5 V pin included). **Out** = buck isolated from the rail even if 12 V is still on the inlet; USB free. GND unswitched. Mechanical USB-blocking holder **fabricated** (2026-08-25).
 - **F1** PPTC is in the schematic; not fitted on this article.
 
-Human-reported (2026-08-25): current image flashed and working; dummy AC load on the relay validated (CT still binary, reliable for running/not); NTC cables built and tested good; sensors potted. Ice water: TPO/TPU/AMB **0.2–0.6 °C** at **760–776 mV**. Boiling: AMB then TPO/TPU climb to **94.8 °C / 3053 mV**, then **FAULT at 3063–3083 mV** — that is ~100 °C hitting the old 95 °C software cap, not a short (short ≈ 3283 mV). TFT LED brighter with **R3 = 100 Ω** (schematic still 220 Ω). Encoder module is fine; bounce was the 5 ms A-edge poll. Human (2026-08-26): ISR rewrite **loads and runs**, encoder **much better**; doubled 6×8 font **rejected** — next is a real 12×16 bitmap ([010](../issues/open/010-tft-encoder-menu.md)).
+Human-reported (2026-08-25): current image flashed and working; dummy AC load on the relay validated (CT still binary, reliable for running/not); NTC cables built and tested good; sensors potted. Ice water: TPO/TPU/AMB **0.2–0.6 °C** at **760–776 mV**. Boiling: AMB then TPO/TPU climb to **94.8 °C / 3053 mV**, then **FAULT at 3063–3083 mV** — that is ~100 °C hitting the old 95 °C software cap, not a short (short ≈ 3283 mV). TFT LED brighter with **R3 = 100 Ω** (schematic still 220 Ω). Encoder module is fine; bounce was the 5 ms A-edge poll. Human (2026-08-26): ISR rewrite **loads and runs**, encoder **much better**; doubled 6×8 font **rejected**.
 
-Still open on the protoboard: connector / jumper labels, PPTC when stock arrives. UI (TFT + encoder) is on a **breadboard** for validation ([010](../issues/open/010-tft-encoder-menu.md)); not on the protoboard yet. Do not put the real BBU pump on this image yet.
+Human (2026-08-27): UI moved onto the **protoboard**. Modern DOS 8×16 (CC0, 20×8 grid, col 0 blank) is **readable**, upright, LTR; no right-edge junk. MADCTL stays MY|MV|BGR with software X/Y flip (MX|MV made glyphs worse). Encoder rotate **sometimes OK**; switch **double-clicks** (hard to enter a menu without bouncing back). Remaining 010: debounce/scroll, System Data, Control Program, `st` with panel unplugged.
+
+Still open on the protoboard: connector / jumper labels, PPTC when stock arrives. Do not put the real BBU pump on this image yet.
 
 Shared ESP-IDF is under `~/projects/share/lib/esp/esp-idf`.
 
