@@ -14,12 +14,11 @@
 #define TAG "tft"
 
 /*
- * Green-tab 128x160 (MSP1803). Portrait was MADCTL 0xC8, gap 2/1.
- * Landscape = Adafruit ST7735 rotation 1 + BGR: MY|MV|BGR, gaps swapped.
- * First pixel is written in logical raster order; retune MADCTL/gaps on bench
- * if the image is mirrored or shifted.
+ * Green-tab 128x160 (MSP1803). Landscape MADCTL MY|MV|BGR (Adafruit rot 1).
+ * window() flips X and Y so callers keep top-left origin + LTR text under MY.
+ * XSTART 0 keeps 20x8 rows inside visible GRAM (XSTART 1 clipped a column).
  */
-#define XSTART 1
+#define XSTART 0
 #define YSTART 2
 #define MADCTL_LAND  (LCD_CMD_MY_BIT | LCD_CMD_MV_BIT | LCD_CMD_BGR_BIT)
 
@@ -151,8 +150,8 @@ static void cmd_data(int c, const uint8_t *d, size_t n)
 
 static void window(int x, int y, int w, int h)
 {
-    /* MY: RAM row 0 is the visual bottom of the glass. Invert Y so callers
-     * keep a top-left origin (UI row 0 = header at the top). */
+    /* MY|MV landscape: flip both axes so callers keep top-left + LTR. */
+    x = TFT_W - x - w;
     y = TFT_H - y - h;
     int x0 = x + XSTART;
     int x1 = x + w - 1 + XSTART;
@@ -227,12 +226,13 @@ void tft_char(int x, int y, char c, uint16_t fg, uint16_t bg)
     uint16_t fgbe = be16(fg);
     uint16_t bgbe = be16(bg);
 
-    /* MY makes the first RAM write land at the visual bottom of the window.
-     * Send font rows bottom-first (g[0] = top of glyph). Same fix as 1a0b045. */
+    /* MY: first RAM write is visual bottom of the window → rows bottom-first.
+     * X flip in window(): first RAM write is visual right → columns right-first.
+     * g[0]/MSB = top-left of glyph. */
     for (int row = 0; row < TFT_CHAR_H; row++) {
         uint8_t bits = g[TFT_CHAR_H - 1 - row];
         for (int col = 0; col < TFT_CHAR_W; col++) {
-            s_glyph[row * TFT_CHAR_W + col] =
+            s_glyph[row * TFT_CHAR_W + (TFT_CHAR_W - 1 - col)] =
                 (bits & (uint8_t)(0x80u >> col)) ? fgbe : bgbe;
         }
     }
