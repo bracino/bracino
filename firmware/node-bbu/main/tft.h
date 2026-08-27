@@ -8,14 +8,17 @@
 #define TFT_PIN_DC    3
 #define TFT_PIN_RST   2
 
-/* Landscape 160x128. 8x16 cells → 20 columns, 8 rows. */
+/* Landscape 160x128. 8x16 cells → 20 columns, 8 rows.
+ * TEXT_X 8: MY|MV + software X flip draws logical col 0 one cell past the
+ * left edge; inset so the first glyph is on glass. Trailing pad col unused.
+ */
 #define TFT_W         160
 #define TFT_H         128
 #define TFT_COLS      20
 #define TFT_ROWS      8
 #define TFT_CHAR_W    8
 #define TFT_CHAR_H    16
-#define TFT_TEXT_X    0
+#define TFT_TEXT_X    8
 
 #define COL_BG        0x0000
 #define COL_FG        0xFFFF
