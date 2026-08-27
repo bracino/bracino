@@ -14,13 +14,14 @@
 #define TAG "tft"
 
 /*
- * Green-tab 128x160 (MSP1803). Landscape MADCTL MY|MV|BGR (Adafruit rot 1).
- * window() flips X and Y so callers keep top-left origin + LTR text under MY.
- * XSTART 0 keeps 20x8 rows inside visible GRAM (XSTART 1 clipped a column).
+ * Green-tab 128x160 (MSP1803). Landscape MADCTL MX|MV|BGR (Adafruit rot 3).
+ * Matches the protoboard origin without software axis flips. Gaps swapped
+ * from portrait 2/1. 20-column rows are exact-width — a 1 px XSTART error
+ * clips a whole glyph column.
  */
-#define XSTART 0
+#define XSTART 1
 #define YSTART 2
-#define MADCTL_LAND  (LCD_CMD_MY_BIT | LCD_CMD_MV_BIT | LCD_CMD_BGR_BIT)
+#define MADCTL_LAND  (LCD_CMD_MX_BIT | LCD_CMD_MV_BIT | LCD_CMD_BGR_BIT)
 
 #define STRIP_H  16
 #define SPI_HZ   (10 * 1000 * 1000)
@@ -150,9 +151,6 @@ static void cmd_data(int c, const uint8_t *d, size_t n)
 
 static void window(int x, int y, int w, int h)
 {
-    /* MY|MV landscape: flip both axes so callers keep top-left + LTR. */
-    x = TFT_W - x - w;
-    y = TFT_H - y - h;
     int x0 = x + XSTART;
     int x1 = x + w - 1 + XSTART;
     int y0 = y + YSTART;
@@ -226,13 +224,11 @@ void tft_char(int x, int y, char c, uint16_t fg, uint16_t bg)
     uint16_t fgbe = be16(fg);
     uint16_t bgbe = be16(bg);
 
-    /* MY: first RAM write is visual bottom of the window → rows bottom-first.
-     * X flip in window(): first RAM write is visual right → columns right-first.
-     * g[0]/MSB = top-left of glyph. */
+    /* g[0]/MSB = top-left of glyph. MX|MV first RAM write is visual top-left. */
     for (int row = 0; row < TFT_CHAR_H; row++) {
-        uint8_t bits = g[TFT_CHAR_H - 1 - row];
+        uint8_t bits = g[row];
         for (int col = 0; col < TFT_CHAR_W; col++) {
-            s_glyph[row * TFT_CHAR_W + (TFT_CHAR_W - 1 - col)] =
+            s_glyph[row * TFT_CHAR_W + col] =
                 (bits & (uint8_t)(0x80u >> col)) ? fgbe : bgbe;
         }
     }
