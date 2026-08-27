@@ -151,6 +151,9 @@ static void cmd_data(int c, const uint8_t *d, size_t n)
 
 static void window(int x, int y, int w, int h)
 {
+    /* MY: RAM row 0 is the visual bottom of the glass. Invert Y so callers
+     * keep a top-left origin (UI row 0 = header at the top). */
+    y = TFT_H - y - h;
     int x0 = x + XSTART;
     int x1 = x + w - 1 + XSTART;
     int y0 = y + YSTART;
@@ -224,8 +227,10 @@ void tft_char(int x, int y, char c, uint16_t fg, uint16_t bg)
     uint16_t fgbe = be16(fg);
     uint16_t bgbe = be16(bg);
 
+    /* MY makes the first RAM write land at the visual bottom of the window.
+     * Send font rows bottom-first (g[0] = top of glyph). Same fix as 1a0b045. */
     for (int row = 0; row < TFT_CHAR_H; row++) {
-        uint8_t bits = g[row];
+        uint8_t bits = g[TFT_CHAR_H - 1 - row];
         for (int col = 0; col < TFT_CHAR_W; col++) {
             s_glyph[row * TFT_CHAR_W + col] =
                 (bits & (uint8_t)(0x80u >> col)) ? fgbe : bgbe;
