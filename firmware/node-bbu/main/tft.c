@@ -255,10 +255,11 @@ void tft_text_row(int row, const char *s, uint16_t fg, uint16_t bg)
     buf[TFT_COLS] = '\0';
     if (s) {
         size_t n = strlen(s);
-        if (n > TFT_COLS) {
-            n = TFT_COLS;
+        /* Leave col 0 blank; start text in col 1 (plenty of room on the right). */
+        if (n > TFT_COLS - 1) {
+            n = TFT_COLS - 1;
         }
-        memcpy(buf, s, n);
+        memcpy(buf + 1, s, n);
     }
     if (row < 0) {
         row = 0;
