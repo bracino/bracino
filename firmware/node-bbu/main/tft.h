@@ -18,16 +18,22 @@
 #define TFT_CHAR_H    16
 #define TFT_TEXT_X    0
 
+/* RGB565 constants. MADCTL is BGR on this panel, so R and B nibbles are
+ * swapped versus the usual Adafruit RGB wire order — otherwise amber/red
+ * read as deep blue and cyan headers go yellowish. */
+#define COL_RGB565(r, g, b) \
+    ((uint16_t)((((b) & 0x1F) << 11) | (((g) & 0x3F) << 5) | ((r) & 0x1F)))
+
 #define COL_BG        0x0000
 #define COL_FG        0xFFFF
-#define COL_HEADER    0x07FF
-#define COL_FOOTER    0x07FF
-#define COL_FOCUS     0xFFE0
-#define COL_EDIT      0xFD20
-#define COL_DIM       0x8410
-#define COL_OK        0x07E0
-#define COL_WARN      0xFD20
-#define COL_BAD       0xF800
+#define COL_HEADER    COL_RGB565(0, 63, 31)   /* cyan */
+#define COL_FOOTER    COL_RGB565(0, 63, 31)   /* cyan */
+#define COL_FOCUS     COL_RGB565(31, 63, 0)   /* yellow */
+#define COL_EDIT      COL_RGB565(31, 40, 0)   /* amber */
+#define COL_DIM       COL_RGB565(16, 32, 16)  /* grey */
+#define COL_OK        COL_RGB565(0, 63, 0)    /* green */
+#define COL_WARN      COL_RGB565(31, 40, 0)   /* amber */
+#define COL_BAD       COL_RGB565(31, 0, 0)    /* red */
 
 void tft_init(void);
 void tft_fill(uint16_t color);
