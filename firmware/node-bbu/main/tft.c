@@ -129,9 +129,9 @@ static const uint8_t FONT8X16[95][16] = {
 static esp_lcd_panel_io_handle_t s_io;
 static uint16_t s_strip[TFT_W * STRIP_H];
 static uint16_t s_glyph[TFT_CHAR_W * TFT_CHAR_H];
-/* esp_lcd DMA reads the color pointer after tx_color returns; recycle only
- * from on_color_trans_done. Without this wait, row redraws tear glyphs
- * (e.g. "27.9" → " 7.9") as the next char overwrites s_glyph mid-transfer. */
+/* One full text row (160×16). tft_text_row blits all glyphs then one DMA —
+ * not 20 serial char transfers. Wait on_color_trans_done before reuse. */
+static uint16_t s_row[TFT_W * TFT_CHAR_H];
 static SemaphoreHandle_t s_tx_done;
 
 static uint16_t be16(uint16_t c)
@@ -280,12 +280,15 @@ void tft_text(int x, int y, const char *s, uint16_t fg, uint16_t bg)
 
 void tft_text_row(int row, const char *s, uint16_t fg, uint16_t bg)
 {
+    if (!s_io) {
+        return;
+    }
     char buf[TFT_COLS + 1];
     memset(buf, ' ', TFT_COLS);
     buf[TFT_COLS] = '\0';
     if (s) {
         size_t n = strlen(s);
-        /* Leave col 0 blank; start text in col 1 (plenty of room on the right). */
+        /* Leave col 0 blank; start text in col 1 (left-edge clip workaround). */
         if (n > TFT_COLS - 1) {
             n = TFT_COLS - 1;
         }
@@ -297,7 +300,35 @@ void tft_text_row(int row, const char *s, uint16_t fg, uint16_t bg)
     if (row >= TFT_ROWS) {
         row = TFT_ROWS - 1;
     }
-    tft_text(TFT_TEXT_X, row * TFT_CHAR_H, buf, fg, bg);
+
+    uint16_t fgbe = be16(fg);
+    uint16_t bgbe = be16(bg);
+
+    /*
+     * window() + MY|MV: first RAM write is visual bottom-right of the rect.
+     * Pack the row buffer bottom-first / right-first so a single transfer
+     * matches the proven per-glyph orientation.
+     */
+    for (int col = 0; col < TFT_COLS; col++) {
+        unsigned idx = (unsigned)(uint8_t)buf[col];
+        if (idx < 0x20 || idx > 0x7E) {
+            idx = (unsigned)'?';
+        }
+        const uint8_t *g = FONT8X16[idx - 0x20];
+        for (int gr = 0; gr < TFT_CHAR_H; gr++) {
+            uint8_t bits = g[gr]; /* g[0] = glyph top */
+            for (int gc = 0; gc < TFT_CHAR_W; gc++) {
+                uint16_t px = (bits & (uint8_t)(0x80u >> gc)) ? fgbe : bgbe;
+                int vx = col * TFT_CHAR_W + gc;
+                int vy = gr;
+                s_row[(TFT_CHAR_H - 1 - vy) * TFT_W + (TFT_W - 1 - vx)] = px;
+            }
+        }
+    }
+
+    int y = row * TFT_CHAR_H;
+    window(0, y, TFT_W, TFT_CHAR_H);
+    send_color(s_row, sizeof(s_row));
 }
 
 static void hw_reset(void)

@@ -461,6 +461,21 @@ void ui_set_live(const ui_live_t *live)
     s_live = *live;
 }
 
+static bool scr_needs_live(int scr)
+{
+    /* Static menus only redraw on input; live temps/state ~1 Hz. */
+    switch (scr) {
+    case SCR_HOME:
+    case SCR_TEMP:
+    case SCR_CNT:
+    case SCR_PROG:
+    case SCR_DIAG:
+        return true;
+    default:
+        return false;
+    }
+}
+
 void ui_task(void *arg)
 {
     (void)arg;
@@ -468,7 +483,7 @@ void ui_task(void *arg)
     s_dirty = true;
     int live_div = 0;
     for (;;) {
-        enc_poll();
+        /* Switch is polled by enc's 5 ms timer; just consume events here. */
         int steps = enc_take_steps();
         bool click = enc_take_click();
         bool hold = enc_take_hold();
@@ -492,19 +507,22 @@ void ui_task(void *arg)
         }
 
         live_div++;
-        if (s_dirty || live_div >= 200) { /* live values ~1 s */
+        bool live = scr_needs_live(s_scr) && live_div >= 200; /* ~1 s */
+        if (s_dirty || live) {
             live_div = 0;
             bbu_ctrl_t snap;
             ui_live_t lv;
             bbu_params_t p;
+            int scr;
             xSemaphoreTake(s_mu, portMAX_DELAY);
             snap = *s_c;
             lv = s_live;
             p = *s_params();
+            scr = s_scr;
             xSemaphoreGive(s_mu);
 
             begin_page();
-            switch (s_scr) {
+            switch (scr) {
             case SCR_HOME: draw_home(&snap, &lv, &p); break;
             case SCR_SEL:  draw_sel(s_cur); break;
             case SCR_TEMP: draw_temp(&lv, &p); break;

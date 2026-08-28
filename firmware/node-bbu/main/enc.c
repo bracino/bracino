@@ -4,6 +4,9 @@
 #include "esp_attr.h"
 #include "esp_err.h"
 #include "esp_log.h"
+#include "esp_timer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/portmacro.h"
 
 #define TAG "enc"
 
@@ -18,28 +21,31 @@ static const int8_t k_quad[16] = {
      0, +1, -1,  0
 };
 
+/* Switch timing is wall-clock so a slow TFT redraw cannot starve hold/click. */
+#define SW_POLL_US       5000LL
+#define SW_DEBOUNCE_N    3          /* 15 ms stable */
+#define SW_CLICK_MIN_US  25000LL    /* ignore taps shorter than this */
+#define SW_HOLD_US       800000LL   /* long-press → home */
+
+enum { SW_IDLE = 0, SW_PRESSED, SW_HELD };
+
 static volatile int32_t s_raw;
 static int32_t s_raw_taken;
 static int s_net;
 static volatile uint8_t s_ab;
 
-/* Switch: stable-level debounce, then click-on-release / hold-on-long-press.
- * Old edge counter reset on any bounce-high → false click, then the still-held
- * press could reach hold and bounce every submenu straight back to Home. */
-#define SW_DEBOUNCE_N  4    /* 20 ms stable at 5 ms poll */
-#define SW_CLICK_MIN   2    /* min ticks after stable press before click */
-#define SW_HOLD_N      160  /* ~0.8 s after stable press */
+static portMUX_TYPE s_mux = portMUX_INITIALIZER_UNLOCKED;
 
-enum { SW_IDLE = 0, SW_PRESSED, SW_HELD };
-
-static int s_sw_cand = 1;      /* candidate level being timed */
-static int s_sw_cand_n;        /* consecutive samples of s_sw_cand */
-static int s_sw_stable = 1;    /* debounced level */
-static int s_sw_phase;         /* IDLE / PRESSED / HELD */
-static int s_sw_down;          /* ticks while stably pressed (pre-hold) */
+static int s_sw_cand = 1;
+static int s_sw_cand_n;
+static int s_sw_stable = 1;
+static int s_sw_phase;
+static int64_t s_press_us;
 static bool s_click;
 static bool s_hold;
 static int s_sw = 1;
+
+static esp_timer_handle_t s_timer;
 
 static void IRAM_ATTR enc_isr(void *arg)
 {
@@ -53,6 +59,56 @@ static void IRAM_ATTR enc_isr(void *arg)
     if (d) {
         s_raw += d;
     }
+}
+
+void enc_poll(void)
+{
+    int raw = gpio_get_level(ENC_PIN_SW) ? 1 : 0; /* 0 = pressed */
+    int64_t now = esp_timer_get_time();
+
+    if (raw == s_sw_cand) {
+        if (s_sw_cand_n < SW_DEBOUNCE_N) {
+            s_sw_cand_n++;
+        }
+    } else {
+        s_sw_cand = raw;
+        s_sw_cand_n = 1;
+    }
+
+    portENTER_CRITICAL(&s_mux);
+
+    if (s_sw_cand_n >= SW_DEBOUNCE_N && s_sw_cand != s_sw_stable) {
+        int prev = s_sw_stable;
+        s_sw_stable = s_sw_cand;
+        s_sw = s_sw_stable;
+
+        if (prev == 1 && s_sw_stable == 0) {
+            s_sw_phase = SW_PRESSED;
+            s_press_us = now;
+        } else if (prev == 0 && s_sw_stable == 1) {
+            if (s_sw_phase == SW_PRESSED &&
+                (now - s_press_us) >= SW_CLICK_MIN_US) {
+                s_click = true;
+            }
+            s_sw_phase = SW_IDLE;
+        }
+    } else {
+        s_sw = s_sw_stable;
+    }
+
+    if (s_sw_stable == 0 && s_sw_phase == SW_PRESSED &&
+        (now - s_press_us) >= SW_HOLD_US) {
+        s_hold = true;
+        s_sw_phase = SW_HELD;
+    }
+
+    portEXIT_CRITICAL(&s_mux);
+}
+
+static void enc_timer_cb(void *arg)
+{
+    (void)arg;
+    enc_poll();
 }
 
 void enc_init(void)
@@ -77,7 +133,7 @@ void enc_init(void)
         gpio_get_level(ENC_PIN_SW) ? 1 : 0;
     s_sw_cand_n = SW_DEBOUNCE_N;
     s_sw_phase = SW_IDLE;
-    s_sw_down = 0;
+    s_press_us = 0;
     s_click = false;
     s_hold = false;
 
@@ -90,57 +146,33 @@ void enc_init(void)
     gpio_set_intr_type(ENC_PIN_B, GPIO_INTR_ANYEDGE);
     gpio_isr_handler_add(ENC_PIN_A, enc_isr, NULL);
     gpio_isr_handler_add(ENC_PIN_B, enc_isr, NULL);
-}
 
-void enc_poll(void)
-{
-    int raw = gpio_get_level(ENC_PIN_SW) ? 1 : 0; /* 0 = pressed */
-
-    /* Require SW_DEBOUNCE_N identical samples before accepting a level change. */
-    if (raw == s_sw_cand) {
-        if (s_sw_cand_n < SW_DEBOUNCE_N) {
-            s_sw_cand_n++;
-        }
-    } else {
-        s_sw_cand = raw;
-        s_sw_cand_n = 1;
+    /* Independent of UI/TFT: never miss press/release during a redraw. */
+    const esp_timer_create_args_t targs = {
+        .callback = &enc_timer_cb,
+        .arg = NULL,
+        .dispatch_method = ESP_TIMER_TASK,
+        .name = "enc_sw",
+        .skip_unhandled_events = true,
+    };
+    err = esp_timer_create(&targs, &s_timer);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "timer %s", esp_err_to_name(err));
+        return;
     }
-
-    if (s_sw_cand_n >= SW_DEBOUNCE_N && s_sw_cand != s_sw_stable) {
-        int prev = s_sw_stable;
-        s_sw_stable = s_sw_cand;
-        s_sw = s_sw_stable;
-
-        if (prev == 1 && s_sw_stable == 0) {
-            /* stable press edge */
-            s_sw_phase = SW_PRESSED;
-            s_sw_down = 0;
-        } else if (prev == 0 && s_sw_stable == 1) {
-            /* stable release edge */
-            if (s_sw_phase == SW_PRESSED && s_sw_down >= SW_CLICK_MIN) {
-                s_click = true;
-            }
-            s_sw_phase = SW_IDLE;
-            s_sw_down = 0;
-        }
-    } else {
-        s_sw = s_sw_stable;
-    }
-
-    /* Hold runs only on a continuous stable press — bounce cannot reset it. */
-    if (s_sw_stable == 0 && s_sw_phase == SW_PRESSED) {
-        if (s_sw_down < 10000) {
-            s_sw_down++;
-        }
-        if (s_sw_down >= SW_HOLD_N) {
-            s_hold = true;
-            s_sw_phase = SW_HELD;
-        }
+    err = esp_timer_start_periodic(s_timer, SW_POLL_US);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "timer start %s", esp_err_to_name(err));
     }
 }
 
 int enc_take_steps(void)
 {
+    /* Ignore turn while the switch is down — click, don't scroll. */
+    if (s_sw_stable == 0) {
+        s_raw_taken = s_raw;
+        return 0;
+    }
     int32_t raw = s_raw;
     int32_t delta = raw - s_raw_taken;
     int steps = (int)(delta / 4);
@@ -163,20 +195,28 @@ void enc_levels(int *a, int *b, int *sw)
         *b = gpio_get_level(ENC_PIN_B) ? 1 : 0;
     }
     if (sw) {
+        portENTER_CRITICAL(&s_mux);
         *sw = s_sw;
+        portEXIT_CRITICAL(&s_mux);
     }
 }
 
 bool enc_take_click(void)
 {
-    bool v = s_click;
+    bool v;
+    portENTER_CRITICAL(&s_mux);
+    v = s_click;
     s_click = false;
+    portEXIT_CRITICAL(&s_mux);
     return v;
 }
 
 bool enc_take_hold(void)
 {
-    bool v = s_hold;
+    bool v;
+    portENTER_CRITICAL(&s_mux);
+    v = s_hold;
     s_hold = false;
+    portEXIT_CRITICAL(&s_mux);
     return v;
 }
