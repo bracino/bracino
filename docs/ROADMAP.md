@@ -28,7 +28,7 @@ Preferred order when something has to wait:
 - [x] Dummy AC load on the relay (human, 2026-08-25); CT still binary, reliable for that
 - [x] Ice / boil two-point on potted NTCs (human, 2026-08-25); β=3950 holds; 95 °C cap was too tight
 - [ ] Gateway still empty
-- [ ] TFT + encoder protoboard (010): 8×16 font **readable** (2026-08-27); encoder scroll/click bounce still open, then remaining menu checks
+- [x] TFT + encoder protoboard (010 closed 2026-08-28): menus navigate; rotate/click/hold OK; BGR palette
 - [ ] Node-RED flow structure + first useful views
 - [ ] InfluxDB backup/retention (NAS + cloud) — policy before years of data matter
 
@@ -48,7 +48,7 @@ Preferred order when something has to wait:
 - [x] Same loop on dummy AC load (human, 2026-08-25); no real BBU pump yet
 - [x] Ice / boil two-point on the potted NTCs (human, 2026-08-25)
 - [ ] Plant install (no real BBU pump yet)
-- [ ] TFT + encoder: debounce switch + reliable scroll (010); menu checks; UI is on protoboard
+- [x] TFT + encoder UI on protoboard (010 closed 2026-08-28)
 - [ ] Gateway builds; ESP-NOW bring-up with control node
 - [ ] MQTT publish path + retained state / LWT
 - [ ] `server/docker-compose.yml` + Mosquitto config in git

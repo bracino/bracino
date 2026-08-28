@@ -19,7 +19,7 @@ Work in chat / sketches; promote settled notes to `docs/` or `hardware/bbu-contr
 
 Settled enough to write I/O against: ADR 001 + KiCad **v0.08** (modules, pins, Q1 on relay IN, TH1–TH3 on A1–A3, GPIO8 LED, 12 V LED, J7 5 V-only jumper). CT is boolean (DESIGN_NOTE_001). Protoboard soldered and I/O-checked (heartbeat on external 5 V, relay switches loads, NTCs reasonable).
 
-Human (2026-08-25): USB-blocking jumper holder **fabricated**; NTC cables **built and tested good**; sensors potted. Ice / boil two-point done (009). Remaining hardware: connector / jumper labels, PPTC when stock arrives. UI (TFT + encoder) on breadboard (010), not on this protoboard yet.
+Human (2026-08-25): USB-blocking jumper holder **fabricated**; NTC cables **built and tested good**; sensors potted. Ice / boil two-point done (009). UI (TFT + encoder) on protoboard; **010 closed** 2026-08-28. Remaining hardware: connector / jumper labels, PPTC when stock arrives.
 
 ## Fix
 

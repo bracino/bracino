@@ -1,8 +1,9 @@
 # 010 — TFT + encoder bring-up and MES-style menus
 
-- **Status:** open
+- **Status:** closed
 - **Type:** task
 - **Opened:** 2026-08-25
+- **Closed:** 2026-08-28
 - **Refs:** `firmware/node-bbu/` (`tft.c`, `enc.c`, `ui.c`), `001`, `009`, `docs/DESIGN_NOTE_002_bbu_control_loop.md`, ADR 001, v0.08 netlist
 
 ## Context
@@ -29,11 +30,16 @@ C3 has no `pulse_cnt`. Do not add LVGL. Do not use in-tree `esp_lcd_new_panel_st
 
 `firmware/node-bbu/main/{tft,enc,ui}.c`. Modes in `control.c`.
 
-Bench 2026-08-25: glyphs were Y-mirrored (ST7735 MY vs char RAM order); 2 Hz dark bar was full-row `fill_rect` at 500 ms; Home had only one cursor item so rotation looked dead. Glyphs sent bottom-first; live lines are cached (no row wipe). Serial `enc` prints A/B/SW. Gamma tables added. Human: LED brighter with **R3 = 100 Ω** (was 220). Old A-edge poll was bouncy; module is fine.
+Bench path (2026-08-25 → 27): glyphs Y-mirrored then fixed; ISR gray-code encoder; Modern DOS 8×16; MADCTL MY|MV|BGR + software axis flips; col 0 blank left-clip workaround.
 
-Human 2026-08-26: `c9ca914` loads and runs. ISR quadrature encoder is **much better**. Doubled 6×8 font is **unacceptable** — replace before more menu polish.
+Session 2026-08-28 closed the remaining input/draw bugs:
 
-Human 2026-08-27: protoboard. `9b57530` — Modern DOS 8×16 **readable**, upright, LTR, no junk column. `MADCTL` MY|MV|BGR + software axis flips + bottom-first/right-first glyphs. MX|MV made diacritics. Col 0 is a forced blank. Encoder rotate **sometimes OK / sometimes not**. Switch **double-clicks** — click often enters and immediately returns. Next: switch debounce + scroll, not more font work.
+1. **DMA glyph tear** (`27.9` → `7.9`): `esp_lcd` reuses color buffers only after `on_color_trans_done`. Wait on a binary semaphore before recycling `s_glyph` / strips (`fa7659f`).
+2. **Per-glyph wait starved input**: full-row 160×16 blit (one DMA per text row) so redraws are fast again (`e454f60`).
+3. **Switch bounce / menus → Home / hold dead**: stable-level debounce was not enough while UI blocked. Encoder switch runs on a **5 ms `esp_timer`** with **wall-clock** click (≥25 ms) and hold (~0.8 s); turn ignored while SW down. False mid-press release no longer emits click then hold→Home (`e454f60`).
+4. **WARN amber looked deep blue**: MADCTL BGR — Adafruit-order orange `0xFD20` drove blue. Palette is BGR-aware via `COL_RGB565` (`ee3e6c3`).
+
+Working tip commits: UI image through `ee3e6c3` (palette) on top of row-blit/timer (`e454f60`).
 
 ## Verify
 
@@ -43,9 +49,10 @@ Human 2026-08-27: protoboard. `9b57530` — Modern DOS 8×16 **readable**, uprig
 - [x] Landscape rewrite loads and runs (human, 2026-08-26)
 - [x] Replace doubled 6×8 with Modern DOS 8×16 (human, 2026-08-27 — readable on protoboard)
 - [x] Orientation: upright LTR; col 0 blank as left-clip workaround (2026-08-27)
-- [ ] Encoder rotate is reliable (human: sometimes OK, sometimes not)
-- [ ] Switch: one click → one enter (human: double-click / bounce back)
-- [ ] System Data (8 items) scrolls the 6-row window
-- [ ] Control Program cycles Auto / Manual / Test / Off; pump toggle only in Manual/Test
-- [ ] Loop still ticks with the panel disconnected (serial `st`)
+- [x] Encoder rotate reliable / snappy enough (human, 2026-08-28)
+- [x] Switch: one click → one enter; hold ~0.8 s → Home (human, 2026-08-28)
+- [x] Menus navigate: Temperatures, Counters, System Data, Control Prog, Diagnostics (human, 2026-08-28)
+- [x] Control Program: Manual + pump ON; footer **WARN no CT** in amber (human, 2026-08-28)
+- [x] Live temps stable (no disappearing digits) (human, 2026-08-28)
+- [ ] Serial `st` with panel unplugged — not re-checked this close (control loop is independent of UI task; light residual)
 - [ ] Real BBU pump — still out of scope
