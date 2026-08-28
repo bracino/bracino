@@ -23,11 +23,23 @@ static int32_t s_raw_taken;
 static int s_net;
 static volatile uint8_t s_ab;
 
-static int s_sw_down;
+/* Switch: stable-level debounce, then click-on-release / hold-on-long-press.
+ * Old edge counter reset on any bounce-high → false click, then the still-held
+ * press could reach hold and bounce every submenu straight back to Home. */
+#define SW_DEBOUNCE_N  4    /* 20 ms stable at 5 ms poll */
+#define SW_CLICK_MIN   2    /* min ticks after stable press before click */
+#define SW_HOLD_N      160  /* ~0.8 s after stable press */
+
+enum { SW_IDLE = 0, SW_PRESSED, SW_HELD };
+
+static int s_sw_cand = 1;      /* candidate level being timed */
+static int s_sw_cand_n;        /* consecutive samples of s_sw_cand */
+static int s_sw_stable = 1;    /* debounced level */
+static int s_sw_phase;         /* IDLE / PRESSED / HELD */
+static int s_sw_down;          /* ticks while stably pressed (pre-hold) */
 static bool s_click;
 static bool s_hold;
-static bool s_held_sent;
-static int s_sw;
+static int s_sw = 1;
 
 static void IRAM_ATTR enc_isr(void *arg)
 {
@@ -61,7 +73,13 @@ void enc_init(void)
     int a = gpio_get_level(ENC_PIN_A) ? 1 : 0;
     int b = gpio_get_level(ENC_PIN_B) ? 1 : 0;
     s_ab = (uint8_t)((a << 1) | b);
-    s_sw = gpio_get_level(ENC_PIN_SW) ? 1 : 0;
+    s_sw_cand = s_sw_stable = s_sw =
+        gpio_get_level(ENC_PIN_SW) ? 1 : 0;
+    s_sw_cand_n = SW_DEBOUNCE_N;
+    s_sw_phase = SW_IDLE;
+    s_sw_down = 0;
+    s_click = false;
+    s_hold = false;
 
     esp_err_t err = gpio_install_isr_service(0);
     if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
@@ -76,22 +94,48 @@ void enc_init(void)
 
 void enc_poll(void)
 {
-    int sw = gpio_get_level(ENC_PIN_SW) ? 1 : 0; /* 0 = pressed */
-    s_sw = sw;
-    if (sw == 0) {
+    int raw = gpio_get_level(ENC_PIN_SW) ? 1 : 0; /* 0 = pressed */
+
+    /* Require SW_DEBOUNCE_N identical samples before accepting a level change. */
+    if (raw == s_sw_cand) {
+        if (s_sw_cand_n < SW_DEBOUNCE_N) {
+            s_sw_cand_n++;
+        }
+    } else {
+        s_sw_cand = raw;
+        s_sw_cand_n = 1;
+    }
+
+    if (s_sw_cand_n >= SW_DEBOUNCE_N && s_sw_cand != s_sw_stable) {
+        int prev = s_sw_stable;
+        s_sw_stable = s_sw_cand;
+        s_sw = s_sw_stable;
+
+        if (prev == 1 && s_sw_stable == 0) {
+            /* stable press edge */
+            s_sw_phase = SW_PRESSED;
+            s_sw_down = 0;
+        } else if (prev == 0 && s_sw_stable == 1) {
+            /* stable release edge */
+            if (s_sw_phase == SW_PRESSED && s_sw_down >= SW_CLICK_MIN) {
+                s_click = true;
+            }
+            s_sw_phase = SW_IDLE;
+            s_sw_down = 0;
+        }
+    } else {
+        s_sw = s_sw_stable;
+    }
+
+    /* Hold runs only on a continuous stable press — bounce cannot reset it. */
+    if (s_sw_stable == 0 && s_sw_phase == SW_PRESSED) {
         if (s_sw_down < 10000) {
             s_sw_down++;
         }
-        if (s_sw_down == 160 && !s_held_sent) { /* ~0.8 s at 5 ms */
+        if (s_sw_down >= SW_HOLD_N) {
             s_hold = true;
-            s_held_sent = true;
+            s_sw_phase = SW_HELD;
         }
-    } else {
-        if (s_sw_down >= 6 && s_sw_down < 160 && !s_held_sent) {
-            s_click = true;
-        }
-        s_sw_down = 0;
-        s_held_sent = false;
     }
 }
 

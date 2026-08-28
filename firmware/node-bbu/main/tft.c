@@ -9,6 +9,7 @@
 #include "esp_lcd_panel_io.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 #include "freertos/task.h"
 
 #define TAG "tft"
@@ -128,6 +129,10 @@ static const uint8_t FONT8X16[95][16] = {
 static esp_lcd_panel_io_handle_t s_io;
 static uint16_t s_strip[TFT_W * STRIP_H];
 static uint16_t s_glyph[TFT_CHAR_W * TFT_CHAR_H];
+/* esp_lcd DMA reads the color pointer after tx_color returns; recycle only
+ * from on_color_trans_done. Without this wait, row redraws tear glyphs
+ * (e.g. "27.9" → " 7.9") as the next char overwrites s_glyph mid-transfer. */
+static SemaphoreHandle_t s_tx_done;
 
 static uint16_t be16(uint16_t c)
 {
@@ -163,12 +168,37 @@ static void window(int x, int y, int w, int h)
     cmd_data(LCD_CMD_RASET, raset, 4);
 }
 
+static bool IRAM_ATTR color_done_cb(esp_lcd_panel_io_handle_t io,
+                                    esp_lcd_panel_io_event_data_t *edata,
+                                    void *user_ctx)
+{
+    (void)io;
+    (void)edata;
+    (void)user_ctx;
+    BaseType_t hp = pdFALSE;
+    if (s_tx_done) {
+        xSemaphoreGiveFromISR(s_tx_done, &hp);
+    }
+    return hp == pdTRUE;
+}
+
 static void send_color(const uint16_t *buf, size_t nbytes)
 {
     if (!s_io || nbytes == 0) {
         return;
     }
-    esp_lcd_panel_io_tx_color(s_io, LCD_CMD_RAMWR, buf, nbytes);
+    /* Drop a stale done from a prior timeout so we wait for *this* transfer. */
+    if (s_tx_done) {
+        (void)xSemaphoreTake(s_tx_done, 0);
+    }
+    esp_err_t err = esp_lcd_panel_io_tx_color(s_io, LCD_CMD_RAMWR, buf, nbytes);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "tx_color %s", esp_err_to_name(err));
+        return;
+    }
+    if (s_tx_done) {
+        (void)xSemaphoreTake(s_tx_done, portMAX_DELAY);
+    }
 }
 
 void tft_fill_rect(int x, int y, int w, int h, uint16_t color)
@@ -351,12 +381,21 @@ void tft_init(void)
         return;
     }
 
+    s_tx_done = xSemaphoreCreateBinary();
+    if (!s_tx_done) {
+        ESP_LOGE(TAG, "tx_done sem");
+        return;
+    }
+
     esp_lcd_panel_io_spi_config_t io_cfg = {
         .cs_gpio_num = -1,
         .dc_gpio_num = TFT_PIN_DC,
         .spi_mode = 0,
         .pclk_hz = SPI_HZ,
-        .trans_queue_depth = 4,
+        /* Depth 1 + done-wait: single shared glyph/strip buffer is safe. */
+        .trans_queue_depth = 1,
+        .on_color_trans_done = color_done_cb,
+        .user_ctx = NULL,
         .lcd_cmd_bits = 8,
         .lcd_param_bits = 8,
     };
