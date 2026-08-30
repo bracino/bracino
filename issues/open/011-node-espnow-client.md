@@ -23,9 +23,11 @@ cache. Version / unknown-TLV skip paths implemented, not stubbed.
 ## Proposal
 
 Bench-test against gateway firmware skeleton (issue 006) on a second ESP —
-the whole DN003 wire contract is verifiable without MQTT. Consider an NVS
+the whole DN003 wire contract is verifiable without MQTT. NVS
 `comms_enabled` flag (default off) as a de-risk for the 2026-08-31
-installation deadline.
+installation deadline; toggled from the Control Programming menu. Node
+keeps buffering until first TIME_SYNC (DN003 epoch-less bring-up
+invariant) — no telemetry leaves the node pre-sync.
 
 ## Fix
 

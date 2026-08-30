@@ -555,20 +555,28 @@ typedef struct __attribute__((packed)) {
 
 A node provisioned and powered before any gateway exists (phase-1 field
 reality: first node in the plant, gateway built later) runs with **no
-epoch at all**. This is defined behavior, not an error:
+epoch at all**. This is defined behavior, not an error — and it changes
+*transmission*, not just stamping:
 
-- Before the first `TIME_SYNC`, the node's effective epoch is **0**:
-  reported time is simply `node_clock_ms`. The envelope is honest;
-  there is nothing to fake.
-- Backlog captured pre-sync is **not stale**. Once an anchor exists
-  (first `HELLO_ACK`), the same translation —
-  `anchor_epoch + (capture_ms − anchor_clock)` — extrapolates *backwards*
-  through the entire buffer: samples taken hours before the gateway first
-  answered get correct wall-clock stamps. No special node-side handling;
-  the FIFO never needed an epoch.
-- Therefore the gateway and commit service **must not discard points for
-  being "too old"** (e.g. 1970-based). Back-dated Influx writes are normal
-  here; `boot_session` scopes them.
+- **Invariant: a node does not transmit `TELEMETRY_BATCH` until it holds
+  a non-zero epoch** from a `TIME_SYNC` — in practice, until the first
+  acknowledged `HELLO` of this boot session. `HELLO` itself is exempt
+  (it is how sync is obtained). `EPOCH = 0` therefore means exactly one
+  thing: *this node has never spoken to a gateway since boot* — and a
+  never-synced node keeps buffering until it is anchored.
+- Before sync, reported time is simply `node_clock_ms` (effective epoch
+  0). The envelope is honest; there is nothing to fake.
+- Once anchored, the backlog drains normally, and the anchor math
+  extrapolates *backwards* correctly: a sample captured at node clock
+  `c < T₀` translates to `E₀ − (T₀ − c)`, which is a real, correct
+  wall-clock date (the node's boot time was real too). The gateway uses
+  one formula for everything; there is no special pre-sync path.
+- **Back-dated points are routine, not anomalies.** Every outage drain
+  writes points dated to the outage window, and Influx does not require
+  monotonic write order. The gateway/commit service must not filter for
+  "freshness." Epoch-0-era stamps (1970s), however, **cannot legitimately
+  occur** under the invariant above — if seen, they are a protocol
+  violation: drop, count, and surface as a gateway event.
 - Multi-boot pre-gateway history is lost by design (RAM FIFO, Non-goals).
   Within a single boot the full backlog survives the gateway's late
   arrival — making first-node bring-up a natural field test of the
@@ -669,6 +677,9 @@ is simply FIFO depth 1.
    FIFO entries with `capture_ms ≤ W` (same boot session).
 4. The FIFO is RAM-only and bounded (see Sizing). A node reboot loses the
    FIFO — accepted (Non-goals).
+5. **No telemetry transmission before first sync in this boot session**
+   (Pre-gateway provisioning): a never-anchored node keeps buffering.
+   `HELLO` is exempt.
 
 ### Normal operation (depth 1)
 
@@ -743,7 +754,10 @@ reach far beyond the raw 32 h while keeping recent data dense.
 - Decimated samples create gaps *inside* a frame's declared
   `[start_ms, end_ms]` span (count < span). That is expected and honest:
   the gateway writes what it receives and never tries to "close" internal
-  gaps.
+  gaps. **Decimation evidence travels with the data**: the span-vs-count
+  relationship in each batch header is the per-frame record of what was
+  dropped — no separate event could be delivered anyway, since decimation
+  fires precisely when the gateway is unreachable.
 - This is a deliberate, lossy emergency valve, subordinate to the trim
   invariant: the invariant governs normal trimming; decimation is the
   bounded-memory fallback when an outage outlasts the ring.
@@ -818,8 +832,7 @@ assigned, lives in `espnow_schema.h`.
 | 0x03 | `PARAM_CHANGED` | `param_id u8, new_value[], source u8` (1=LOCAL_UI, 2=PARAM_SET echo) | Keeps admin panel honest on local encoder changes |
 | 0x04 | `CONFIG_CHANGED` | `config_ver u8` | Descriptor changed → gateway should re-`CONFIG_GET` |
 | 0x05 | `BATTERY_WARN` | `level_pct u8` | Future sleepy nodes; reserved now |
-| 0x06 | `DECIMATION_OCCURRED` | `ring_pct u8, dropped u16` | Diagnostic: a decimation pass fired — evidence for buffer-sizing review |
-| 0x07–0xFF | — | — | unassigned, append-only |
+| 0x06–0xFF | — | — | unassigned, append-only |
 
 The gateway maps event ids to MQTT event-topic payloads (DN004); the
 mapping is a gateway concern, the registry here is the contract.

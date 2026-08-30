@@ -115,6 +115,12 @@ The node **boots in its last known user mode**, not a fixed default:
   readings — the cycle is not persisted, only the mode.
 - **TEST is never persisted** (it is intrinsically transient): a reboot
   during Test comes up **Manual / coil OFF**.
+- **All tunable parameters in the Parameters table persist to NVS on
+  change** (setpoint, hysteresis, min on/off times, `ct_confirm_s`,
+  `min_tpo_tpu_delta_c`, `max_run_time_min`) and are restored at boot.
+  They are field-adjustable from the local UI (Control Programming menu)
+  and later over `PARAM_SET` — one validated setter path for both
+  (DESIGN_NOTE_003 Parameters).
 - **Off (`halt`) persists like Auto/Manual:** an operator who stopped the
   pump deliberately must not find it running after a power blip.
 - **Factory-fresh NVS** boots **Manual / coil OFF**.
@@ -155,7 +161,7 @@ Cool TPU water into the jacket is what makes the boiler fire. No network in this
 ## Out of scope for the first loop
 
 - AMB in the start/stop decision (print only)
-- Encoder / TFT **edits** of setpoints (`prog` + NVS first; menus are live/read for now except mode and Manual/Test pump)
+- Encoder / TFT **edits** of setpoints (`prog` + NVS first; menus are live/read for now except mode and Manual/Test pump) — **promoted into the field-deployable image**: full parameter editing from the local UI, parity with the future admin panel (issue 012)
 - ESP-NOW / MQTT reporting of warnings/faults
 - Real BBU pump on the bench sketch until 009 has a plant checklist
 - CT overcurrent / ampere field (closed: binary only; no-CT is warn only)
