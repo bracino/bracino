@@ -1,0 +1,64 @@
+# 013 — Minimal bench gateway (DN003 wire-contract test harness)
+
+- **Status:** open
+- **Type:** firmware / test
+- **Opened:** 2026-08-30
+- **Refs:** `firmware/gateway/`, DESIGN_NOTE_003, issue 006 (skeletons), issue 011 (node client)
+
+## Context
+
+The 2-ESP desk test of the node's DN003 client (2026-08-30 plan) needs a
+gateway-side counterpart **without** the DN004 machinery (WiFi, MQTT,
+state machine, registry persistence). This spec defines the minimal bench
+gateway: a DN003-speaking counterpart, not the real firmware.
+
+## Scope
+
+**In:** ESP-NOW init on a fixed channel, HELLO→HELLO_ACK (+`TIME_SYNC`),
+HEARTBEAT/TELEMETRY_BATCH/EVENT receive + serial log, BATCH_ACK responder
+(bench "durable write" = serial log line; ack after that), PARAM_SET
+sender on keypress, CONFIG_GET after unknown `config_ver`, retransmit
+tolerance.
+
+**Out (deliberately):** WiFi STA, MQTT, state machine, NVS role table,
+commit watermarking, maintenance AP. This harness acks on log-write, not
+backend-commit — fine for wire-contract validation, **not** evidence of
+DN004 compliance.
+
+## Behavior table
+
+| Node sends | Bench gateway does |
+|---|---|
+| `HELLO` (broadcast) | Reply unicast `HELLO_ACK` with TLV `TIME_SYNC` (host time via serial-set epoch, or epoch of first PC sync); log registration |
+| `HEARTBEAT` | Log (liveness line); no reply |
+| `TELEMETRY_BATCH` | Decode header + samples; print one line per sample (`capture_ms`→translated epoch, temps, mode, relay, ct, faults); send `BATCH_ACK(end_ms of frame)` |
+| `EVENT` | Print tag + value; log |
+| `CONFIG_DESC` / `PARAM_ACK` | Print |
+| — | `t` keypress: send `TIME_SYNC`; `p` keypress: send canned `PARAM_SET` (e.g. setpoint ±); `s` keypress: print registry/counters |
+
+Bench knobs (compile-time): `BENCH_NO_ACK_S` (suppress BATCH_ACK for N s to
+force retransmit/stop-and-wait test), `BENCH_DROP_PCT` (random frame loss),
+short ring override on the node for decimation drills.
+
+## Bench scenarios
+
+1. **Discovery:** gateway on ch 6; node cold boot → HELLO/HELLO_ACK/sync.
+   Repeat with gateway on ch 1, then ch 11.
+2. **Live telemetry:** depth-1 batches at 15 s cadence for ≥10 min; verify
+   seq continuity, translation math at the gateway.
+3. **Outage/drain:** gateway channel-hops away mid-run (simulates loss);
+   node buffers; gateway returns → FIFO drains oldest-first, BATCH_ACK
+   watermarks advance, no duplicates after settle.
+4. **Pre-gateway bring-up:** node runs alone ≥1 h (fill FIFO), gateway
+   appears → drain with back-dated (correct) timestamps; verify
+   epoch-0-no-TX invariant (nothing sent before first sync).
+5. **Decimation field test:** outage > ring capacity at full cadence →
+   span-vs-count gaps in drained frames (decimation evidence), drain
+   completes, loop cadence unaffected throughout (non-blocking contract).
+6. **PARAM_SET round-trip:** setpoint change from bench keys → PARAM_ACK →
+   loop threshold moves (verify on TFT/serial).
+
+## Verify
+
+All six scenarios pass on the desk pair; serial logs archived under
+`issues/fixtures/` as the wire-contract evidence for 011.

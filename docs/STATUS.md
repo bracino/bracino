@@ -1,6 +1,6 @@
 # Status
 
-**As of:** 2026-08-28  
+**As of:** 2026-08-30  
 **Phase:** 1 — prototype (BBU control node + WiFi gateway)  
 **Repo:** https://github.com/bracino/bracino
 
@@ -8,7 +8,11 @@
 
 Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08**). The **protoboard is soldered to v0.08** and has passed the same I/O tests as the breadboard. `firmware/node-bbu` runs the offline loop ([DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md)): boots **Manual**, `auto` / `sim` / `halt` on the desk. Human-reported **desk `sim` walk-through passed** (2026-08-22). Human-reported (2026-08-25): dummy **AC load** validated; NTC ice/boil two-point; USB safety block fabricated; TFT+encoder on breadboard (glyphs/flicker fixed). Human-reported (2026-08-26): landscape/SPI2/ISR image **loads and runs**; encoder is **much better**; doubled 6×8 font is **unacceptable**. Human-reported (2026-08-27): TFT+encoder **on the protoboard**; Modern DOS 8×16 **readable**. Human-reported (2026-08-28): UI menus **usable** — rotate/click/hold OK; System Data / Control Program / etc. navigate; WARN amber correct (BGR palette). Issue **010 closed**. Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
 
+Issue **010 closed**. Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
+
 CT no-current / unusable is **warning only** — stay on the standard algorithm (same blindness as the old MES-BBU, plus a notice). `TPO_ONLY` is for TPU faults only.
+
+Design contracts settled 2026-08-30: **ESP-NOW wire law** ([DESIGN_NOTE_003](DESIGN_NOTE_003_espnow_node_schema.md)) and **gateway design + MQTT contract** ([DESIGN_NOTE_004](DESIGN_NOTE_004_gateway_design.md)). Not yet implemented in firmware. DN002 updated: boot-in-last-known-mode + NVS-persisted parameters are field-image requirements (issues 011/012/013 open; install deadline 2026-08-31).
 
 Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMAP.md). Kickoff scrap (not maintained): [`project_slug.md`](project_slug.md).
 
@@ -21,14 +25,15 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | STATUS / ROADMAP / issues notebook | Process solid; this file tracks bench reality |
 | Control-node HW definition | **Settled for the module proto** — ADR 001 + KiCad **v0.08**. Protoboard built |
 | `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002. User modes **Auto / Manual / Test / Off**. Dummy AC load OK. Ice/boil NTCs OK (conversion −5–110 °C). TFT+encoder UI **on protoboard, menus OK** (2026-08-28; 010 closed): Modern DOS 8×16, row DMA + done-wait, 5 ms SW timer, BGR palette. Boots Manual |
-| `gateway` firmware | **Not started** |
-| MQTT topic + payload schema | **Not decided** |
-| ESP-NOW payload schema | **Not decided** |
+| `gateway` firmware | **Not started** — contract settled: DN003 (wire law) + DN004; bench harness spec in issue 013 |
+| MQTT topic + payload schema | **Settled** — [DESIGN_NOTE_004](DESIGN_NOTE_004_gateway_design.md) (2026-08-30). Not implemented |
+| ESP-NOW payload schema | **Settled — wire law** — [DESIGN_NOTE_003](DESIGN_NOTE_003_espnow_node_schema.md) (2026-08-30). Not yet implemented |
+| Commit service (MQTT→Influx + watermarks) | **Designed in outline** — DN004 contract; DN005 to write |
 | Relay drive (5 V module vs GPIO10) | **OK on protoboard** — Q1 2N3904, high = ON. Coil toggles and holds; dummy AC load validated (2026-08-25) |
 | CT / current sense | **Binary only** — [DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md). Dummy load: reliable running/not. No-current is **warn only** (DESIGN_NOTE_002) |
 | NTCs (A1–A3) | **°C in firmware** (β=3950). Ice ~0.4 °C (770 mV); boil ~100 °C (3083 mV) was FAULT on the old 95 °C cap — conversion now −5–110 °C. Open/short = FAULT |
 | 12 V / buck vs USB | **Heartbeat OK on external 5 V** (USB unplugged). J7 is a **5 V-only** jumper (buck VO ↔ board +5 V). USB-blocking holder **fabricated** |
-| `server/` docker compose + provisioning | **Not started** |
+| `server/` docker compose + provisioning | **Not started** (commit service planned — DN005 stub in DN004) |
 | Grafana dashboards / Node-RED flows | **Not started** |
 | Influx backup/retention policy | **Not decided** |
 

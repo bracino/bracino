@@ -20,22 +20,22 @@ Preferred order when something has to wait:
 - [x] Control-node monitoring/control hardware definition (what + how) — ADR 001; Q1 2N3904 on relay IN (v0.08)
 - [x] BOM / schematic notes (module proto) — KiCad v0.08 on disk; protoboard soldered
 - [ ] Hardware test / verification strategy (plant checklist still open; protoboard I/O matches breadboard)
-- [ ] **MQTT topic + payload schema** (stabilize before many nodes care; CT field is boolean — DESIGN_NOTE_001)
-- [ ] **ESP-NOW payload** between `node-bbu` and gateway
+- [x] **ESP-NOW payload** between `node-bbu` and gateway — [DESIGN_NOTE_003](DESIGN_NOTE_003_espnow_node_schema.md) (wire law, 2026-08-30)
+- [x] **MQTT topic + payload schema** — [DESIGN_NOTE_004](DESIGN_NOTE_004_gateway_design.md) (2026-08-30; issue 004 closes against it)
 - [x] Offline BBU control law written — [DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md)
 - [x] v0 firmware: implement that loop on `node-bbu` (boots MANUAL; `auto` / `sim`)
 - [x] Desk `sim` walk-through of start / stay-running / stop / FAULT (human, 2026-08-22)
 - [x] Dummy AC load on the relay (human, 2026-08-25); CT still binary, reliable for that
 - [x] Ice / boil two-point on potted NTCs (human, 2026-08-25); β=3950 holds; 95 °C cap was too tight
-- [ ] Gateway still empty
+- [ ] Gateway still empty (contracts settled: DN003 wire law, DN004 gateway design; bench harness in 013)
 - [x] TFT + encoder protoboard (010 closed 2026-08-28): menus navigate; rotate/click/hold OK; BGR palette
-- [ ] Node-RED flow structure + first useful views
-- [ ] InfluxDB backup/retention (NAS + cloud) — policy before years of data matter
+- [ ] Commit service: MQTT → Influx with per-node commit watermarks (DESIGN_NOTE_005 stub in DN004; replaces Node-RED in the telemetry path)
+- [ ] Influx backup/retention (NAS + cloud) — policy before years of data matter
 
 ### Implementation milestones (checklist)
 
 - [x] Repo scaffold, docs, issues notebook
-- [ ] Documented MQTT + ESP-NOW contracts under `docs/`
+- [x] Documented MQTT + ESP-NOW contracts under `docs/` (DN003 + DN004, 2026-08-30)
 - [x] `node-bbu` builds under ESP-IDF; bring-up I/O (relay + A0–A3), not the loop
 - [x] Flash inverted `relay_set()`; coil toggles and holds. GPIO10 backfeed not DVM’d this pass
 - [x] GPIO8 heartbeat; external 5 V (USB unplugged); coil commanded off stays off
@@ -47,13 +47,17 @@ Preferred order when something has to wait:
 - [x] Pump on/off logic on desk `sim` (setpoint / hysteresis / TPU hold)
 - [x] Same loop on dummy AC load (human, 2026-08-25); no real BBU pump yet
 - [x] Ice / boil two-point on the potted NTCs (human, 2026-08-25)
-- [ ] Plant install (no real BBU pump yet)
+- [ ] Field install (012 — node runs the pump; ESP-NOW client compiled in per 011, comms-enabled flag per DN003)
 - [x] TFT + encoder UI on protoboard (010 closed 2026-08-28)
+- [ ] 2-ESP bench wire test: node client vs bench gateway harness (011 + 013)
 - [ ] Gateway builds; ESP-NOW bring-up with control node
 - [ ] MQTT publish path + retained state / LWT
-- [ ] `server/docker-compose.yml` + Mosquitto config in git
-- [ ] Influx write path + one Grafana dashboard
-- [ ] Node-RED: read-only status / non-critical setpoints only
+- [ ] Commit service (DN005): MQTT → Influx with commit watermarks; chain-health + notifications
+- [ ] `server/docker-compose.yml` + Mosquitto config (persistence on) in git
+- [ ] Influx write path + one Grafana dashboard (events stream + annotations per DN006)
+- [ ] Admin panel (descriptor-driven; DN003 PARAM_SET path)
+- [ ] Data-integrity failure-mode matrix (DN006)
+- [ ] Node-RED optional views (demoted from telemetry path by DN004 commit service)
 - [ ] Forcible “server down” test: pump loop still correct
 
 ## Phase 2+ (not scheduled — do not pre-build empty trees)

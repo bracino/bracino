@@ -169,5 +169,7 @@ Cool TPU water into the jacket is what makes the boiler fire. No network in this
 ## Related
 
 - [DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md) — CT boolean
+- [DESIGN_NOTE_003](DESIGN_NOTE_003_espnow_node_schema.md) — ESP-NOW wire law (supervisory client, issue 011)
 - [ADR_001](ADR_001.txt) — hardware
 - Issue [009](../issues/open/009-offline-control-loop.md) — implementation
+- Issue [012](../issues/open/012-field-install-readiness.md) — field-image checklist

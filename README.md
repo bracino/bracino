@@ -55,9 +55,12 @@ Atomic commits across firmware + server when MQTT/ESP-NOW contracts change. No n
 
 Self-hosted, **local network only**, no cloud requirement for heating:
 
-- **Mosquitto** — retained last-known state; LWT for online/offline
-- **Node-RED** — non-safety-critical logic + light phone-friendly UI (thresholds, schedules)
+- **Mosquitto** — retained last-known state; LWT for online/offline (persistence on so retained state survives broker restarts)
+- **Commit service** (planned, [DESIGN_NOTE_005] stub in [DESIGN_NOTE_004](docs/DESIGN_NOTE_004_gateway_design.md)) — MQTT → Influx with per-node commit watermarks; the gateway only acks telemetry durably written; chain-health alarms + optional push notifications
 - **InfluxDB + Grafana** — history and owner-shareable read-only graphs
+- **Node-RED** — optional convenience UI only; **not** in the telemetry write path (the commit service owns that per DN004)
+
+MQTT topics/payloads: [DESIGN_NOTE_004](docs/DESIGN_NOTE_004_gateway_design.md). ESP-NOW wire schema: [DESIGN_NOTE_003](docs/DESIGN_NOTE_003_espnow_node_schema.md).
 
 Config in git; secrets via environment. Influx **data** is backed up separately (NAS → cloud), not treated as compose fodder.
 
@@ -70,14 +73,14 @@ Primarily the builder/maintainer. Read-only graphs/status for other unit owners 
 ## Development environment
 
 - Headless Ubuntu Server VM; `~/projects` shared with the host
-- Firmware: **C**, **ESP-IDF** (shared installs under `~/projects/shared`, not vendored here)
+- Firmware: **C**, **ESP-IDF** (shared installs under `~/projects/share/lib/esp/esp-idf`, not vendored here)
 - Flash/bench on real hardware; agents prepare commands, humans run them on the iron
 
 ## Verification (as it grows)
 
 ```bash
 # Firmware (once ESP-IDF projects exist), typical pattern:
-# . ~/projects/shared/esp-idf/export.sh   # or your shared install
+# . ~/projects/share/lib/esp/esp-idf/export.sh   # or your shared install
 # cd firmware/node-bbu && idf.py build
 
 # Server (once compose lands):
