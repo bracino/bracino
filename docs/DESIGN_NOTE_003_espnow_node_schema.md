@@ -374,6 +374,29 @@ change — AP reboot, auto channel selection, DFS event).
   gap exactly as in any other outage — no special case beyond "unreachable
   ⇒ scan."
 
+### Non-blocking radio contract
+
+Scanning, `HELLO` retries, batch sends, retransmits, and all other
+ESP-NOW work are **asynchronous to the control loop by construction, not
+by hope**. This is the explicit scheduling contract behind the Motivation
+promise ("no node's control loop may block on, or degrade unsafely
+without, this link"):
+
+- The control loop runs in the highest-priority task and **never calls
+  into the radio path synchronously** — it hands telemetry samples to the
+  FIFO (an enqueue, no I/O) and nothing else.
+- All radio work runs in a dedicated comms task, scheduled strictly below
+  the loop and below UI input handling.
+- Discovery scanning is windowed and bounded: per-channel dwell (start:
+  ~250 ms), a total budget per scan attempt (start: ~5 s across the
+  priority list), and a rest interval between attempts (start: ≥ 10 s)
+  while searching. A gateway-less node is *always searching* on this duty
+  cycle, never saturating the radio.
+- **Invariant: sample/act cadence and UI responsiveness are bit-identical
+  whether or not a scan or drain is in progress.** If bench measurement
+  shows loop jitter attributable to comms, the comms budget shrinks until
+  it doesn't.
+
 ## Gateway ESP-NOW gating (backend availability)
 
 Buffering during an outage is a **node-side responsibility only** — the
@@ -527,6 +550,29 @@ typedef struct __attribute__((packed)) {
 - Outage-duration estimation and timestamp stitching are gateway/backend
   concerns (DN004); this schema exposes `boot_session` + local clock
   honestly enough for that reconciliation to be possible.
+
+### Pre-gateway provisioning (epoch-less bring-up)
+
+A node provisioned and powered before any gateway exists (phase-1 field
+reality: first node in the plant, gateway built later) runs with **no
+epoch at all**. This is defined behavior, not an error:
+
+- Before the first `TIME_SYNC`, the node's effective epoch is **0**:
+  reported time is simply `node_clock_ms`. The envelope is honest;
+  there is nothing to fake.
+- Backlog captured pre-sync is **not stale**. Once an anchor exists
+  (first `HELLO_ACK`), the same translation —
+  `anchor_epoch + (capture_ms − anchor_clock)` — extrapolates *backwards*
+  through the entire buffer: samples taken hours before the gateway first
+  answered get correct wall-clock stamps. No special node-side handling;
+  the FIFO never needed an epoch.
+- Therefore the gateway and commit service **must not discard points for
+  being "too old"** (e.g. 1970-based). Back-dated Influx writes are normal
+  here; `boot_session` scopes them.
+- Multi-boot pre-gateway history is lost by design (RAM FIFO, Non-goals).
+  Within a single boot the full backlog survives the gateway's late
+  arrival — making first-node bring-up a natural field test of the
+  decimation policy and a heavy stop-and-wait drain.
 
 ### Sync interval
 
@@ -772,7 +818,8 @@ assigned, lives in `espnow_schema.h`.
 | 0x03 | `PARAM_CHANGED` | `param_id u8, new_value[], source u8` (1=LOCAL_UI, 2=PARAM_SET echo) | Keeps admin panel honest on local encoder changes |
 | 0x04 | `CONFIG_CHANGED` | `config_ver u8` | Descriptor changed → gateway should re-`CONFIG_GET` |
 | 0x05 | `BATTERY_WARN` | `level_pct u8` | Future sleepy nodes; reserved now |
-| 0x06–0xFF | — | — | unassigned, append-only |
+| 0x06 | `DECIMATION_OCCURRED` | `ring_pct u8, dropped u16` | Diagnostic: a decimation pass fired — evidence for buffer-sizing review |
+| 0x07–0xFF | — | — | unassigned, append-only |
 
 The gateway maps event ids to MQTT event-topic payloads (DN004); the
 mapping is a gateway concern, the registry here is the contract.
@@ -823,4 +870,5 @@ schema extension rather than a schema rewrite.
   use (frame-capacity constants depend on it); actual crystal drift on
   node hardware (adjust `TIME_SYNC` interval from the 1×/hour starting
   value if warranted); stop-and-wait drain throughput with several nodes
-  draining simultaneously.
+  draining simultaneously; control-loop jitter with discovery scans and
+  a drain in progress (Non-blocking radio contract invariant).

@@ -1,7 +1,7 @@
 # Design note 002 — BBU offline control loop (emulate MES-BBU)
 
 **Status:** Implemented. Desk `sim` walk-through passed (2026-08-22). Dummy AC load validated (2026-08-25). Thermometer / plant proof still open.  
-**Date:** 2026-08-22 (CT warn-only 2026-08-25)  
+**Date:** 2026-08-22 (CT warn-only 2026-08-25; boot-mode persistence 2026-08-30)  
 **Applies to:** `firmware/node-bbu` local loop on the v0.08 protoboard  
 **Does not apply to:** gateway, MQTT, or a later ACS node. Local TFT/encoder is on-node I/O (not the network path).
 
@@ -98,7 +98,29 @@ IDLE --(TPO ≤ tpo_on_threshold && off-timer expired)──► RUNNING
 
 In `TPO_ONLY` the stop line is only `min_on_time` done **and** `TPO ≥ tpo_off_threshold`.
 
-Bring-up firmware **boots Manual / coil OFF** so CT and load tests are not seized. `auto` enters Auto. Production default can become Auto once the loop is proven.
+Bring-up firmware boots **Manual / coil OFF** (factory default — see Boot
+behavior, below). `auto` enters Auto.
+
+## Boot behavior (power-on / power-loss)
+
+The node **boots in its last known user mode**, not a fixed default:
+
+- **Persisted on every human action** (TFT menu or serial): `user_mode`,
+  plus the commanded coil state when in **Manual** — Manual is the
+  operator's explicit pump decision, and a power blip must not silently
+  change it. Auto relay transitions are loop-owned and **never written**
+  to NVS (wear stays human-rate).
+- **Restored at boot:** the persisted mode resumes (and the Manual coil
+  state with it). Auto re-derives its IDLE/RUNNING state from sensor
+  readings — the cycle is not persisted, only the mode.
+- **TEST is never persisted** (it is intrinsically transient): a reboot
+  during Test comes up **Manual / coil OFF**.
+- **Off (`halt`) persists like Auto/Manual:** an operator who stopped the
+  pump deliberately must not find it running after a power blip.
+- **Factory-fresh NVS** boots **Manual / coil OFF**.
+
+Field sequence: first boot → Manual/OFF; operator selects Auto on the
+UI; every subsequent power loss reboots straight into Auto.
 
 GPIO8: idle = 100 ms on / 900 ms off; RUNNING = steady on; any warning (including no-CT) / `FAULT` / `TPO_ONLY` / TPO unusable = 300 ms on/off.
 
