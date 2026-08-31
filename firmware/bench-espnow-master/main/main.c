@@ -129,6 +129,9 @@ typedef struct {
     bool config_fetched;
     uint32_t last_seen_ms;
     bool flagged_unreach;      /* liveness warning latched (harness-level) */
+    uint16_t last_batch_seq;
+    uint8_t last_batch_boot;   /* dedupe retransmitted batches (re-ACK,
+                                * don't re-print the sample block) */
     anchor_t anchor;
     /* CONFIG_DESC reassembly */
     uint8_t frag_total, frag_next;
@@ -491,6 +494,8 @@ static void handle_hello(const rx_msg_t *m, const espnow_envelope_t *e)
 
 static void print_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec_t *n)
 {
+    bool dup = n != NULL && e->seq == n->last_batch_seq &&
+               e->boot_session == n->last_batch_boot;
     const telemetry_batch_hdr_t *h =
         (const telemetry_batch_hdr_t *)(m->data + ESPNOW_ENV_SIZE);
     size_t plen = m->len - ESPNOW_ENV_SIZE;
@@ -513,6 +518,14 @@ static void print_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec_
         int64_t d1 = (int64_t)(int32_t)(h->end_ms - n->anchor.node_clock_ms);
         epoch_to_str(n->anchor.epoch_total_ms + (uint64_t)d0, t0s, sizeof(t0s));
         epoch_to_str(n->anchor.epoch_total_ms + (uint64_t)d1, t1s, sizeof(t1s));
+    }
+    if (dup) {
+        TLOG("  (dup batch seq=%u re-ACKed)\n", e->seq);
+        return;
+    }
+    if (n != NULL) {
+        n->last_batch_seq = e->seq;
+        n->last_batch_boot = e->boot_session;
     }
     TLOG("$ committed node(%u,%u) seq=%u span=[%lu..%lu] ms=%u count=%u "
            "utc=[%s .. %s] boot=%u\n",

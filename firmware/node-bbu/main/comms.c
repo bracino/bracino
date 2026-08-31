@@ -80,6 +80,8 @@ typedef enum { CS_SCANNING = 0, CS_ONLINE } comms_state_t;
 typedef struct {
     uint8_t mac[6];
     int len;
+    uint8_t ch; /* primary channel at rx time — bind decisions need it,
+                 * because scan pops stale frames from later dwells */
     uint8_t data[ESPNOW_MAX_PAYLOAD];
 } rx_msg_t;
 
@@ -330,6 +332,9 @@ static void radio_recv_cb(const esp_now_recv_info_t *info,
     }
     memcpy(m.mac, info->src_addr, 6);
     m.len = len;
+    uint8_t prim;
+    wifi_second_chan_t sec;
+    m.ch = (esp_wifi_get_channel(&prim, &sec) == ESP_OK) ? prim : 0;
     memcpy(m.data, data, (size_t)len);
     s_ct.rx++;
     if (xQueueSend(s_rx_q, &m, 0) != pdTRUE) {
@@ -563,7 +568,7 @@ static void apply_time_sync(uint32_t epoch_s, uint16_t epoch_ms)
 }
 
 /* HELLO_ACK: always carries TIME_SYNC; may carry REJECT_REASON. */
-static bool parse_hello_ack(const rx_msg_t *m)
+static bool parse_hello_ack(const rx_msg_t *m, uint8_t expect_ch)
 {
     const espnow_envelope_t *e = (const espnow_envelope_t *)m->data;
     if (m->len < ESPNOW_ENV_SIZE + 2 || e->msg_type != MSG_HELLO_ACK) {
@@ -580,6 +585,16 @@ static bool parse_hello_ack(const rx_msg_t *m)
         } else if (tag == TLV_REJECT_REASON && vlen == 1) {
             TLOG("comms: HELLO rejected, reason=%u\n", val[0]);
         }
+    }
+    if (got_sync && m->ch != expect_ch) {
+        /* Late ACK from an earlier dwell: the gateway was heard on
+         * expect_ch-adjacent traffic, but this frame came in on a
+         * different channel than the one we're dwelling on now. Anchor
+         * refresh is fine, BINDING here is not — the gateway isn't on
+         * m->ch (that's why the batch afterwards always failed). */
+        TLOG("comms: HELLO_ACK heard on ch %u while dwelling on %u — "
+               "not binding\n", m->ch, expect_ch);
+        return false;
     }
     return got_sync;
 }
@@ -625,7 +640,7 @@ static void scan_attempt(void)
         }
         rx_msg_t m;
         while (xQueueReceive(s_rx_q, &m, pdMS_TO_TICKS(SCAN_DWELL_MS)) == pdTRUE) {
-            if (parse_hello_ack(&m)) {
+            if (parse_hello_ack(&m, chans[i])) {
                 s_channel = chans[i];
                 memcpy(s_gw_mac, m.mac, 6);
                 add_gw_peer(s_gw_mac);
@@ -652,6 +667,11 @@ static void go_unreachable(void)
     s_batch_out = false; /* entries stay in the FIFO and drain on rebind */
     s_state = CS_SCANNING;
     s_next_scan_ms = now_ms() + SCAN_REST_MS;
+    rx_msg_t stale;
+    while (xQueueReceive(s_rx_q, &stale, 0) == pdTRUE) {
+        /* drop frames that pre-date the outage: a stale HELLO_ACK sitting
+         * here would re-bind instantly on a dead channel */
+    }
 }
 
 /* ---- telemetry batch (stop-and-wait) ---- */
@@ -903,7 +923,9 @@ static void handle_rx(const rx_msg_t *m)
         }
         break;
     case MSG_HELLO_ACK:
-        parse_hello_ack(m); /* late duplicate HELLO_ACKs refresh the anchor */
+        /* late duplicate HELLO_ACKs refresh the anchor; no channel check
+         * needed here — the node is not re-binding from ONLINE */
+        parse_hello_ack(m, m->ch);
         break;
     case MSG_BATCH_ACK:
         if (m->len == ESPNOW_ENV_SIZE + 4 && s_batch_out) {
