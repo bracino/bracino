@@ -261,6 +261,18 @@ static void recv_cb(const esp_now_recv_info_t *info, const uint8_t *data, int le
     }
 }
 
+/* Channel set with loud failure logging (silently-wrong channel wasted a
+ * bench session once — never trust this call without checking). */
+static void set_channel_checked(uint8_t ch)
+{
+    esp_wifi_set_promiscuous(true);
+    esp_err_t err = esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
+    esp_wifi_set_promiscuous(false);
+    if (err != ESP_OK) {
+        printf("!! set_channel(%u) FAILED: %s\n", ch, esp_err_to_name(err));
+    }
+}
+
 static esp_err_t radio_start(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
@@ -272,9 +284,7 @@ static esp_err_t radio_start(void)
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_start());
     ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE)); /* ESP-NOW rx latency */
-    esp_wifi_set_promiscuous(true);
-    esp_wifi_set_channel(DEFAULT_CH, WIFI_SECOND_CHAN_NONE);
-    esp_wifi_set_promiscuous(false);
+    set_channel_checked(DEFAULT_CH);
 
     ESP_ERROR_CHECK(esp_now_init());
     ESP_ERROR_CHECK(esp_now_register_send_cb(send_cb));
@@ -684,14 +694,22 @@ static void handle_rx(const rx_msg_t *m)
     case MSG_HEARTBEAT:
         if (n) {
             n->last_seen_ms = now_ms();
+            printf("HB node(%u,%u) seq=%u clk=%lu ms\n", e->node_type, e->node_id,
+                   e->seq, (unsigned long)e->node_clock_ms);
+        } else {
+            printf("HB from unregistered MAC " MACSTR " node(%u,%u) "
+                   "— waiting for HELLO\n", MAC2STR(m->mac),
+                   e->node_type, e->node_id);
         }
-        printf("HB node(%u,%u) seq=%u clk=%lu ms\n", e->node_type, e->node_id,
-               e->seq, (unsigned long)e->node_clock_ms);
         break;
     case MSG_TELEMETRY_BATCH:
         if (n) {
             n->last_seen_ms = now_ms();
             handle_batch(m, e, n);
+        } else {
+            printf("TELEMETRY_BATCH seq=%u from unregistered MAC " MACSTR
+                   " — dropped (node re-HELLOs after ack timeouts)\n",
+                   e->seq, MAC2STR(m->mac));
         }
         break;
     case MSG_EVENT:
@@ -799,6 +817,14 @@ static void registry_print(void)
     }
 }
 
+static volatile uint32_t s_sniff_cnt;
+static void sniff_cb(void *buf, wifi_promiscuous_pkt_type_t type)
+{
+    (void)buf;
+    (void)type;
+    s_sniff_cnt++;
+}
+
 static void print_help(void)
 {
     printf(
@@ -809,6 +835,8 @@ static void print_help(void)
         "  t           push TIME_SYNC to all nodes\n"
         "  p           PARAM_SET setpoint +/-0.5 C to first node\n"
         "  s           registry + counters (GPIO27 button too)\n"
+        "  k           show driver's actual current channel\n"
+        "  w           5 s promiscuous frame count (RF sanity)\n"
         "  h           this help\n"
         "knobs (edit + rebuild): BENCH_NO_ACK_S=%d BENCH_DROP_PCT=%d\n",
         BENCH_NO_ACK_S, BENCH_DROP_PCT);
@@ -874,13 +902,34 @@ void app_main(void)
             } else if (line[0] == 'c' && line[1] == ' ') {
                 int ch = atoi(line + 2);
                 if (ch >= 1 && ch <= 13) {
-                    esp_wifi_set_promiscuous(true);
-                    esp_wifi_set_channel((uint8_t)ch, WIFI_SECOND_CHAN_NONE);
-                    esp_wifi_set_promiscuous(false);
-                    printf("channel -> %d (nodes must rescan)\n", ch);
+                    set_channel_checked((uint8_t)ch);
+                    uint8_t prim;
+                    wifi_second_chan_t sc;
+                    esp_wifi_get_channel(&prim, &sc);
+                    printf("channel -> %d (driver says %u; nodes must rescan)\n",
+                           ch, prim);
                 } else {
                     printf("c 1..13\n");
                 }
+            } else if (strcmp(line, "k") == 0) {
+                uint8_t prim;
+                wifi_second_chan_t sc;
+                esp_wifi_get_channel(&prim, &sc);
+                printf("driver channel: primary=%u second=%d\n",
+                       prim, (int)sc);
+            } else if (strcmp(line, "w") == 0) {
+                uint8_t prim;
+                wifi_second_chan_t sc;
+                esp_wifi_get_channel(&prim, &sc);
+                s_sniff_cnt = 0;
+                esp_wifi_set_promiscuous_rx_cb(sniff_cb);
+                esp_wifi_set_promiscuous(true);
+                printf("sniffing on ch %u for 5 s...\n", prim);
+                vTaskDelay(pdMS_TO_TICKS(5000));
+                esp_wifi_set_promiscuous(false);
+                esp_wifi_set_promiscuous_rx_cb(NULL);
+                printf("sniff done: %lu frames heard\n",
+                       (unsigned long)s_sniff_cnt);
             } else if (strcmp(line, "t") == 0) {
                 for (int i = 0; i < s_node_cnt; i++) {
                     time_sync_send(&s_nodes[i]);

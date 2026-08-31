@@ -330,8 +330,12 @@ static void radio_recv_cb(const esp_now_recv_info_t *info,
 static void set_channel(uint8_t ch)
 {
     esp_wifi_set_promiscuous(true);
-    esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
+    esp_err_t err = esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
     esp_wifi_set_promiscuous(false);
+    if (err != ESP_OK) {
+        printf("comms: !! set_channel(%u) FAILED: %s — TX may stay on prior "
+               "channel\n", ch, esp_err_to_name(err));
+    }
 }
 
 static esp_err_t radio_start(void)
@@ -580,7 +584,11 @@ static void scan_attempt(void)
 
     for (int i = 0; i < nch && (now_ms() - t0) < SCAN_BUDGET_MS; i++) {
         set_channel(chans[i]);
-        esp_now_send(BCAST_MAC, buf, len); /* broadcast; cb is don't-care */
+        esp_err_t send_err = esp_now_send(BCAST_MAC, buf, len);
+        if (send_err != ESP_OK) {
+            printf("comms: !! HELLO send on ch %u FAILED: %s\n",
+                   chans[i], esp_err_to_name(send_err));
+        }
         rx_msg_t m;
         while (xQueueReceive(s_rx_q, &m, pdMS_TO_TICKS(SCAN_DWELL_MS)) == pdTRUE) {
             if (parse_hello_ack(&m)) {
@@ -1035,8 +1043,14 @@ void comms_enable(bool on)
     }
     s_enabled = on;
     if (on) {
+        /* Force re-discovery: the gateway (re)learns us only via HELLO.
+         * A stale ONLINE state from before the disable would leave us
+         * unregistered on a restarted gateway (DN003 registration model). */
+        s_state = CS_SCANNING;
+        s_bound = false;
+        s_batch_out = false;
         s_next_scan_ms = 0;
-        printf("comms: enabled\n");
+        printf("comms: enabled (re-discovery forced)\n");
     } else {
         printf("comms: disabled (FIFO held, no radio work)\n");
     }
