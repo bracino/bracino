@@ -913,7 +913,7 @@ void app_main(void)
                 if (ch >= 1 && ch <= 13) {
                     set_channel_checked((uint8_t)ch);
                     uint8_t prim;
-                    wifi_second_chan_t sc;
+                    wifi_second_chan_t sc = WIFI_SECOND_CHAN_NONE; /* driver may leave this unwritten */
                     esp_wifi_get_channel(&prim, &sc);
                     printf("channel -> %d (driver says %u; nodes must rescan)\n",
                            ch, prim);
@@ -922,7 +922,7 @@ void app_main(void)
                 }
             } else if (strcmp(line, "k") == 0) {
                 uint8_t prim;
-                wifi_second_chan_t sc;
+                wifi_second_chan_t sc = WIFI_SECOND_CHAN_NONE; /* driver may leave this unwritten */
                 esp_wifi_get_channel(&prim, &sc);
                 printf("driver channel: primary=%u second=%d\n",
                        prim, (int)sc);
@@ -935,7 +935,7 @@ void app_main(void)
                     sec = 5;
                 }
                 uint8_t prim;
-                wifi_second_chan_t sc;
+                wifi_second_chan_t sc = WIFI_SECOND_CHAN_NONE; /* driver may leave this unwritten */
                 esp_wifi_get_channel(&prim, &sc);
                 s_sniff_cnt = 0;
                 s_sniff_printed = 0;
