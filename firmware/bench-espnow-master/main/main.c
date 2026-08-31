@@ -520,10 +520,10 @@ static void print_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec_
                (double)s->t_tpo_x10 / 10.0, (double)s->t_tpu_x10 / 10.0,
                (double)s->t_amb_x10 / 10.0, s->fault_flags);
         if (s->fault_flags) {
-            TLOG(" (");
+            printf(" (");
             for (uint8_t b = 0; b < BBU_FAULT_COUNT; b++) {
                 if (s->fault_flags & (1u << b)) {
-                    TLOG("%s ", fault_name(b));
+                    printf("%s ", fault_name(b));
                 }
             }
             TLOG(")");
@@ -581,10 +581,10 @@ static void handle_event(const rx_msg_t *m)
                        tag == EVENT_BATTERY_WARN  ? "BATTERY_WARN" : "?";
     TLOG("EVENT %s value=", name);
     for (int i = 0; i < vlen; i++) {
-        TLOG("%02x ", v[i]);
+        printf("%02x ", v[i]);
     }
     if (tag == EVENT_PARAM_CHANGED && vlen >= 1) {
-        TLOG("(param %u)", v[0]);
+        printf("(param %u)", v[0]);
     }
     TLOG("\n");
 }
@@ -648,6 +648,7 @@ static void handle_config_desc(const rx_msg_t *m, const espnow_envelope_t *e,
         TLOG("  id=%2u %-24s type=%u flags=%u min=%s max=%s step=%s\n",
                val[0], vname, val[1], val[2], mn, mx, st);
     }
+    n->frag_total = 0; /* done — disarm the reassembly watchdog */
     n->config_fetched = true;
 }
 
@@ -828,7 +829,7 @@ static void registry_print(void)
     TLOG("counters: rx=");
     for (int t = 1; t <= MSG_PARAM_ACK; t++) {
         if (s_ct.rx[t]) {
-            TLOG("%s=%lu ", MSG_NAMES[t], (unsigned long)s_ct.rx[t]);
+            printf("%s=%lu ", MSG_NAMES[t], (unsigned long)s_ct.rx[t]);
         }
     }
     TLOG("\n  acks_sent=%lu suppressed=%lu drops=%lu tx_ok=%lu tx_fail=%lu\n",
@@ -934,6 +935,9 @@ void app_main(void)
                     char ts[24];
                     epoch_to_str(s_epoch_set_ms, ts, sizeof(ts));
                     TLOG("epoch set: %s UTC — TIME_SYNC now carries it\n", ts);
+                    if (end && *end != '\0') {
+                        TLOG("  (note: ignored trailing '%s' — integer seconds only)\n", end);
+                    }
                 } else {
                     TLOG("usage: n <unix_seconds>\n");
                 }
@@ -1003,8 +1007,18 @@ void app_main(void)
             fflush(stdout);
             continue;
         }
-        if (len + 1 < sizeof(line)) {
+        if (c == 0x7f || c == 0x08) {
+            if (len > 0) {
+                len--;
+                printf("\b \b");
+                fflush(stdout);
+            }
+        } else if (len + 1 < sizeof(line)) {
             line[len++] = (char)c;
+            if (c >= 0x20 && c < 0x7f) {
+                putchar(c);
+                fflush(stdout);
+            }
         }
     }
 }

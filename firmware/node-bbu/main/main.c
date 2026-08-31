@@ -235,14 +235,14 @@ static void cmd_scan(i2c_master_bus_handle_t bus)
     int found = 0;
     for (uint16_t a = 0x03; a <= 0x77; a++) {
         if (i2c_master_probe(bus, a, 20) == ESP_OK) {
-            TLOG(" 0x%02X", a);
+            printf(" 0x%02X", a);
             found++;
         }
         vTaskDelay(pdMS_TO_TICKS(1));
     }
     xSemaphoreGive(s_mu);
     if (!found) {
-        TLOG(" (none)");
+        printf(" (none)");
     }
     TLOG("\n");
 }
@@ -250,10 +250,10 @@ static void cmd_scan(i2c_master_bus_handle_t bus)
 static void print_ntc(const char *name, ntc_sample_t s)
 {
     if (!s.ok) {
-        TLOG("%s=FAULT (%d mV)", name, s.mv);
+        printf("%s=FAULT (%d mV)", name, s.mv);
         return;
     }
-    TLOG("%s=%.1f C (%d mV)", name, (double)s.c, s.mv);
+    printf("%s=%.1f C (%d mV)", name, (double)s.c, s.mv);
 }
 
 static ntc_sample_t live_or_sim(int ch, ntc_sample_t hw)
@@ -278,7 +278,7 @@ static void print_sample(int ch, int16_t c)
     ntc_sample_t s = live_or_sim(ch, ntc_from_mv(mv));
     print_ntc(name, s);
     if ((ch == 1 && s_sim_tpo) || (ch == 2 && s_sim_tpu)) {
-        TLOG(" [sim]");
+        printf(" [sim]");
     }
 }
 
@@ -306,7 +306,7 @@ static void cmd_read_all(void)
             TLOG("  A%d err %s\n", ch, esp_err_to_name(err));
             return;
         }
-        TLOG("  ");
+        printf("  ");
         print_sample(ch, c);
     }
     TLOG("\n");
@@ -323,7 +323,7 @@ static void cmd_burst(int ch)
            sat ? "  SAT" : "");
     if (ch >= 1) {
         const char *name = (ch == 1) ? "TPO" : (ch == 2) ? "TPU" : "AMB";
-        TLOG("  ");
+        printf("  ");
         print_ntc(name, live_or_sim(ch, ntc_from_mv(mid_mv)));
     }
     TLOG("\n");
@@ -353,10 +353,10 @@ static void cmd_status(void)
     if (s_sim_tpo || s_sim_tpu) {
         TLOG("sim");
         if (s_sim_tpo) {
-            TLOG(" TPO=%.1f", (double)s_fake_tpo.c);
+            printf(" TPO=%.1f", (double)s_fake_tpo.c);
         }
         if (s_sim_tpu) {
-            TLOG(" TPU=%.1f", (double)s_fake_tpu.c);
+            printf(" TPU=%.1f", (double)s_fake_tpu.c);
         }
         TLOG("\n");
     }
@@ -910,8 +910,19 @@ void app_main(void)
             fflush(stdout);
             continue;
         }
-        if (len + 1 < sizeof(line)) {
+        if (c == 0x7f || c == 0x08) {
+            /* backspace / delete: erase locally so typing isn't blind */
+            if (len > 0) {
+                len--;
+                printf("\b \b");
+                fflush(stdout);
+            }
+        } else if (len + 1 < sizeof(line)) {
             line[len++] = (char)c;
+            if (c >= 0x20 && c < 0x7f) {
+                putchar(c);
+                fflush(stdout);
+            }
         }
     }
 }
