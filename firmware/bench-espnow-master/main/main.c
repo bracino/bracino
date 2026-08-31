@@ -359,6 +359,14 @@ static size_t gw_env_build(uint8_t *buf, uint8_t node_type, uint8_t node_id,
     return ESPNOW_ENV_SIZE + plen;
 }
 
+/* current primary channel, for loud logging (0 on read failure) */
+static uint8_t wifi_prim_ch(void)
+{
+    uint8_t prim;
+    wifi_second_chan_t sc;
+    return (esp_wifi_get_channel(&prim, &sc) == ESP_OK) ? prim : 0;
+}
+
 static size_t time_sync_tlv(uint8_t *tlv)
 {
     tlv[0] = TLV_TIME_SYNC;
@@ -463,8 +471,9 @@ static void handle_hello(const rx_msg_t *m, const espnow_envelope_t *e)
     n->liveness_s = 2;
     n->last_seen_ms = now_ms();
     n->last_boot = e->boot_session;
-    TLOG("HELLO node(%u,%u) mac " MACSTR " cfg_ver=%u seq=%u\n",
-           e->node_type, e->node_id, MAC2STR(m->mac), config_ver, e->seq);
+    TLOG("HELLO node(%u,%u) mac " MACSTR " cfg_ver=%u seq=%u (driver ch %u)\n",
+           e->node_type, e->node_id, MAC2STR(m->mac), config_ver, e->seq,
+           wifi_prim_ch());
 
     /* HELLO_ACK: always carries a fresh TIME_SYNC (DN003). */
     uint8_t tlv[8];

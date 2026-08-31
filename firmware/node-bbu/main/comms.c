@@ -352,6 +352,20 @@ static void set_channel(uint8_t ch)
                "channel\n", ch, esp_err_to_name(err));
         return;
     }
+    /* Disabling promiscuous has been reported to revert the channel to the
+     * pre-toggle value on some IDF/silicon combos. Read back and shout. */
+    uint8_t prim;
+    wifi_second_chan_t sec;
+    if (esp_wifi_get_channel(&prim, &sec) == ESP_OK && prim != ch) {
+        TLOG("comms: !! channel REVERTED: asked %u, driver now on %u — "
+               "retrying without toggle\n", ch, prim);
+        if (esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE) == ESP_OK &&
+            esp_wifi_get_channel(&prim, &sec) == ESP_OK && prim == ch) {
+            TLOG("comms: retry OK — driver on %u\n", prim);
+        } else {
+            TLOG("comms: !! retry FAILED — driver insists on %u\n", prim);
+        }
+    }
     /* Keep the broadcast peer's channel in sync: if the driver latches the
      * peer's TX channel at add_peer time, every HELLO would leave on the
      * boot channel no matter what set_channel does. (This exact symptom —
@@ -413,7 +427,11 @@ static void add_gw_peer(const uint8_t *mac)
 {
     esp_now_peer_info_t peer = { 0 };
     memcpy(peer.peer_addr, mac, 6);
-    peer.channel = s_channel;
+    /* channel 0 = "follow the radio's current channel". Pinning
+     * peer.channel = s_channel here backfired: when s_channel was wrong,
+     * every unicast TX left on the wrong channel (master never heard it,
+     * NAK, unreachable) while RX still worked. TX must follow the radio. */
+    peer.channel = 0;
     peer.ifidx = WIFI_IF_STA;
     peer.encrypt = false;
     if (esp_now_is_peer_exist(mac)) {
