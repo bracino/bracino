@@ -60,5 +60,22 @@ short ring override on the node for decimation drills.
 
 ## Verify
 
+Harness implemented 2026-08-31 (both projects build clean, esp32 + esp32c3):
+
+- `firmware/shared/bracino_schema/` — shared wire-law header.
+- Master: `firmware/bench-espnow-master/` (throwaway half — the real
+  gateway tree stays untouched per DN004). WROOM/UART0 console, fixed
+  channel 6, `c <ch>` hops for the outage drill, GPIO27 button = status
+  print (strapping-pin-safe). Registry keyed by MAC; anchors node clock
+  at HELLO_ACK for UTC translation; reassembles CONFIG_DESC fragments
+  (2 s timeout); BATCH_ACK only after the `$ committed` log line,
+  suppressed before epoch is set (node then buffers — matching the
+  epoch-less invariant). Knobs: BENCH_NO_ACK_S, BENCH_DROP_PCT.
+- The remote is the REAL node-bbu firmware (011 client) — wire
+  validation exercises shipping code.
+
+Still to do: run the six scenarios below on the desk pair; archive
+serial logs here as wire-contract evidence.
+
 All six scenarios pass on the desk pair; serial logs archived under
 `issues/fixtures/` as the wire-contract evidence for 011.

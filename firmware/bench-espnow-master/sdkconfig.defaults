@@ -1,0 +1,2 @@
+# Bench master: ESP32-WROOM dev module (UART0 console @115200)
+CONFIG_IDF_TARGET="esp32"

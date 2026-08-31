@@ -31,4 +31,30 @@ invariant) — no telemetry leaves the node pre-sync.
 
 ## Fix
 
+Implemented 2026-08-31 (bench-ready, build-clean for both targets):
+
+- `firmware/shared/bracino_schema/` — `espnow_schema.h` canonical registry
+  (envelope, msg types, TLV tags, event ids, BBU telemetry v1, BBU param
+  ids), included by node and bench-master from one physical file.
+- `main/comms.{h,c}` — the DN003 client: unified FIFO (default 4096
+  samples, `ring <n>` bench knob; graceful degradation to 32 on OOM),
+  stop-and-wait + BATCH_ACK watermark trim, 2 s retransmit, 3-fail ⇒
+  rescan, channel scan cached→1/6/11→1..13 with DN003 dwell/budget/rest,
+  TIME_SYNC anchoring + epoch-less TX invariant (no telemetry before
+  non-zero epoch), HEARTBEAT 2 s, EVENT (FAULT_RAISED/CLEARED diffed in
+  monitor task, PARAM_CHANGED on local setter), PARAM_GET/SET with
+  monotonic-admin_seq replay guard (EXPIRED; TTL wall-clock deferred to
+  DN005), CONFIG_DESC with fragmentation ({idx,total} + MORE_FRAGMENTS,
+  2 s reassembly timeout). Identity + comms_enabled in NVS ("comms" ns).
+- DN003 param_id table in `params.{c,h}` — one validated setter path;
+  ids 8/9/10 (user_mode, manual_relay, comms_enable) route to control
+  via hooks. Serial `prog` emits PARAM_CHANGED (source=LOCAL_UI).
+- `main.c` — 1 Hz capture hook (cadence-gated, default 15 s, `tel <s>`
+  knob), wire-mode mapping, fault-bit mapping (open/short by rail side,
+  range_fault→OPEN), quiet CT burst in the monitor path.
+- Bench counterpart: `firmware/bench-espnow-master/` per issue 013.
+
+Deferred to 012 field-image pass: UI-menu parity for comms status and
+param editing (serial covers both today).
+
 ## Verify

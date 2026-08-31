@@ -20,6 +20,115 @@ typedef struct {
 } params_blob_t;
 
 static bbu_params_t s_p;
+static params_changed_fn_t s_changed_cb;
+
+void params_register_changed_cb(params_changed_fn_t fn)
+{
+    s_changed_cb = fn;
+}
+
+/* DN003 param table: ids are BBU_PARAM_* (shared header). Range checks
+ * mirror params_set() string validation exactly — one setter semantics. */
+static const bbu_param_desc_t s_table[] = {
+    { BBU_PARAM_TPO_SETPOINT_C,      PTYPE_I16_X10, PARAM_FLAG_RW, 200, 900,   5, "tpo_setpoint_c" },
+    { BBU_PARAM_HYSTERESIS_C,        PTYPE_I16_X10, PARAM_FLAG_RW, 5,   150,   5, "hysteresis_c" },
+    { BBU_PARAM_MIN_ON_TIME_S,       PTYPE_U32,     PARAM_FLAG_RW, 0,   3600,  1, "min_on_time_s" },
+    { BBU_PARAM_MIN_OFF_TIME_S,      PTYPE_U32,     PARAM_FLAG_RW, 0,   3600,  1, "min_off_time_s" },
+    { BBU_PARAM_CT_CONFIRM_S,        PTYPE_U32,     PARAM_FLAG_RW, 1,   120,   1, "ct_confirm_s" },
+    { BBU_PARAM_MIN_TPO_TPU_DELTA_C, PTYPE_I16_X10, PARAM_FLAG_RW, 0,   300,   5, "min_tpo_tpu_delta_c" },
+    { BBU_PARAM_MAX_RUN_TIME_MIN,    PTYPE_U32,     PARAM_FLAG_RW, 1,   240,   1, "max_run_time_min" },
+    { BBU_PARAM_USER_MODE,           PTYPE_ENUM,    PARAM_FLAG_RW, 0,   3,     1, "user_mode" },
+    { BBU_PARAM_MANUAL_RELAY,        PTYPE_ENUM,    PARAM_FLAG_RW, 0,   1,     1, "manual_relay" },
+    { BBU_PARAM_COMMS_ENABLE,        PTYPE_ENUM,    PARAM_FLAG_RW, 0,   1,     1, "comms_enable" },
+};
+
+const bbu_param_desc_t *params_table(int *count)
+{
+    if (count) {
+        *count = sizeof(s_table) / sizeof(s_table[0]);
+    }
+    return s_table;
+}
+
+const bbu_param_desc_t *params_desc_by_id(uint8_t id)
+{
+    for (size_t i = 0; i < sizeof(s_table) / sizeof(s_table[0]); i++) {
+        if (s_table[i].id == id) {
+            return &s_table[i];
+        }
+    }
+    return NULL;
+}
+
+bool params_id_from_name(const char *name, uint8_t *id)
+{
+    for (size_t i = 0; i < sizeof(s_table) / sizeof(s_table[0]); i++) {
+        if (strcmp(s_table[i].name, name) == 0) {
+            *id = s_table[i].id;
+            return true;
+        }
+    }
+    return false;
+}
+
+/* ids 8/9/10 live outside params.c (mode/relay/comms gate) — main.c
+ * registers one hook pair; this is still a single validated setter path. */
+static bool (*s_ext_set)(uint8_t id, int32_t v);
+static bool (*s_ext_get)(uint8_t id, int32_t *v);
+
+void params_register_ext_setters(bool (*set)(uint8_t, int32_t),
+                                 bool (*get)(uint8_t, int32_t *))
+{
+    s_ext_set = set;
+    s_ext_get = get;
+}
+
+bool params_set_by_id(uint8_t id, int32_t v)
+{
+    const bbu_param_desc_t *d = params_desc_by_id(id);
+    if (d == NULL) {
+        return false;
+    }
+    if (d->type == PTYPE_U32 && v < 0) {
+        return false; /* negative into an unsigned param: type error */
+    }
+    if (v < d->min || v > d->max) {
+        return false;
+    }
+    switch (id) {
+    case BBU_PARAM_TPO_SETPOINT_C:      s_p.tpo_setpoint_c = v / 10.0f; break;
+    case BBU_PARAM_HYSTERESIS_C:        s_p.hysteresis_c = v / 10.0f; break;
+    case BBU_PARAM_MIN_ON_TIME_S:       s_p.min_on_time_s = (uint32_t)v; break;
+    case BBU_PARAM_MIN_OFF_TIME_S:      s_p.min_off_time_s = (uint32_t)v; break;
+    case BBU_PARAM_CT_CONFIRM_S:        s_p.ct_confirm_s = (uint32_t)v; break;
+    case BBU_PARAM_MIN_TPO_TPU_DELTA_C: s_p.min_tpo_tpu_delta_c = v / 10.0f; break;
+    case BBU_PARAM_MAX_RUN_TIME_MIN:    s_p.max_run_time_min = (uint32_t)v; break;
+    default:
+        if (s_ext_set && s_ext_set(id, v)) {
+            break;
+        }
+        return false;
+    }
+    return true;
+}
+
+bool params_get_raw_by_id(uint8_t id, int32_t *raw)
+{
+    if (raw == NULL) {
+        return false;
+    }
+    switch (id) {
+    case BBU_PARAM_TPO_SETPOINT_C:      *raw = (int32_t)(s_p.tpo_setpoint_c * 10.0f); return true;
+    case BBU_PARAM_HYSTERESIS_C:        *raw = (int32_t)(s_p.hysteresis_c * 10.0f); return true;
+    case BBU_PARAM_MIN_ON_TIME_S:       *raw = (int32_t)s_p.min_on_time_s; return true;
+    case BBU_PARAM_MIN_OFF_TIME_S:      *raw = (int32_t)s_p.min_off_time_s; return true;
+    case BBU_PARAM_CT_CONFIRM_S:        *raw = (int32_t)s_p.ct_confirm_s; return true;
+    case BBU_PARAM_MIN_TPO_TPU_DELTA_C: *raw = (int32_t)(s_p.min_tpo_tpu_delta_c * 10.0f); return true;
+    case BBU_PARAM_MAX_RUN_TIME_MIN:    *raw = (int32_t)s_p.max_run_time_min; return true;
+    default:
+        return s_ext_get && s_ext_get(id, raw);
+    }
+}
 
 static void defaults(bbu_params_t *p)
 {
@@ -80,6 +189,9 @@ bool params_set(const char *name, const char *value)
         return false;
     }
 
+    uint8_t id;
+    bool id_ok = params_id_from_name(name, &id);
+
     if (strcmp(name, "tpo_setpoint_c") == 0) {
         if (!in_range_f((float)d, 20.0f, 90.0f)) {
             printf("tpo_setpoint_c 20..90\n");
@@ -125,6 +237,13 @@ bool params_set(const char *name, const char *value)
     } else {
         printf("unknown param '%s'\n", name);
         return false;
+    }
+
+    if (id_ok && s_changed_cb) {
+        int32_t raw;
+        if (params_get_raw_by_id(id, &raw)) {
+            s_changed_cb(id, raw);
+        }
     }
     return true;
 }

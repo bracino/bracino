@@ -22,9 +22,11 @@
 #include "freertos/task.h"
 
 #include "control.h"
+#include "comms.h"
 #include "ntc.h"
 #include "params.h"
 #include "enc.h"
+#include "espnow_schema.h"
 #include "ui.h"
 
 #define PIN_RELAY          GPIO_NUM_10
@@ -58,6 +60,9 @@ static bool s_sim_tpu;
 static ntc_sample_t s_fake_tpo;
 static ntc_sample_t s_fake_tpu;
 static bool s_hw_relay;
+
+static void print_help(void);
+static void cmd_comms(char *line); /* defined below; used in handle_line */
 
 static void hw_relay(bool on)
 {
@@ -154,7 +159,8 @@ static esp_err_t ads_read_ch(int ch, int16_t *counts)
     return err;
 }
 
-static bool burst_ch(int ch, int *mid_mv, int *rms_mv, int *pp_mv, int *sat)
+static bool burst_ch(int ch, int *mid_mv, int *rms_mv, int *pp_mv, int *sat,
+                     bool quiet)
 {
     int32_t sum = 0;
     int16_t samples[CT_BURST_N];
@@ -166,7 +172,9 @@ static bool burst_ch(int ch, int *mid_mv, int *rms_mv, int *pp_mv, int *sat)
         esp_err_t err = ads_read_ch_locked(ch, &c);
         if (err != ESP_OK) {
             xSemaphoreGive(s_mu);
-            printf("A%d burst err at %d: %s\n", ch, i, esp_err_to_name(err));
+            if (!quiet) {
+                printf("A%d burst err at %d: %s\n", ch, i, esp_err_to_name(err));
+            }
             return false;
         }
         samples[i] = c;
@@ -209,6 +217,10 @@ static void print_help(void)
         "  sim tpo 55       inject TPO °C (desk loop proof)\n"
         "  sim tpu 30       inject TPU °C\n"
         "  sim clear        use real NTCs again\n"
+        "  comms [on|off]   ESP-NOW client (DN003); 'comms' = status\n"
+        "  ident T I        provision node_type/id (NVS)\n"
+        "  tel <sec>        telemetry capture period (default 15)\n"
+        "  ring <n>         resize FIFO ring EMPTY (bench decimation)\n"
         "  prog / st / scan / enc / h\n"
         "GPIO8: idle 100/900, RUNNING steady, alert 300/300.\n"
         "Boots Manual. CT is loaded/not. Do not hang the real BBU pump.\n");
@@ -301,7 +313,7 @@ static void cmd_read_all(void)
 static void cmd_burst(int ch)
 {
     int mid_mv, rms_mv, pp_mv, sat;
-    if (!burst_ch(ch, &mid_mv, &rms_mv, &pp_mv, &sat)) {
+    if (!burst_ch(ch, &mid_mv, &rms_mv, &pp_mv, &sat, false)) {
         return;
     }
     printf("relay=%s  A%d  n=%d  mid=%d mV  rms=%d mV  pp=%d mV%s",
@@ -537,6 +549,11 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
         printf("mode Off (coil stays OFF until mode changes)\n");
     } else if (strncmp(line, "sim", 3) == 0) {
         cmd_sim(line);
+    } else if (strncmp(line, "comms", 5) == 0 ||
+               strncmp(line, "ident", 5) == 0 ||
+               strncmp(line, "tel ", 4) == 0 ||
+               strncmp(line, "ring ", 5) == 0) {
+        cmd_comms(line);
     } else if (strcmp(line, "prog") == 0) {
         s_prog = true;
         printf("programming on  (list | NAME VALUE | save | default | exit)\n");
@@ -572,24 +589,166 @@ static void log_events(uint32_t ev)
     }
 }
 
+/* ---- comms integration (DESIGN_NOTE_003 client, issue 011) ---- */
+
+static uint8_t mode_wire(bbu_mode_t m)
+{
+    switch (m) {
+    case BBU_MODE_MANUAL:   return BBU_MODE_W_MANUAL;
+    case BBU_MODE_AUTO:     return BBU_MODE_W_AUTO;
+    case BBU_MODE_TPO_ONLY: return BBU_MODE_W_AUTO; /* internal Auto variant */
+    case BBU_MODE_TESTING:  return BBU_MODE_W_TEST;
+    case BBU_MODE_OFF:
+    case BBU_MODE_FAULT:    return BBU_MODE_W_OFF;
+    default:                return BBU_MODE_W_OFF;
+    }
+}
+
+static bool mode_from_wire(uint8_t w, bbu_mode_t *out)
+{
+    switch (w) {
+    case BBU_MODE_W_MANUAL: *out = BBU_MODE_MANUAL; return true;
+    case BBU_MODE_W_AUTO:   *out = BBU_MODE_AUTO;   return true;
+    case BBU_MODE_W_TEST:   *out = BBU_MODE_TESTING; return true;
+    case BBU_MODE_W_OFF:    *out = BBU_MODE_OFF;    return true;
+    default:                return false;
+    }
+}
+
+/* Param ids 8/9/10 live outside params.c — the hooks keep ONE validated
+ * setter path: PARAM_SET and the serial UI both land here. */
+static bool hook_param_set(uint8_t id, int32_t v)
+{
+    switch (id) {
+    case BBU_PARAM_USER_MODE: {
+        bbu_mode_t m;
+        if (!mode_from_wire((uint8_t)v, &m)) {
+            return false;
+        }
+        xSemaphoreTake(s_mu, portMAX_DELAY);
+        bbu_ctrl_request_mode(&s_ctrl, m);
+        apply_ctrl();
+        xSemaphoreGive(s_mu);
+        return true;
+    }
+    case BBU_PARAM_MANUAL_RELAY:
+        xSemaphoreTake(s_mu, portMAX_DELAY);
+        if (s_ctrl.mode != BBU_MODE_MANUAL) {
+            bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_MANUAL);
+        }
+        bbu_ctrl_manual_relay(&s_ctrl, v != 0);
+        apply_ctrl();
+        xSemaphoreGive(s_mu);
+        return true;
+    case BBU_PARAM_COMMS_ENABLE:
+        comms_enable(v != 0);
+        return true;
+    default:
+        return false;
+    }
+}
+
+static bool hook_param_get(uint8_t id, int32_t *v)
+{
+    switch (id) {
+    case BBU_PARAM_USER_MODE:
+        xSemaphoreTake(s_mu, portMAX_DELAY);
+        *v = mode_wire(s_ctrl.user_mode);
+        xSemaphoreGive(s_mu);
+        return true;
+    case BBU_PARAM_MANUAL_RELAY:
+        xSemaphoreTake(s_mu, portMAX_DELAY);
+        *v = s_ctrl.relay_on ? 1 : 0;
+        xSemaphoreGive(s_mu);
+        return true;
+    case BBU_PARAM_COMMS_ENABLE:
+        *v = comms_enabled() ? 1 : 0;
+        return true;
+    default:
+        return false;
+    }
+}
+
+/* Local (serial/UI) changes propagate as PARAM_CHANGED events (DN003). */
+static void param_changed_cb(uint8_t id, int32_t raw)
+{
+    uint8_t ev[8];
+    size_t n = comms_encode_param_value(id, raw, ev + 1);
+    if (n == 0) {
+        return;
+    }
+    ev[0] = id;
+    ev[1 + n] = PARAM_SRC_LOCAL_UI;
+    comms_offer_event(EVENT_PARAM_CHANGED, ev, (uint8_t)(2 + n));
+}
+
+static uint8_t ntc_fault_bits(const ntc_sample_t *s, uint8_t open_bit,
+                              uint8_t short_bit)
+{
+    if (s->ok) {
+        return 0;
+    }
+    if (s->range_fault) {
+        /* plausible mV but outside -5–110 °C: unusable → OPEN bit */
+        return (uint8_t)(1u << open_bit);
+    }
+    /* rail fault: open sits at the low rail, short at the high rail */
+    int mid = (NTC_RAIL_LO_MV + NTC_RAIL_HI_MV) / 2;
+    return (uint8_t)(1u << (s->mv < mid ? open_bit : short_bit));
+}
+
+static void cmd_comms(char *line)
+{
+    if (strcmp(line, "comms") == 0) {
+        comms_status_print();
+        return;
+    }
+    if (strcmp(line, "comms on") == 0) {
+        comms_enable(true);
+        return;
+    }
+    if (strcmp(line, "comms off") == 0) {
+        comms_enable(false);
+        return;
+    }
+    unsigned int t, i;
+    if (sscanf(line, "ident %u %u", &t, &i) == 2) {
+        comms_set_ident((uint8_t)t, (uint8_t)i);
+        return;
+    }
+    unsigned int v;
+    if (sscanf(line, "tel %u", &v) == 1) {
+        comms_set_sample_period_s(v);
+        return;
+    }
+    if (sscanf(line, "ring %u", &v) == 1) {
+        comms_ring_resize((uint16_t)v);
+        return;
+    }
+    printf("comms [on|off] | ident <type> <id> | tel <sec> | ring <samples>\n");
+}
+
 static void monitor_task(void *arg)
 {
     (void)arg;
     for (;;) {
         int mid0 = 0, rms0 = 0, pp0 = 0, sat0 = 0;
-        bool ct_ok = burst_ch(0, &mid0, &rms0, &pp0, &sat0);
+        bool ct_ok = burst_ch(0, &mid0, &rms0, &pp0, &sat0, true);
         bool ct_on = ct_ok && (rms0 >= CT_ON_RMS_MV);
 
         int16_t c1 = 0, c2 = 0, c3 = 0;
         ntc_sample_t tpo = { .ok = false, .rail_fault = true };
         ntc_sample_t tpu = { .ok = false, .rail_fault = true };
+        ntc_sample_t amb = { .ok = false, .rail_fault = true };
         if (ads_read_ch(1, &c1) == ESP_OK) {
             tpo = ntc_from_mv(counts_to_mv(c1));
         }
         if (ads_read_ch(2, &c2) == ESP_OK) {
             tpu = ntc_from_mv(counts_to_mv(c2));
         }
-        (void)ads_read_ch(3, &c3);
+        if (ads_read_ch(3, &c3) == ESP_OK) {
+            amb = ntc_from_mv(counts_to_mv(c3));
+        }
 
         xSemaphoreTake(s_mu, portMAX_DELAY);
         if (s_sim_tpo) {
@@ -608,6 +767,40 @@ static void monitor_task(void *arg)
         apply_ctrl();
         ui_live_t live = { .tpo = tpo, .tpu = tpu, .ct_present = ct_on };
         ui_set_live(&live);
+
+        /* comms sample + fault-transition events (DN003 EVENT registry) */
+        uint8_t faults = ntc_fault_bits(&tpo, BBU_FAULT_TPO_OPEN,
+                                        BBU_FAULT_TPO_SHORT) |
+                         ntc_fault_bits(&tpu, BBU_FAULT_TPU_OPEN,
+                                        BBU_FAULT_TPU_SHORT) |
+                         ntc_fault_bits(&amb, BBU_FAULT_AMB_OPEN,
+                                        BBU_FAULT_AMB_SHORT);
+        static uint8_t s_prev_faults;
+        if (faults != s_prev_faults) {
+            uint8_t raised = faults & ~s_prev_faults;
+            uint8_t cleared = s_prev_faults & ~faults;
+            for (uint8_t f = 0; f < BBU_FAULT_COUNT; f++) {
+                if (raised & (1u << f)) {
+                    comms_offer_event(EVENT_FAULT_RAISED, &f, 1);
+                }
+                if (cleared & (1u << f)) {
+                    comms_offer_event(EVENT_FAULT_CLEARED, &f, 1);
+                }
+            }
+            s_prev_faults = faults;
+        }
+        comms_sample_t sample = {
+            .mode_w = mode_wire(s_ctrl.mode),
+            .relay_state = s_ctrl.relay_on ? 1 : 0,
+            .ct_state = s_ctrl.relay_on ? (ct_on ? 1 : 2)
+                                        : (ct_on ? 2 : 0),
+            .t_tpo_x10 = tpo.ok ? (int16_t)(tpo.c * 10.0f) : -999,
+            .t_tpu_x10 = tpu.ok ? (int16_t)(tpu.c * 10.0f) : -999,
+            .t_amb_x10 = amb.ok ? (int16_t)(amb.c * 10.0f) : -999,
+            .fault_flags = faults,
+        };
+        comms_offer_sample(&sample);
+
         bool alert = s_ctrl.warn_stuck || s_ctrl.warn_maxrun ||
                      s_ctrl.warn_noct ||
                      (s_ctrl.mode == BBU_MODE_FAULT) ||
@@ -646,6 +839,11 @@ void app_main(void)
     bbu_ctrl_init(&s_ctrl);
 
     params_init();
+    /* comms needs params (param table) and NVS up; hooks give it the
+     * control struct without a compile-time dependency cycle. */
+    params_register_ext_setters(hook_param_set, hook_param_get);
+    params_register_changed_cb(param_changed_cb);
+    comms_init();
     xTaskCreate(heartbeat_task, "heart", 2048, NULL, 1, NULL);
 
     i2c_master_bus_config_t bus_cfg = {
