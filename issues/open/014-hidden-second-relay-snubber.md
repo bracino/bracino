@@ -92,6 +92,29 @@ removal, new protoboard rework note), DN002 parameter note for
 `ct_confirm_s` semantics if CT is repurposed or dropped, possible new input
 if aux-contact confirmation is chosen.
 
+### Investigation plan (agreed 2026-08-31, human executes)
+
+1. **Bench:** cut the snubber out of the relay circuit on the protoboard.
+2. **Bench retest with a dummy load** — verify relay opens/closes cleanly.
+   Note: a resistive dummy load cannot reproduce the failure mode (held
+   coil). To test the snubber-leak hypothesis on the bench, drive an actual
+   small relay coil (24 V AC/DC) with the node contact; with contacts open,
+   measure coil voltage — **above drop-out ⇒ hypothesis confirmed**, without
+   a boiler-room trip. Cheap to do while the snubber is lifted.
+3. **Boiler room round 2, snubberless:** node OFF ⇒ does the pump stop
+   immediately? Measure the 24 V line (AC vs DC, and voltage across the
+   second relay coil with our contacts open — distinguishes snubber leak
+   from a parallel path per the diagnostic sequence above).
+4. **Locate the second relay** if accessible (model / coil rating / spare
+   poles).
+
+Once those are in hand: decide the relay/contact rework and the
+run-confirmation direction. **Initial human direction:** the *next* node
+becomes a **boiler monitor** — split-core CT on one pump leg, temps at flue
+and water-jacket inlet/outlet, blower + fuel-feed current. That group sits
+naturally at the plant and would obviate any pump-current sensing on the
+BBU controller (see ROADMAP phase-2 energy accounting).
+
 ## Verify
 
 - [ ] 24 V line AC/DC measured and recorded here

@@ -65,7 +65,11 @@ Preferred order when something has to wait:
 Recreate directories when work actually starts.
 
 - **Harden** — PCB (`hardware/bbu-controller`); ACS pump loop node (new `firmware/…` when named)
-- **Energy accounting** — monitor-only board for fuel-in vs BTU-delivered
+- **Energy accounting** — monitor-only board for fuel-in vs BTU-delivered.
+  (Sketched 2026-08-31 as a **boiler monitor** node: split-core CT on one
+  pump leg, flue + water-jacket inlet/outlet temps, blower and fuel-feed
+  current. Would also give true pump run-confirmation that the BBU node
+  lost with the 014 plant finding — see issues/open/014.)
 - **Further variants** — TBD from real usefulness
 
 ## Non-goals (for now)
