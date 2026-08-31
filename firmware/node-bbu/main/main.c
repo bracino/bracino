@@ -28,6 +28,7 @@
 #include "enc.h"
 #include "espnow_schema.h"
 #include "ui.h"
+#include "bracino_log.h"
 
 #define PIN_RELAY          GPIO_NUM_10
 #define PIN_HEART          GPIO_NUM_8
@@ -173,7 +174,7 @@ static bool burst_ch(int ch, int *mid_mv, int *rms_mv, int *pp_mv, int *sat,
         if (err != ESP_OK) {
             xSemaphoreGive(s_mu);
             if (!quiet) {
-                printf("A%d burst err at %d: %s\n", ch, i, esp_err_to_name(err));
+                TLOG("A%d burst err at %d: %s\n", ch, i, esp_err_to_name(err));
             }
             return false;
         }
@@ -207,7 +208,7 @@ static bool burst_ch(int ch, int *mid_mv, int *rms_mv, int *pp_mv, int *sat,
 
 static void print_help(void)
 {
-    printf(
+    TLOG(
         "commands:\n"
         "  on / off / t     relay (forces Manual)\n"
         "  auto / manual / test / halt\n"
@@ -230,29 +231,29 @@ static void print_help(void)
 static void cmd_scan(i2c_master_bus_handle_t bus)
 {
     xSemaphoreTake(s_mu, portMAX_DELAY);
-    printf("I2C:");
+    TLOG("I2C:");
     int found = 0;
     for (uint16_t a = 0x03; a <= 0x77; a++) {
         if (i2c_master_probe(bus, a, 20) == ESP_OK) {
-            printf(" 0x%02X", a);
+            TLOG(" 0x%02X", a);
             found++;
         }
         vTaskDelay(pdMS_TO_TICKS(1));
     }
     xSemaphoreGive(s_mu);
     if (!found) {
-        printf(" (none)");
+        TLOG(" (none)");
     }
-    printf("\n");
+    TLOG("\n");
 }
 
 static void print_ntc(const char *name, ntc_sample_t s)
 {
     if (!s.ok) {
-        printf("%s=FAULT (%d mV)", name, s.mv);
+        TLOG("%s=FAULT (%d mV)", name, s.mv);
         return;
     }
-    printf("%s=%.1f C (%d mV)", name, (double)s.c, s.mv);
+    TLOG("%s=%.1f C (%d mV)", name, (double)s.c, s.mv);
 }
 
 static ntc_sample_t live_or_sim(int ch, ntc_sample_t hw)
@@ -270,14 +271,14 @@ static void print_sample(int ch, int16_t c)
 {
     int mv = counts_to_mv(c);
     if (ch == 0) {
-        printf("A0=%d mV counts=%d", mv, (int)c);
+        TLOG("A0=%d mV counts=%d", mv, (int)c);
         return;
     }
     const char *name = (ch == 1) ? "TPO" : (ch == 2) ? "TPU" : "AMB";
     ntc_sample_t s = live_or_sim(ch, ntc_from_mv(mv));
     print_ntc(name, s);
     if ((ch == 1 && s_sim_tpo) || (ch == 2 && s_sim_tpu)) {
-        printf(" [sim]");
+        TLOG(" [sim]");
     }
 }
 
@@ -286,29 +287,29 @@ static void cmd_read_ch(int ch)
     int16_t c;
     esp_err_t err = ads_read_ch(ch, &c);
     if (err != ESP_OK) {
-        printf("A%d err %s\n", ch, esp_err_to_name(err));
+        TLOG("A%d err %s\n", ch, esp_err_to_name(err));
         return;
     }
-    printf("relay=%s  ", s_hw_relay ? "ON" : "OFF");
+    TLOG("relay=%s  ", s_hw_relay ? "ON" : "OFF");
     print_sample(ch, c);
-    printf("\n");
+    TLOG("\n");
 }
 
 static void cmd_read_all(void)
 {
-    printf("relay=%s mode=%s", s_hw_relay ? "ON" : "OFF",
+    TLOG("relay=%s mode=%s", s_hw_relay ? "ON" : "OFF",
            bbu_mode_name(s_ctrl.mode));
     for (int ch = 0; ch <= ADS_CH_MAX; ch++) {
         int16_t c;
         esp_err_t err = ads_read_ch(ch, &c);
         if (err != ESP_OK) {
-            printf("  A%d err %s\n", ch, esp_err_to_name(err));
+            TLOG("  A%d err %s\n", ch, esp_err_to_name(err));
             return;
         }
-        printf("  ");
+        TLOG("  ");
         print_sample(ch, c);
     }
-    printf("\n");
+    TLOG("\n");
 }
 
 static void cmd_burst(int ch)
@@ -317,21 +318,21 @@ static void cmd_burst(int ch)
     if (!burst_ch(ch, &mid_mv, &rms_mv, &pp_mv, &sat, false)) {
         return;
     }
-    printf("relay=%s  A%d  n=%d  mid=%d mV  rms=%d mV  pp=%d mV%s",
+    TLOG("relay=%s  A%d  n=%d  mid=%d mV  rms=%d mV  pp=%d mV%s",
            s_hw_relay ? "ON" : "OFF", ch, CT_BURST_N, mid_mv, rms_mv, pp_mv,
            sat ? "  SAT" : "");
     if (ch >= 1) {
         const char *name = (ch == 1) ? "TPO" : (ch == 2) ? "TPU" : "AMB";
-        printf("  ");
+        TLOG("  ");
         print_ntc(name, live_or_sim(ch, ntc_from_mv(mid_mv)));
     }
-    printf("\n");
+    TLOG("\n");
 }
 
 static void cmd_status(void)
 {
     xSemaphoreTake(s_mu, portMAX_DELAY);
-    printf("mode=%s user=%s cycle=%s relay=%s led=%s run=%lus cycle=%lus\n",
+    TLOG("mode=%s user=%s cycle=%s relay=%s led=%s run=%lus cycle=%lus\n",
            bbu_mode_name(s_ctrl.mode),
            bbu_mode_name(s_ctrl.user_mode),
            bbu_cycle_name(s_ctrl.cycle),
@@ -341,23 +342,23 @@ static void cmd_status(void)
            (unsigned long)s_ctrl.run_s,
            (unsigned long)s_ctrl.cycle_s);
     if (s_ctrl.warn_stuck) {
-        printf("WARN stuck-on (CT present while relay OFF)\n");
+        TLOG("WARN stuck-on (CT present while relay OFF)\n");
     }
     if (s_ctrl.warn_maxrun) {
-        printf("WARN max_run_time_min exceeded\n");
+        TLOG("WARN max_run_time_min exceeded\n");
     }
     if (s_ctrl.warn_noct) {
-        printf("WARN no CT (commanded ON, no current) — loop unchanged\n");
+        TLOG("WARN no CT (commanded ON, no current) — loop unchanged\n");
     }
     if (s_sim_tpo || s_sim_tpu) {
-        printf("sim");
+        TLOG("sim");
         if (s_sim_tpo) {
-            printf(" TPO=%.1f", (double)s_fake_tpo.c);
+            TLOG(" TPO=%.1f", (double)s_fake_tpo.c);
         }
         if (s_sim_tpu) {
-            printf(" TPU=%.1f", (double)s_fake_tpu.c);
+            TLOG(" TPU=%.1f", (double)s_fake_tpu.c);
         }
-        printf("\n");
+        TLOG("\n");
     }
     xSemaphoreGive(s_mu);
     params_print();
@@ -367,13 +368,13 @@ static void cmd_sim(char *line)
 {
     if (strcmp(line, "sim") == 0 || strcmp(line, "sim show") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
-        printf("sim tpo=%s tpu=%s\n",
+        TLOG("sim tpo=%s tpu=%s\n",
                s_sim_tpo ? "on" : "off", s_sim_tpu ? "on" : "off");
         if (s_sim_tpo) {
-            printf("  TPO=%.1f C\n", (double)s_fake_tpo.c);
+            TLOG("  TPO=%.1f C\n", (double)s_fake_tpo.c);
         }
         if (s_sim_tpu) {
-            printf("  TPU=%.1f C\n", (double)s_fake_tpu.c);
+            TLOG("  TPU=%.1f C\n", (double)s_fake_tpu.c);
         }
         xSemaphoreGive(s_mu);
         return;
@@ -383,7 +384,7 @@ static void cmd_sim(char *line)
         s_sim_tpo = false;
         s_sim_tpu = false;
         xSemaphoreGive(s_mu);
-        printf("sim off (real NTCs)\n");
+        TLOG("sim off (real NTCs)\n");
         return;
     }
     char which[8];
@@ -392,7 +393,7 @@ static void cmd_sim(char *line)
         char *end = NULL;
         float c = strtof(val, &end);
         if (end == val) {
-            printf("sim tpo|tpu <degC>\n");
+            TLOG("sim tpo|tpu <degC>\n");
             return;
         }
         ntc_sample_t fake = { .mv = 0, .c = c, .ok = true };
@@ -405,7 +406,7 @@ static void cmd_sim(char *line)
             s_fake_tpo = fake;
             s_sim_tpo = true;
             xSemaphoreGive(s_mu);
-            printf("sim TPO=%.1f%s\n", (double)c, fake.ok ? "" : " FAULT");
+            TLOG("sim TPO=%.1f%s\n", (double)c, fake.ok ? "" : " FAULT");
             return;
         }
         if (strcmp(which, "tpu") == 0) {
@@ -413,11 +414,11 @@ static void cmd_sim(char *line)
             s_fake_tpu = fake;
             s_sim_tpu = true;
             xSemaphoreGive(s_mu);
-            printf("sim TPU=%.1f%s\n", (double)c, fake.ok ? "" : " FAULT");
+            TLOG("sim TPU=%.1f%s\n", (double)c, fake.ok ? "" : " FAULT");
             return;
         }
     }
-    printf("sim | sim tpo N | sim tpu N | sim clear\n");
+    TLOG("sim | sim tpo N | sim tpu N | sim clear\n");
 }
 
 static int parse_ch_suffix(const char *line, char cmd)
@@ -432,7 +433,7 @@ static bool handle_prog(char *line)
 {
     if (strcmp(line, "exit") == 0 || strcmp(line, "q") == 0 || strcmp(line, "prog") == 0) {
         s_prog = false;
-        printf("programming off\n");
+        TLOG("programming off\n");
         return true;
     }
     if (strcmp(line, "list") == 0 || strcmp(line, "p") == 0 || line[0] == '\0') {
@@ -441,13 +442,13 @@ static bool handle_prog(char *line)
     }
     if (strcmp(line, "default") == 0 || strcmp(line, "defaults") == 0) {
         params_set_defaults();
-        printf("defaults in RAM (save to persist)\n");
+        TLOG("defaults in RAM (save to persist)\n");
         params_print();
         return true;
     }
     if (strcmp(line, "save") == 0) {
         esp_err_t err = params_save();
-        printf("save %s\n", err == ESP_OK ? "ok" : esp_err_to_name(err));
+        TLOG("save %s\n", err == ESP_OK ? "ok" : esp_err_to_name(err));
         return true;
     }
 
@@ -455,12 +456,12 @@ static bool handle_prog(char *line)
     char val[32];
     if (sscanf(line, "%31s %31s", name, val) == 2) {
         if (params_set(name, val)) {
-            printf("set %s\n", name);
+            TLOG("set %s\n", name);
             params_print();
         }
         return true;
     }
-    printf("prog: list | NAME VALUE | save | default | exit\n");
+    TLOG("prog: list | NAME VALUE | save | default | exit\n");
     return true;
 }
 
@@ -494,19 +495,19 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
         bbu_ctrl_manual_relay(&s_ctrl, true);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("relay ON  mode=Manual\n");
+        TLOG("relay ON  mode=Manual\n");
     } else if (strcmp(line, "off") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
         bbu_ctrl_manual_relay(&s_ctrl, false);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("relay OFF  mode=Manual\n");
+        TLOG("relay OFF  mode=Manual\n");
     } else if (strcmp(line, "t") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
         bbu_ctrl_manual_relay(&s_ctrl, !s_ctrl.relay_on);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("relay %s  mode=Manual\n", s_hw_relay ? "ON" : "OFF");
+        TLOG("relay %s  mode=Manual\n", s_hw_relay ? "ON" : "OFF");
     } else if (strcmp(line, "r") == 0) {
         cmd_read_all();
     } else if ((ch = parse_ch_suffix(line, 'r')) >= 0) {
@@ -518,7 +519,7 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
     } else if (strcmp(line, "enc") == 0) {
         int a = 0, b = 0, sw = 0;
         enc_levels(&a, &b, &sw);
-        printf("enc A=%d B=%d SW=%d net=%d (SW 0=pressed)\n",
+        TLOG("enc A=%d B=%d SW=%d net=%d (SW 0=pressed)\n",
                a, b, sw, enc_net());
     } else if (strcmp(line, "scan") == 0) {
         cmd_scan(bus);
@@ -529,25 +530,25 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
         bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_AUTO);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("mode Auto (coil OFF, min_off then start if TPO cold)\n");
+        TLOG("mode Auto (coil OFF, min_off then start if TPO cold)\n");
     } else if (strcmp(line, "manual") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
         bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_MANUAL);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("mode Manual\n");
+        TLOG("mode Manual\n");
     } else if (strcmp(line, "test") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
         bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_TESTING);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("mode Test (15 min then Auto)\n");
+        TLOG("mode Test (15 min then Auto)\n");
     } else if (strcmp(line, "halt") == 0) {
         xSemaphoreTake(s_mu, portMAX_DELAY);
         bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_OFF);
         apply_ctrl();
         xSemaphoreGive(s_mu);
-        printf("mode Off (coil stays OFF until mode changes)\n");
+        TLOG("mode Off (coil stays OFF until mode changes)\n");
     } else if (strncmp(line, "sim", 3) == 0) {
         cmd_sim(line);
     } else if (strncmp(line, "comms", 5) == 0 ||
@@ -561,40 +562,40 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
         if (ch >= 1 && ch <= 13 && cnt >= 1 && cnt <= 300) {
             comms_bench_hello_burst((uint8_t)ch, (int)cnt);
         } else {
-            printf("hel <ch 1-13> [count=20]  (run `comms off` first)\n");
+            TLOG("hel <ch 1-13> [count=20]  (run `comms off` first)\n");
         }
     } else if (strcmp(line, "prog") == 0) {
         s_prog = true;
-        printf("programming on  (list | NAME VALUE | save | default | exit)\n");
+        TLOG("programming on  (list | NAME VALUE | save | default | exit)\n");
         params_print();
     } else if (strcmp(line, "h") == 0 || strcmp(line, "help") == 0 || strcmp(line, "?") == 0) {
         print_help();
     } else {
-        printf("unknown '%s'  (h for help)\n", line);
+        TLOG("unknown '%s'  (h for help)\n", line);
     }
 }
 
 static void log_events(uint32_t ev)
 {
     if (ev & BBU_EVT_TEST_END) {
-        printf("Test expired → Auto\n");
+        TLOG("Test expired → Auto\n");
     }
     if (ev & BBU_EVT_MODE) {
-        printf("mode %s\n", bbu_mode_name(s_ctrl.mode));
+        TLOG("mode %s\n", bbu_mode_name(s_ctrl.mode));
     }
     if (ev & BBU_EVT_CYCLE) {
-        printf("%s relay=%s\n",
+        TLOG("%s relay=%s\n",
                bbu_cycle_name(s_ctrl.cycle),
                s_ctrl.relay_on ? "ON" : "OFF");
     }
     if (ev & BBU_EVT_WARN_STUCK) {
-        printf("WARN stuck-on (CT present, relay OFF)\n");
+        TLOG("WARN stuck-on (CT present, relay OFF)\n");
     }
     if (ev & BBU_EVT_WARN_MAX) {
-        printf("WARN max_run_time_min exceeded (still running)\n");
+        TLOG("WARN max_run_time_min exceeded (still running)\n");
     }
     if (ev & BBU_EVT_WARN_NOCT) {
-        printf("WARN no CT (commanded ON, no current) — loop unchanged\n");
+        TLOG("WARN no CT (commanded ON, no current) — loop unchanged\n");
     }
 }
 
@@ -734,7 +735,7 @@ static void cmd_comms(char *line)
         comms_ring_resize((uint16_t)v);
         return;
     }
-    printf("comms [on|off] | ident <type> <id> | tel <sec> | ring <samples>\n");
+    TLOG("comms [on|off] | ident <type> <id> | tel <sec> | ring <samples>\n");
 }
 
 static void monitor_task(void *arg)
@@ -875,7 +876,7 @@ void app_main(void)
     };
     ESP_ERROR_CHECK(i2c_master_bus_add_device(bus, &dev_cfg, &s_ads));
 
-    printf("\n# node-bbu  mode=Manual  loop=DESIGN_NOTE_002  beta=3950  "
+    TLOG("\n# node-bbu  mode=Manual  loop=DESIGN_NOTE_002  beta=3950  "
            "relay=GPIO%d heart=GPIO%d\n",
            (int)PIN_RELAY, (int)PIN_HEART);
     cmd_scan(bus);
@@ -900,6 +901,9 @@ void app_main(void)
         }
         if (c == '\n') {
             line[len] = '\0';
+            if (len > 0) {
+                TLOG("cmd: %s", line);
+            }
             handle_line(line, bus);
             len = 0;
             printf(s_prog ? "PROG> " : "> ");

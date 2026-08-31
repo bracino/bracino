@@ -46,6 +46,7 @@
 #include "nvs_flash.h"
 
 #include "espnow_schema.h"
+#include "bracino_log.h"
 
 #define PIN_BUTTON     GPIO_NUM_27
 #define DEFAULT_CH     6
@@ -273,7 +274,7 @@ static void set_channel_checked(uint8_t ch)
     esp_err_t err = esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
     esp_wifi_set_promiscuous(false);
     if (err != ESP_OK) {
-        printf("!! set_channel(%u) FAILED: %s\n", ch, esp_err_to_name(err));
+        TLOG("!! set_channel(%u) FAILED: %s\n", ch, esp_err_to_name(err));
         return;
     }
     for (int i = 0; i < s_node_cnt; i++) {
@@ -399,8 +400,11 @@ static void time_sync_send(node_rec_t *n)
     size_t tlen = time_sync_tlv(tlv);
     uint8_t buf[ESPNOW_MAX_PAYLOAD];
     size_t len = gw_env_build(buf, n->type, n->id, MSG_TIME_SYNC, tlv, (uint8_t)tlen);
+    uint8_t prim;
+    wifi_second_chan_t sc;
+    esp_wifi_get_channel(&prim, &sc);
     if (send_wait(n->mac, buf, len)) {
-        printf("> TIME_SYNC -> node(%u,%u)\n", n->type, n->id);
+        TLOG("> TIME_SYNC -> node(%u,%u) on ch %u\n", n->type, n->id, prim);
     }
 }
 
@@ -419,11 +423,11 @@ static void param_set_send(node_rec_t *n)
     uint8_t buf[ESPNOW_MAX_PAYLOAD];
     size_t len = gw_env_build(buf, n->type, n->id, MSG_PARAM_SET, tlv, (uint8_t)n_tlv);
     if (send_wait(n->mac, buf, len)) {
-        printf("> PARAM_SET setpoint=%.1f admin_seq=%lu -> node(%u,%u)\n",
+        TLOG("> PARAM_SET setpoint=%.1f admin_seq=%lu -> node(%u,%u)\n",
                (double)s_param_setpoint_raw / 10.0,
                (unsigned long)s_param_admin_seq, n->type, n->id);
     } else {
-        printf("> PARAM_SET send failed\n");
+        TLOG("> PARAM_SET send failed\n");
     }
 }
 
@@ -442,13 +446,13 @@ static void handle_hello(const rx_msg_t *m, const espnow_envelope_t *e)
     }
     node_rec_t *n = node_find_or_add(m->mac, e->node_type, e->node_id);
     if (n == NULL) {
-        printf("node(%u,%u) HELLO but registry full — no ack\n", e->node_type, e->node_id);
+        TLOG("node(%u,%u) HELLO but registry full — no ack\n", e->node_type, e->node_id);
         return;
     }
     n->liveness_s = 2;
     n->last_seen_ms = now_ms();
     n->last_boot = e->boot_session;
-    printf("HELLO node(%u,%u) mac " MACSTR " cfg_ver=%u seq=%u\n",
+    TLOG("HELLO node(%u,%u) mac " MACSTR " cfg_ver=%u seq=%u\n",
            e->node_type, e->node_id, MAC2STR(m->mac), config_ver, e->seq);
 
     /* HELLO_ACK: always carries a fresh TIME_SYNC (DN003). */
@@ -458,7 +462,7 @@ static void handle_hello(const rx_msg_t *m, const espnow_envelope_t *e)
     size_t len = gw_env_build(buf, e->node_type, e->node_id, MSG_HELLO_ACK,
                               tlv, (uint8_t)tlen);
     if (!send_wait(n->mac, buf, len)) {
-        printf("HELLO_ACK send failed\n");
+        TLOG("HELLO_ACK send failed\n");
         return;
     }
     /* Anchor: gateway time now, vs node clock in the HELLO envelope. */
@@ -470,7 +474,7 @@ static void handle_hello(const rx_msg_t *m, const espnow_envelope_t *e)
     bool known = n->config_fetched && n->config_ver == config_ver;
     n->config_ver = config_ver;
     if (!known) {
-        printf("config_ver=%u unknown/changed -> CONFIG_GET\n", config_ver);
+        TLOG("config_ver=%u unknown/changed -> CONFIG_GET\n", config_ver);
         uint8_t get_buf[ESPNOW_ENV_SIZE];
         size_t glen = gw_env_build(get_buf, n->type, n->id, MSG_CONFIG_GET, NULL, 0);
         send_wait(n->mac, get_buf, glen);
@@ -483,13 +487,13 @@ static void print_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec_
         (const telemetry_batch_hdr_t *)(m->data + ESPNOW_ENV_SIZE);
     size_t plen = m->len - ESPNOW_ENV_SIZE;
     if (plen < 11) {
-        printf("TELEMETRY_BATCH malformed (short header)\n");
+        TLOG("TELEMETRY_BATCH malformed (short header)\n");
         return;
     }
     uint16_t count = rd_u16((const uint8_t *)&h->count);
     size_t expected = 11 + (size_t)count * 12;
     if (count > 0 && plen < expected) {
-        printf("TELEMETRY_BATCH malformed (count %u, plen %u)\n",
+        TLOG("TELEMETRY_BATCH malformed (count %u, plen %u)\n",
                count, (unsigned)plen);
         return;
     }
@@ -501,7 +505,7 @@ static void print_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec_
         epoch_to_str(n->anchor.epoch_total_ms + (uint64_t)d0, t0s, sizeof(t0s));
         epoch_to_str(n->anchor.epoch_total_ms + (uint64_t)d1, t1s, sizeof(t1s));
     }
-    printf("$ committed node(%u,%u) seq=%u span=[%lu..%lu] ms=%u count=%u "
+    TLOG("$ committed node(%u,%u) seq=%u span=[%lu..%lu] ms=%u count=%u "
            "utc=[%s .. %s] boot=%u\n",
            e->node_type, e->node_id, e->seq,
            (unsigned long)h->start_ms, (unsigned long)h->end_ms,
@@ -510,21 +514,21 @@ static void print_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec_
     const uint8_t *p = m->data + ESPNOW_ENV_SIZE + 11;
     for (uint16_t i = 0; i < count; i++, p += 12) {
         const bbu_telemetry_v1_t *s = (const bbu_telemetry_v1_t *)p;
-        printf("  [%2u] mode=%-6s relay=%u ct=%-15s tpo=%.1f tpu=%.1f amb=%.1f"
+        TLOG("  [%2u] mode=%-6s relay=%u ct=%-15s tpo=%.1f tpu=%.1f amb=%.1f"
                " faults=%02x",
                i, mode_name(s->mode), s->relay_state, ct_name(s->ct_state),
                (double)s->t_tpo_x10 / 10.0, (double)s->t_tpu_x10 / 10.0,
                (double)s->t_amb_x10 / 10.0, s->fault_flags);
         if (s->fault_flags) {
-            printf(" (");
+            TLOG(" (");
             for (uint8_t b = 0; b < BBU_FAULT_COUNT; b++) {
                 if (s->fault_flags & (1u << b)) {
-                    printf("%s ", fault_name(b));
+                    TLOG("%s ", fault_name(b));
                 }
             }
-            printf(")");
+            TLOG(")");
         }
-        printf("\n");
+        TLOG("\n");
     }
 }
 
@@ -533,7 +537,7 @@ static void handle_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec
     /* BENCH_DROP_PCT: randomly drop frames (frame-loss drill) */
     if (BENCH_DROP_PCT > 0 && (rand() % 100) < BENCH_DROP_PCT) {
         s_ct.drops++;
-        printf("TELEMETRY_BATCH seq=%u DROPPED (bench knob)\n", e->seq);
+        TLOG("TELEMETRY_BATCH seq=%u DROPPED (bench knob)\n", e->seq);
         return;
     }
 
@@ -546,7 +550,7 @@ static void handle_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec
     if (BENCH_NO_ACK_S > 0 &&
         (int32_t)(now_ms() - s_boot_ms) < (int32_t)BENCH_NO_ACK_S * 1000) {
         s_ct.acks_suppressed++;
-        printf("  (ack suppressed by BENCH_NO_ACK_S — retransmit drill)\n");
+        TLOG("  (ack suppressed by BENCH_NO_ACK_S — retransmit drill)\n");
         return;
     }
 
@@ -575,14 +579,14 @@ static void handle_event(const rx_msg_t *m)
                        tag == EVENT_PARAM_CHANGED ? "PARAM_CHANGED" :
                        tag == EVENT_CONFIG_CHANGED ? "CONFIG_CHANGED" :
                        tag == EVENT_BATTERY_WARN  ? "BATTERY_WARN" : "?";
-    printf("EVENT %s value=", name);
+    TLOG("EVENT %s value=", name);
     for (int i = 0; i < vlen; i++) {
-        printf("%02x ", v[i]);
+        TLOG("%02x ", v[i]);
     }
     if (tag == EVENT_PARAM_CHANGED && vlen >= 1) {
-        printf("(param %u)", v[0]);
+        TLOG("(param %u)", v[0]);
     }
-    printf("\n");
+    TLOG("\n");
 }
 
 static void handle_config_desc(const rx_msg_t *m, const espnow_envelope_t *e,
@@ -602,13 +606,13 @@ static void handle_config_desc(const rx_msg_t *m, const espnow_envelope_t *e,
         n->desc_len = 0;
     }
     if (total != n->frag_total || idx != n->frag_next) {
-        printf("CONFIG_DESC fragment out of order (got %u, want %u) — dropped\n",
+        TLOG("CONFIG_DESC fragment out of order (got %u, want %u) — dropped\n",
                idx, n->frag_next);
         n->frag_total = 0; /* reset; node retransmits on CONFIG_GET retry */
         return;
     }
     if (n->desc_len + chunk > sizeof(n->desc_buf)) {
-        printf("CONFIG_DESC too big\n");
+        TLOG("CONFIG_DESC too big\n");
         n->frag_total = 0;
         return;
     }
@@ -618,17 +622,17 @@ static void handle_config_desc(const rx_msg_t *m, const espnow_envelope_t *e,
     n->frag_last_ms = now_ms();
 
     if (idx + 1 < total) {
-        printf("CONFIG_DESC frag %u/%u (%u B, more)\n", idx, total, (unsigned)chunk);
+        TLOG("CONFIG_DESC frag %u/%u (%u B, more)\n", idx, total, (unsigned)chunk);
         return;
     }
 
-    printf("CONFIG_DESC complete (%u B):\n", (unsigned)n->desc_len);
+    TLOG("CONFIG_DESC complete (%u B):\n", (unsigned)n->desc_len);
     tlv_cur_t c = { n->desc_buf, (int)n->desc_len };
     uint8_t tag, vlen;
     const uint8_t *val;
     while (tlv_next(&c, &tag, &val, &vlen)) {
         if (tag != TLV_PARAM_DESCRIPTOR || vlen < 16) {
-            printf("  (unknown tag %u len %u)\n", tag, vlen);
+            TLOG("  (unknown tag %u len %u)\n", tag, vlen);
             continue;
         }
         char mn[16], mx[16], st[16], vname[32];
@@ -641,7 +645,7 @@ static void handle_config_desc(const rx_msg_t *m, const espnow_envelope_t *e,
         }
         memcpy(vname, val + 15, name_len);
         vname[name_len] = '\0';
-        printf("  id=%2u %-24s type=%u flags=%u min=%s max=%s step=%s\n",
+        TLOG("  id=%2u %-24s type=%u flags=%u min=%s max=%s step=%s\n",
                val[0], vname, val[1], val[2], mn, mx, st);
     }
     n->config_fetched = true;
@@ -681,7 +685,7 @@ static void handle_param_ack(const rx_msg_t *m)
         }
     }
     static const char *RES[] = { "OK", "REJECTED_RANGE", "REJECTED_TYPE", "EXPIRED" };
-    printf("PARAM_ACK id=%u result=%s prev=%s new=%s\n", id,
+    TLOG("PARAM_ACK id=%u result=%s prev=%s new=%s\n", id,
            result < 4 ? RES[result] : "?",
            have_prev ? prev_s : "-", have_new ? new_s : "-");
 }
@@ -714,10 +718,10 @@ static void handle_rx(const rx_msg_t *m)
     case MSG_HEARTBEAT:
         if (n) {
             n->last_seen_ms = now_ms();
-            printf("HB node(%u,%u) seq=%u clk=%lu ms\n", e->node_type, e->node_id,
+            TLOG("HB node(%u,%u) seq=%u clk=%lu ms\n", e->node_type, e->node_id,
                    e->seq, (unsigned long)e->node_clock_ms);
         } else {
-            printf("HB from unregistered MAC " MACSTR " node(%u,%u) "
+            TLOG("HB from unregistered MAC " MACSTR " node(%u,%u) "
                    "— waiting for HELLO\n", MAC2STR(m->mac),
                    e->node_type, e->node_id);
         }
@@ -727,7 +731,7 @@ static void handle_rx(const rx_msg_t *m)
             n->last_seen_ms = now_ms();
             handle_batch(m, e, n);
         } else {
-            printf("TELEMETRY_BATCH seq=%u from unregistered MAC " MACSTR
+            TLOG("TELEMETRY_BATCH seq=%u from unregistered MAC " MACSTR
                    " — dropped (node re-HELLOs after ack timeouts)\n",
                    e->seq, MAC2STR(m->mac));
         }
@@ -774,7 +778,7 @@ static void proc_task(void *arg)
             node_rec_t *n = &s_nodes[i];
             if (n->frag_total != 0 &&
                 (now_ms() - n->frag_last_ms) > FRAG_TIMEOUT_MS) {
-                printf("CONFIG_DESC reassembly timeout — reset\n");
+                TLOG("CONFIG_DESC reassembly timeout — reset\n");
                 n->frag_total = 0;
             }
         }
@@ -804,10 +808,10 @@ static void button_task(void *arg)
 
 static void registry_print(void)
 {
-    printf("registry (%d node%s):\n", s_node_cnt, s_node_cnt == 1 ? "" : "s");
+    TLOG("registry (%d node%s):\n", s_node_cnt, s_node_cnt == 1 ? "" : "s");
     for (int i = 0; i < s_node_cnt; i++) {
         node_rec_t *n = &s_nodes[i];
-        printf("  node(%u,%u) mac=" MACSTR " cfg_ver=%u fetched=%d "
+        TLOG("  node(%u,%u) mac=" MACSTR " cfg_ver=%u fetched=%d "
                "last_seen=%lus ago boot=%u\n",
                n->type, n->id, MAC2STR(n->mac), n->config_ver,
                n->config_fetched, (unsigned long)((now_ms() - n->last_seen_ms) / 1000),
@@ -817,22 +821,22 @@ static void registry_print(void)
             if (n->anchor.epoch_total_ms) {
                 epoch_to_str(n->anchor.epoch_total_ms, ts, sizeof(ts));
             }
-            printf("    anchor: gw_time=%s @ node_clock=%lu ms (boot %u)\n",
+            TLOG("    anchor: gw_time=%s @ node_clock=%lu ms (boot %u)\n",
                    ts, (unsigned long)n->anchor.node_clock_ms, n->anchor.boot_session);
         }
     }
-    printf("counters: rx=");
+    TLOG("counters: rx=");
     for (int t = 1; t <= MSG_PARAM_ACK; t++) {
         if (s_ct.rx[t]) {
-            printf("%s=%lu ", MSG_NAMES[t], (unsigned long)s_ct.rx[t]);
+            TLOG("%s=%lu ", MSG_NAMES[t], (unsigned long)s_ct.rx[t]);
         }
     }
-    printf("\n  acks_sent=%lu suppressed=%lu drops=%lu tx_ok=%lu tx_fail=%lu\n",
+    TLOG("\n  acks_sent=%lu suppressed=%lu drops=%lu tx_ok=%lu tx_fail=%lu\n",
            (unsigned long)s_ct.acks_sent, (unsigned long)s_ct.acks_suppressed,
            (unsigned long)s_ct.drops, (unsigned long)s_ct.tx_ok,
            (unsigned long)s_ct.tx_fail);
     if (!time_set()) {
-        printf("  EPOCH NOT SET — nodes will buffer telemetry but not "
+        TLOG("  EPOCH NOT SET — nodes will buffer telemetry but not "
                "transmit it (DN003). Use: n <unix_s>\n");
     }
 }
@@ -850,13 +854,13 @@ static void sniff_cb(void *buf, wifi_promiscuous_pkt_type_t type)
     s_sniff_printed++;
     const uint8_t *p = pkt->payload;
     /* 802.11: addr2 (transmitter) at offset 10 for data frames */
-    printf("  snif len=%3u type=%u a2=" MACSTR " fc=%02x%02x\n",
+    TLOG("  snif len=%3u type=%u a2=" MACSTR " fc=%02x%02x\n",
            len, (unsigned)type, MAC2STR(p + 10), p[1], p[0]);
 }
 
 static void print_help(void)
 {
-    printf(
+    TLOG(
         "bench master: HELLO_ACK+TIME_SYNC, BATCH_ACK-after-log, "
         "CONFIG_GET, canned PARAM_SET\n"
         "  n <unix_s>  set epoch (required before telemetry will flow!)\n"
@@ -893,7 +897,7 @@ void app_main(void)
     ESP_ERROR_CHECK(gpio_config(&io));
 
     ESP_ERROR_CHECK(radio_start());
-    printf("\n# bench-espnow-master ch=%d button=GPIO%d NO_ACK=%ds DROP=%d%%\n",
+    TLOG("\n# bench-espnow-master ch=%d button=GPIO%d NO_ACK=%ds DROP=%d%%\n",
            DEFAULT_CH, PIN_BUTTON, BENCH_NO_ACK_S, BENCH_DROP_PCT);
 
     xTaskCreate(proc_task, "proc", 8192, NULL, 2, NULL);
@@ -918,6 +922,9 @@ void app_main(void)
             while (len && (line[len - 1] == ' ' || line[len - 1] == '\t')) {
                 line[--len] = '\0';
             }
+            if (len > 0) {
+                TLOG("cmd: %s", line);
+            }
             if (strncmp(line, "n ", 2) == 0) {
                 char *end = NULL;
                 unsigned long long sec = strtoull(line + 2, &end, 10);
@@ -926,9 +933,9 @@ void app_main(void)
                     s_clock_set_ms = now_ms();
                     char ts[24];
                     epoch_to_str(s_epoch_set_ms, ts, sizeof(ts));
-                    printf("epoch set: %s UTC — TIME_SYNC now carries it\n", ts);
+                    TLOG("epoch set: %s UTC — TIME_SYNC now carries it\n", ts);
                 } else {
-                    printf("usage: n <unix_seconds>\n");
+                    TLOG("usage: n <unix_seconds>\n");
                 }
             } else if (line[0] == 'c' && line[1] == ' ') {
                 int ch = atoi(line + 2);
@@ -937,16 +944,16 @@ void app_main(void)
                     uint8_t prim;
                     wifi_second_chan_t sc = WIFI_SECOND_CHAN_NONE; /* driver may leave this unwritten */
                     esp_wifi_get_channel(&prim, &sc);
-                    printf("channel -> %d (driver says %u; nodes must rescan)\n",
+                    TLOG("channel -> %d (driver says %u; nodes must rescan)\n",
                            ch, prim);
                 } else {
-                    printf("c 1..13\n");
+                    TLOG("c 1..13\n");
                 }
             } else if (strcmp(line, "k") == 0) {
                 uint8_t prim;
                 wifi_second_chan_t sc = WIFI_SECOND_CHAN_NONE; /* driver may leave this unwritten */
                 esp_wifi_get_channel(&prim, &sc);
-                printf("driver channel: primary=%u second=%d\n",
+                TLOG("driver channel: primary=%u second=%d\n",
                        prim, (int)sc);
             } else if (line[0] == 'w') {
                 int sec = 5;
@@ -963,25 +970,25 @@ void app_main(void)
                 s_sniff_printed = 0;
                 esp_wifi_set_promiscuous_rx_cb(sniff_cb);
                 esp_wifi_set_promiscuous(true);
-                printf("sniffing ch %u for %d s (≤130 B frames, ≤40 lines)...\n",
+                TLOG("sniffing ch %u for %d s (≤130 B frames, ≤40 lines)...\n",
                        prim, sec);
                 vTaskDelay(pdMS_TO_TICKS(sec * 1000));
                 esp_wifi_set_promiscuous(false);
                 esp_wifi_set_promiscuous_rx_cb(NULL);
-                printf("sniff done: %lu frames total\n",
+                TLOG("sniff done: %lu frames total\n",
                        (unsigned long)s_sniff_cnt);
             } else if (strcmp(line, "t") == 0) {
                 for (int i = 0; i < s_node_cnt; i++) {
                     time_sync_send(&s_nodes[i]);
                 }
                 if (s_node_cnt == 0) {
-                    printf("no nodes registered yet\n");
+                    TLOG("no nodes registered yet\n");
                 }
             } else if (strcmp(line, "p") == 0) {
                 if (s_node_cnt > 0) {
                     param_set_send(&s_nodes[0]);
                 } else {
-                    printf("no nodes registered yet\n");
+                    TLOG("no nodes registered yet\n");
                 }
             } else if (strcmp(line, "s") == 0) {
                 registry_print();
@@ -989,7 +996,7 @@ void app_main(void)
                        line[0] == '\0') {
                 print_help();
             } else if (line[0] != '\0') {
-                printf("unknown '%s' (h for help)\n", line);
+                TLOG("unknown '%s' (h for help)\n", line);
             }
             len = 0;
             printf("> ");

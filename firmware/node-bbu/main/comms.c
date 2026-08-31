@@ -34,6 +34,7 @@
 #include "nvs.h"
 
 #include "espnow_schema.h"
+#include "bracino_log.h"
 #include "params.h"
 
 /* ---- tuning (DN003 start values) ---- */
@@ -335,7 +336,7 @@ static void set_channel(uint8_t ch)
     esp_err_t err = esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
     esp_wifi_set_promiscuous(false);
     if (err != ESP_OK) {
-        printf("comms: !! set_channel(%u) FAILED: %s — TX may stay on prior "
+        TLOG("comms: !! set_channel(%u) FAILED: %s — TX may stay on prior "
                "channel\n", ch, esp_err_to_name(err));
         return;
     }
@@ -351,7 +352,7 @@ static void set_channel(uint8_t ch)
         peer.encrypt = false;
         err = esp_now_mod_peer(&peer);
         if (err != ESP_OK) {
-            printf("comms: !! peer channel sync to %u FAILED: %s\n",
+            TLOG("comms: !! peer channel sync to %u FAILED: %s\n",
                    ch, esp_err_to_name(err));
         }
     }
@@ -391,7 +392,7 @@ static esp_err_t radio_start(void)
     ESP_ERROR_CHECK(esp_now_add_peer(&peer));
 
     s_radio_up = true;
-    printf("comms: radio up, node(%u,%u) mac " MACSTR "\n",
+    TLOG("comms: radio up, node(%u,%u) mac " MACSTR "\n",
            s_node_type, s_node_id, MAC2STR(s_own_mac));
     return ESP_OK;
 }
@@ -534,13 +535,13 @@ static size_t hello_build(uint8_t *buf)
 static void apply_time_sync(uint32_t epoch_s, uint16_t epoch_ms)
 {
     if (epoch_s == 0) {
-        printf("comms: TIME_SYNC epoch=0 — gateway has no time yet\n");
+        TLOG("comms: TIME_SYNC epoch=0 — gateway has no time yet\n");
         return;
     }
     s_anchor_epoch_s = epoch_s;
     s_anchor_epoch_ms = epoch_ms;
     s_anchor_clock_ms = now_ms();
-    printf("comms: anchored epoch=%lu.%03u at clock %lu ms\n",
+    TLOG("comms: anchored epoch=%lu.%03u at clock %lu ms\n",
            (unsigned long)s_anchor_epoch_s, s_anchor_epoch_ms,
            (unsigned long)s_anchor_clock_ms);
 }
@@ -561,7 +562,7 @@ static bool parse_hello_ack(const rx_msg_t *m)
             apply_time_sync(rd_u32(val), rd_u16(val + 4));
             got_sync = true;
         } else if (tag == TLV_REJECT_REASON && vlen == 1) {
-            printf("comms: HELLO rejected, reason=%u\n", val[0]);
+            TLOG("comms: HELLO rejected, reason=%u\n", val[0]);
         }
     }
     return got_sync;
@@ -603,7 +604,7 @@ static void scan_attempt(void)
         set_channel(chans[i]);
         esp_err_t send_err = esp_now_send(BCAST_MAC, buf, len);
         if (send_err != ESP_OK) {
-            printf("comms: !! HELLO send on ch %u FAILED: %s\n",
+            TLOG("comms: !! HELLO send on ch %u FAILED: %s\n",
                    chans[i], esp_err_to_name(send_err));
         }
         rx_msg_t m;
@@ -618,7 +619,7 @@ static void scan_attempt(void)
                 s_batch_out = false;
                 s_next_heartbeat_ms = now_ms() + HEARTBEAT_S * 1000;
                 nvs_save(); /* remember last-known-good channel */
-                printf("comms: bound gw " MACSTR " ch=%u\n",
+                TLOG("comms: bound gw " MACSTR " ch=%u\n",
                        MAC2STR(s_gw_mac), s_channel);
                 return;
             }
@@ -629,7 +630,7 @@ static void scan_attempt(void)
 
 static void go_unreachable(void)
 {
-    printf("comms: gateway unreachable after %u failed exchanges — "
+    TLOG("comms: gateway unreachable after %u failed exchanges — "
            "buffering, rescanning\n", s_consec_fail);
     s_bound = false;
     s_batch_out = false; /* entries stay in the FIFO and drain on rebind */
@@ -680,7 +681,7 @@ static void send_batch(void)
         s_consec_fail = 0; /* radio link alive; ack decides the rest */
     } else {
         s_consec_fail++;
-        printf("comms: batch send failed (fail %u)\n", s_consec_fail);
+        TLOG("comms: batch send failed (fail %u)\n", s_consec_fail);
     }
 }
 
@@ -779,7 +780,7 @@ static void handle_param_set(const rx_msg_t *m)
     } else {
         s_admin_seq = admin_seq;
         result = PARAM_RESULT_OK;
-        printf("comms: PARAM_SET %s=%ld (admin_seq %lu, ttl %us)\n",
+        TLOG("comms: PARAM_SET %s=%ld (admin_seq %lu, ttl %us)\n",
                d->name, (long)value, (unsigned long)admin_seq,
                PARAM_DEFAULT_TTL_S);
     }
@@ -844,7 +845,7 @@ static void handle_config_get(void)
     if (frag_total < 1) {
         frag_total = 1;
     }
-    printf("comms: CONFIG_DESC %u bytes in %u fragment(s)\n",
+    TLOG("comms: CONFIG_DESC %u bytes in %u fragment(s)\n",
            (unsigned)n, (unsigned)frag_total);
 
     for (size_t f = 0; f < frag_total; f++) {
@@ -859,7 +860,7 @@ static void handle_config_get(void)
         size_t len = env_build(buf, MSG_CONFIG_DESC, flags, payload,
                                (uint8_t)(CONFIG_DESC_FRAG_OVH + chunk));
         if (!send_wait(s_gw_mac, buf, len)) {
-            printf("comms: CONFIG_DESC frag %u send failed\n", (unsigned)f);
+            TLOG("comms: CONFIG_DESC frag %u send failed\n", (unsigned)f);
             return;
         }
     }
@@ -895,7 +896,7 @@ static void handle_rx(const rx_msg_t *m)
             s_batch_out = false;
             s_consec_fail = 0;
             s_ct.acks++;
-            printf("comms: ACK w=%lu fifo=%u\n",
+            TLOG("comms: ACK w=%lu fifo=%u\n",
                    (unsigned long)w, fifo_count());
         }
         break;
@@ -926,7 +927,7 @@ static void online_step(void)
         /* retransmit the SAME entries (stop-and-wait, DN003) */
         s_ct.retrans++;
         s_consec_fail++;
-        printf("comms: ack timeout — retransmit (fail %u)\n", s_consec_fail);
+        TLOG("comms: ack timeout — retransmit (fail %u)\n", s_consec_fail);
         if (s_consec_fail >= MAX_CONSEC_FAIL) {
             go_unreachable();
             return;
@@ -987,7 +988,7 @@ static void comms_task(void *arg)
             continue;
         }
         if (radio_start() != ESP_OK) {
-            printf("comms: radio init failed\n");
+            TLOG("comms: radio init failed\n");
             vTaskDelay(pdMS_TO_TICKS(1000));
             continue;
         }
@@ -1027,7 +1028,7 @@ void comms_init(void)
         s_ring_cap /= 2;
     }
     if (s_ring == NULL) {
-        printf("comms: ring alloc failed even at 32 entries — comms disabled\n");
+        TLOG("comms: ring alloc failed even at 32 entries — comms disabled\n");
         s_enabled = false;
         s_ring_cap = 0;
     }
@@ -1041,10 +1042,10 @@ void comms_init(void)
 
     if (xTaskCreate(comms_task, "comms", COMMS_TASK_STACK, NULL,
                     COMMS_TASK_PRIO, NULL) != pdPASS) {
-        printf("comms: task create failed\n");
+        TLOG("comms: task create failed\n");
         return;
     }
-    printf("comms: init node(%u,%u) boot_session=%u enabled=%d ring=%u\n",
+    TLOG("comms: init node(%u,%u) boot_session=%u enabled=%d ring=%u\n",
            s_node_type, s_node_id, s_boot_session, s_enabled, s_ring_cap);
 }
 
@@ -1067,9 +1068,15 @@ void comms_enable(bool on)
         s_bound = false;
         s_batch_out = false;
         s_next_scan_ms = 0;
-        printf("comms: enabled (re-discovery forced)\n");
+        /* Flush stale queued frames: a HELLO_ACK captured minutes ago (e.g.
+         * replies to a hel burst while disabled) would otherwise bind us to
+         * a dead conversation on the wrong channel with a stale anchor. */
+        rx_msg_t stale;
+        while (xQueueReceive(s_rx_q, &stale, 0) == pdTRUE) {
+        }
+        TLOG("comms: enabled (re-discovery forced, rx queue flushed)\n");
     } else {
-        printf("comms: disabled (FIFO held, no radio work)\n");
+        TLOG("comms: disabled (FIFO held, no radio work)\n");
     }
     nvs_save();
 }
@@ -1107,47 +1114,47 @@ void comms_offer_sample(const comms_sample_t *s)
 void comms_bench_hello_burst(uint8_t ch, int count)
 {
     if (radio_start() != ESP_OK) {
-        printf("comms: radio init failed\n");
+        TLOG("comms: radio init failed\n");
         return;
     }
     if (s_enabled) {
-        printf("comms: WARNING comms task is live and may fight over the "
+        TLOG("comms: WARNING comms task is live and may fight over the "
                "channel — run `comms off` first\n");
     }
     set_channel(ch);
     uint8_t buf[ESPNOW_MAX_PAYLOAD];
     size_t len = hello_build(buf);
-    printf("comms: HELLO burst: %d frames on ch %u (frame %u B)\n",
+    TLOG("comms: HELLO burst: %d frames on ch %u (frame %u B)\n",
            count, ch, (unsigned)len);
     for (int i = 0; i < count; i++) {
         esp_err_t err = esp_now_send(BCAST_MAC, buf, len);
         if (err != ESP_OK) {
-            printf("  send %u FAILED: %s\n", i, esp_err_to_name(err));
+            TLOG("  send %u FAILED: %s\n", i, esp_err_to_name(err));
         }
         vTaskDelay(pdMS_TO_TICKS(100));
     }
-    printf("comms: burst done\n");
+    TLOG("comms: burst done\n");
 }
 
 void comms_status_print(void)
 {
-    printf("comms: enabled=%d state=%s node(%u,%u) boot=%u seq=%u\n",
+    TLOG("comms: enabled=%d state=%s node(%u,%u) boot=%u seq=%u\n",
            s_enabled, TAG_STATE[s_state], s_node_type, s_node_id,
            s_boot_session, s_seq);
-    printf("  channel=%u bound=%d gw=" MACSTR "\n",
+    TLOG("  channel=%u bound=%d gw=" MACSTR "\n",
            s_channel, s_bound, MAC2STR(s_gw_mac));
-    printf("  anchored=%d epoch=%lu.%03u@%lums sample_period=%lus\n",
+    TLOG("  anchored=%d epoch=%lu.%03u@%lums sample_period=%lus\n",
            anchored(), (unsigned long)s_anchor_epoch_s, s_anchor_epoch_ms,
            (unsigned long)s_anchor_clock_ms,
            (unsigned long)s_sample_period_s);
-    printf("  fifo=%u/%u outstanding=%d fails=%u admin_seq=%lu\n",
+    TLOG("  fifo=%u/%u outstanding=%d fails=%u admin_seq=%lu\n",
            fifo_count(), s_ring_cap, s_batch_out, s_consec_fail,
            (unsigned long)s_admin_seq);
-    printf("  rx=%lu drop=%lu tx_ok=%lu fail=%lu acks=%lu retrans=%lu\n",
+    TLOG("  rx=%lu drop=%lu tx_ok=%lu fail=%lu acks=%lu retrans=%lu\n",
            (unsigned long)s_ct.rx, (unsigned long)s_ct.rx_drop,
            (unsigned long)s_ct.tx_ok, (unsigned long)s_ct.tx_fail,
            (unsigned long)s_ct.acks, (unsigned long)s_ct.retrans);
-    printf("  decim=%lu ev_sent=%lu ev_drop=%lu\n",
+    TLOG("  decim=%lu ev_sent=%lu ev_drop=%lu\n",
            (unsigned long)s_ct.decim_passes, (unsigned long)s_ct.ev_sent,
            (unsigned long)s_ct.ev_drop);
 }
@@ -1160,7 +1167,7 @@ bool comms_set_ident(uint8_t node_type, uint8_t node_id)
     s_node_type = node_type;
     s_node_id = node_id;
     nvs_save();
-    printf("comms: identity node(%u,%u) saved\n", s_node_type, s_node_id);
+    TLOG("comms: identity node(%u,%u) saved\n", s_node_type, s_node_id);
     return true;
 }
 
@@ -1170,7 +1177,7 @@ void comms_set_sample_period_s(uint32_t s)
         s = 1;
     }
     s_sample_period_s = s;
-    printf("comms: sample period %lus\n", (unsigned long)s_sample_period_s);
+    TLOG("comms: sample period %lus\n", (unsigned long)s_sample_period_s);
 }
 
 bool comms_ring_resize(uint16_t samples)
@@ -1180,7 +1187,7 @@ bool comms_ring_resize(uint16_t samples)
     }
     fifo_ent_t *ring = malloc(sizeof(fifo_ent_t) * samples);
     if (ring == NULL) {
-        printf("comms: ring resize to %u failed (kept %u)\n",
+        TLOG("comms: ring resize to %u failed (kept %u)\n",
                samples, s_ring_cap);
         return false;
     }
@@ -1191,7 +1198,7 @@ bool comms_ring_resize(uint16_t samples)
     s_ring_head = 0;
     s_ring_cnt = 0;
     portEXIT_CRITICAL(&s_fifo_mu);
-    printf("comms: ring resized to %u samples (EMPTY — bench knob)\n",
+    TLOG("comms: ring resized to %u samples (EMPTY — bench knob)\n",
            samples);
     return true;
 }
