@@ -40,6 +40,26 @@ blocked until 014 resolves and 009's real-pump checklist passes.
         validated setter path
 - [ ] Serial `halt` + UI confirmed before leaving the pump unattended
 
+## Low-priority bench hardening (2026-08-31, from bare-module flash test)
+
+Flashing this image on a bare C3 super-mini (no ADS/TFT) shows the loop
+lives but (a) I2C reads fail every tick and the loop settles in FAULT —
+expected there — and (b) a task watchdog fired with idle starvation, dump
+caught `mon` in the USB-CDC printf spin. Not a permanent hang: IDF's
+USB-CDC TX spins ≤50 ms per call then drops (vfs_usb_serial_jtag.c
+TX_FLUSH_TIMEOUT_US). Likely the 010 leftover "serial `st` with TFT
+unplugged" case. Items:
+
+- [ ] Close the 010 leftover: verify serial `st` + watchdog behavior with
+      TFT unplugged on the protoboard (idle starvation → fix or document)
+- [ ] Optional graceful missing-peripheral mode for bare-module bench
+      tests: one ADS1115 probe at boot; absent ⇒ skip I2C sampling,
+      temps report FAULT with a single startup notice instead of
+      per-tick errors
+- Field-relevant bounds confirmed: printf to a dead USB host degrades
+  (spin ≤50 ms + drop), so the headless field node won't hang on console
+  writes — keep verbose boot prints out of the field image anyway
+
 ## Proposal
 
 Sequence: close 009 on the plant, then flash the install image with
