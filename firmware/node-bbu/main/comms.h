@@ -56,6 +56,7 @@ size_t comms_encode_param_value(uint8_t param_id, int32_t raw, uint8_t *out);
 
 /* Bench/status (serial). */
 void comms_status_print(void);
+void comms_bench_hello_burst(uint8_t ch, int count); /* bench: fixed-ch HELLO burst */
 bool comms_set_ident(uint8_t node_type, uint8_t node_id); /* NVS-persisted */
 void comms_set_sample_period_s(uint32_t s);               /* default 15  */
 bool comms_ring_resize(uint16_t samples); /* bench: reallocates EMPTY ring */

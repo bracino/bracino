@@ -1083,6 +1083,35 @@ void comms_offer_sample(const comms_sample_t *s)
     fifo_push(&t, now);
 }
 
+/* Bench: manual HELLO burst on a fixed channel. Run with `comms off` so
+ * the comms task doesn't fight over the channel (radio_start is
+ * independent of the enable flag). Proves TX radiates + master ESP-NOW RX
+ * independent of the scan state machine. */
+void comms_bench_hello_burst(uint8_t ch, int count)
+{
+    if (radio_start() != ESP_OK) {
+        printf("comms: radio init failed\n");
+        return;
+    }
+    if (s_enabled) {
+        printf("comms: WARNING comms task is live and may fight over the "
+               "channel — run `comms off` first\n");
+    }
+    set_channel(ch);
+    uint8_t buf[ESPNOW_MAX_PAYLOAD];
+    size_t len = hello_build(buf);
+    printf("comms: HELLO burst: %d frames on ch %u (frame %u B)\n",
+           count, ch, (unsigned)len);
+    for (int i = 0; i < count; i++) {
+        esp_err_t err = esp_now_send(BCAST_MAC, buf, len);
+        if (err != ESP_OK) {
+            printf("  send %u FAILED: %s\n", i, esp_err_to_name(err));
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+    printf("comms: burst done\n");
+}
+
 void comms_status_print(void)
 {
     printf("comms: enabled=%d state=%s node(%u,%u) boot=%u seq=%u\n",

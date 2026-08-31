@@ -221,6 +221,7 @@ static void print_help(void)
         "  ident T I        provision node_type/id (NVS)\n"
         "  tel <sec>        telemetry capture period (default 15)\n"
         "  ring <n>         resize FIFO ring EMPTY (bench decimation)\n"
+        "  hel <ch> [n]     bench: HELLO burst on fixed channel\n"
         "  prog / st / scan / enc / h\n"
         "GPIO8: idle 100/900, RUNNING steady, alert 300/300.\n"
         "Boots Manual. CT is loaded/not. Do not hang the real BBU pump.\n");
@@ -554,6 +555,14 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
                strncmp(line, "tel ", 4) == 0 ||
                strncmp(line, "ring ", 5) == 0) {
         cmd_comms(line);
+    } else if (strncmp(line, "hel ", 4) == 0) {
+        unsigned int ch = 0, cnt = 20;
+        sscanf(line + 4, "%u %u", &ch, &cnt);
+        if (ch >= 1 && ch <= 13 && cnt >= 1 && cnt <= 300) {
+            comms_bench_hello_burst((uint8_t)ch, (int)cnt);
+        } else {
+            printf("hel <ch 1-13> [count=20]  (run `comms off` first)\n");
+        }
     } else if (strcmp(line, "prog") == 0) {
         s_prog = true;
         printf("programming on  (list | NAME VALUE | save | default | exit)\n");

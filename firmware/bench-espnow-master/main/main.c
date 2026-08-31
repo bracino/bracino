@@ -818,11 +818,20 @@ static void registry_print(void)
 }
 
 static volatile uint32_t s_sniff_cnt;
+static volatile uint32_t s_sniff_printed;
 static void sniff_cb(void *buf, wifi_promiscuous_pkt_type_t type)
 {
-    (void)buf;
-    (void)type;
+    wifi_promiscuous_pkt_t *pkt = (wifi_promiscuous_pkt_t *)buf;
     s_sniff_cnt++;
+    uint16_t len = pkt->rx_ctrl.sig_len;
+    if (s_sniff_printed >= 40 || len > 130) {
+        return; /* count-only for big/noisy frames */
+    }
+    s_sniff_printed++;
+    const uint8_t *p = pkt->payload;
+    /* 802.11: addr2 (transmitter) at offset 10 for data frames */
+    printf("  snif len=%3u type=%u a2=" MACSTR " fc=%02x%02x\n",
+           len, (unsigned)type, MAC2STR(p + 10), p[1], p[0]);
 }
 
 static void print_help(void)
@@ -836,7 +845,7 @@ static void print_help(void)
         "  p           PARAM_SET setpoint +/-0.5 C to first node\n"
         "  s           registry + counters (GPIO27 button too)\n"
         "  k           show driver's actual current channel\n"
-        "  w           5 s promiscuous frame count (RF sanity)\n"
+        "  w [sec]         promiscuous frame count + MACs (RF sanity)\n"
         "  h           this help\n"
         "knobs (edit + rebuild): BENCH_NO_ACK_S=%d BENCH_DROP_PCT=%d\n",
         BENCH_NO_ACK_S, BENCH_DROP_PCT);
@@ -917,18 +926,27 @@ void app_main(void)
                 esp_wifi_get_channel(&prim, &sc);
                 printf("driver channel: primary=%u second=%d\n",
                        prim, (int)sc);
-            } else if (strcmp(line, "w") == 0) {
+            } else if (line[0] == 'w') {
+                int sec = 5;
+                if (line[1] == ' ') {
+                    sec = atoi(line + 2);
+                }
+                if (sec < 1 || sec > 60) {
+                    sec = 5;
+                }
                 uint8_t prim;
                 wifi_second_chan_t sc;
                 esp_wifi_get_channel(&prim, &sc);
                 s_sniff_cnt = 0;
+                s_sniff_printed = 0;
                 esp_wifi_set_promiscuous_rx_cb(sniff_cb);
                 esp_wifi_set_promiscuous(true);
-                printf("sniffing on ch %u for 5 s...\n", prim);
-                vTaskDelay(pdMS_TO_TICKS(5000));
+                printf("sniffing ch %u for %d s (≤130 B frames, ≤40 lines)...\n",
+                       prim, sec);
+                vTaskDelay(pdMS_TO_TICKS(sec * 1000));
                 esp_wifi_set_promiscuous(false);
                 esp_wifi_set_promiscuous_rx_cb(NULL);
-                printf("sniff done: %lu frames heard\n",
+                printf("sniff done: %lu frames total\n",
                        (unsigned long)s_sniff_cnt);
             } else if (strcmp(line, "t") == 0) {
                 for (int i = 0; i < s_node_cnt; i++) {
