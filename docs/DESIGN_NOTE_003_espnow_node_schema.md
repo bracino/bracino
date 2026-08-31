@@ -288,17 +288,17 @@ Batch header (11 B):
 start_ms    end_ms      count schema_ver=1
 (= capture_ms of first sample)
 
-Sample, bbu_telemetry_v1_t (11 B):
-00 01 01 8A 02 88 02 D2 00 00 01
+Sample, bbu_telemetry_v1_t (12 B):
+00 01 01 8A 02 88 02 D2 00 00 01 00
 ^  ^  ^  ^---^ ^---^ ^---^ ^  ^
 |  |  |  t_tpo t_tpu t_amb |  schema_ver=1
 |  |  ct_state=RUNNING     fault_flags=0
 |  relay_state=ON
 mode=AUTO
 
-Full frame (35 B):
+Full frame (36 B):
 01 01 01 05 2A 00 87 D6 12 00 00 05 16 87 D6 12 00 87 D6 12 00 01 00 01
-00 01 01 8A 02 88 02 D2 00 00 01
+00 01 01 8A 02 88 02 D2 00 00 01 00
 ```
 
 Temperature fields are ×10 fixed-point (`0x028A` = 650 → 65.0 °C) to avoid
@@ -644,6 +644,8 @@ typedef struct __attribute__((packed)) {
     uint8_t  fault_flags;   // bit/sensor: 0=TPO_OPEN 1=TPO_SHORT 2=TPU_OPEN
                             //             3=TPU_SHORT 4=AMB_OPEN 5=AMB_SHORT
     uint8_t  schema_ver;    // = 1
+    uint8_t  rsv;           // reserved — transmit 0 (makes the stated 12 B
+                            // true; earlier text/example showed 11 B by error)
 } bbu_telemetry_v1_t;       // 12 bytes
 ```
 

@@ -296,14 +296,21 @@ static void nvs_load(void)
 
 /* ---- radio ---- */
 
+static volatile bool s_tx_delivered; /* radio-level ack of last unicast: a
+                                      * MAC NAK means the gateway never got
+                                      * the frame (e.g. it hopped channel) */
+
 static void radio_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
     (void)mac_addr;
-    if (status == ESP_NOW_SEND_SUCCESS) {
+    bool ok = status == ESP_NOW_SEND_SUCCESS;
+    if (ok) {
         s_ct.tx_ok++;
     } else {
         s_ct.tx_fail++;
     }
+    s_tx_delivered = ok; /* MAC-level ack: a NAK here means the gateway
+                          * never got the frame (e.g. it hopped channel) */
     xSemaphoreGive(s_tx_done);
 }
 
@@ -411,14 +418,23 @@ static void add_gw_peer(const uint8_t *mac)
 }
 
 /* Send and wait for the MAC-level callback. Returns radio-level success. */
+/* Radio-level delivery: a callback that reports a MAC NAK (gateway gone,
+ * channel mismatch) is a FAILURE — ignoring it here meant heartbeats to a
+ * moved gateway "succeeded" forever and the node never rescanned. */
+static volatile bool s_tx_delivered;
+
 static bool send_wait(const uint8_t *mac, const uint8_t *buf, size_t len)
 {
     xSemaphoreTake(s_tx_done, 0); /* drain stale signal */
+    s_tx_delivered = false;
     if (esp_now_send(mac, buf, len) != ESP_OK) {
         s_ct.tx_fail++;
         return false;
     }
-    return xSemaphoreTake(s_tx_done, pdMS_TO_TICKS(TX_CB_WAIT_MS)) == pdTRUE;
+    if (xSemaphoreTake(s_tx_done, pdMS_TO_TICKS(TX_CB_WAIT_MS)) != pdTRUE) {
+        return false;
+    }
+    return s_tx_delivered;
 }
 
 /* ---- FIFO (spinlock: capture runs in the 1 Hz monitor task) ---- */

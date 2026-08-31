@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "driver/gpio.h"
 #include "driver/i2c_master.h"
@@ -885,8 +886,7 @@ void app_main(void)
     ui_init(s_mu, &s_ctrl, params_get, apply_ctrl);
     xTaskCreate(ui_task, "ui", 8192, NULL, 1, NULL);
     xTaskCreate(monitor_task, "mon", 4096, NULL, 2, NULL);
-    printf("> ");
-    fflush(stdout);
+    printf("> "); fflush(stdout); fsync(fileno(stdout));
 
     char line[CMD_LINE_MAX];
     size_t len = 0;
@@ -906,7 +906,7 @@ void app_main(void)
             }
             handle_line(line, bus);
             len = 0;
-            printf(s_prog ? "PROG> " : "> ");
+            printf(s_prog ? "PROG> " : "> "); fflush(stdout); fsync(fileno(stdout));
             fflush(stdout);
             continue;
         }
@@ -916,12 +916,16 @@ void app_main(void)
                 len--;
                 printf("\b \b");
                 fflush(stdout);
+                fsync(fileno(stdout)); /* USB-CDC: push hw FIFO to host */
             }
         } else if (len + 1 < sizeof(line)) {
             line[len++] = (char)c;
             if (c >= 0x20 && c < 0x7f) {
                 putchar(c);
                 fflush(stdout);
+                /* the USB-CDC FIFO only drains to the host on '\n' or
+                 * fsync — without this, typing stays invisible */
+                fsync(fileno(stdout));
             }
         }
     }

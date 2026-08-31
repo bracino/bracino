@@ -128,6 +128,7 @@ typedef struct __attribute__((packed)) {
     int16_t  t_amb_x10;
     uint8_t  fault_flags; /* bit per sensor fault, see BBU_FAULT_* */
     uint8_t  schema_ver;  /* = 1 */
+    uint8_t  rsv;         /* reserved — transmit 0 (pads to the stated 12 B) */
 } bbu_telemetry_v1_t;
 
 /* Wire encoding of BBU modes (order chosen to match user-facing modes;

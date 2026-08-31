@@ -128,6 +128,7 @@ typedef struct {
     uint8_t config_ver;
     bool config_fetched;
     uint32_t last_seen_ms;
+    bool flagged_unreach;      /* liveness warning latched (harness-level) */
     anchor_t anchor;
     /* CONFIG_DESC reassembly */
     uint8_t frag_total, frag_next;
@@ -396,10 +397,17 @@ static node_rec_t *node_find_or_add(const uint8_t *mac, uint8_t type, uint8_t id
 
 static void time_sync_send(node_rec_t *n)
 {
-    uint8_t tlv[8];
-    size_t tlen = time_sync_tlv(tlv);
+    /* Standalone TIME_SYNC payload is the RAW 6-byte time_sync_t (DN003) —
+     * NOT the TLV-wrapped form (HELLO_ACK carries the TLV; this doesn't).
+     * Sending 8 B here made the node ignore every push (len check 13+6). */
+    time_sync_t ts = { 0 };
+    if (time_set()) {
+        uint64_t ms = epoch_total_ms();
+        ts.epoch_s = (uint32_t)(ms / 1000);
+        ts.epoch_ms = (uint16_t)(ms % 1000);
+    }
     uint8_t buf[ESPNOW_MAX_PAYLOAD];
-    size_t len = gw_env_build(buf, n->type, n->id, MSG_TIME_SYNC, tlv, (uint8_t)tlen);
+    size_t len = gw_env_build(buf, n->type, n->id, MSG_TIME_SYNC, &ts, sizeof(ts));
     uint8_t prim;
     wifi_second_chan_t sc;
     esp_wifi_get_channel(&prim, &sc);
@@ -491,7 +499,8 @@ static void print_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec_
         return;
     }
     uint16_t count = rd_u16((const uint8_t *)&h->count);
-    size_t expected = 11 + (size_t)count * 12;
+    size_t sample_sz = sizeof(bbu_telemetry_v1_t);
+    size_t expected = 11 + (size_t)count * sample_sz;
     if (count > 0 && plen < expected) {
         TLOG("TELEMETRY_BATCH malformed (count %u, plen %u)\n",
                count, (unsigned)plen);
@@ -512,7 +521,7 @@ static void print_batch(const rx_msg_t *m, const espnow_envelope_t *e, node_rec_
            count, (unsigned)plen - 11, t0s, t1s, e->boot_session);
 
     const uint8_t *p = m->data + ESPNOW_ENV_SIZE + 11;
-    for (uint16_t i = 0; i < count; i++, p += 12) {
+    for (uint16_t i = 0; i < count; i++, p += sample_sz) {
         const bbu_telemetry_v1_t *s = (const bbu_telemetry_v1_t *)p;
         TLOG("  [%2u] mode=%-6s relay=%u ct=%-15s tpo=%.1f tpu=%.1f amb=%.1f"
                " faults=%02x",
@@ -711,6 +720,10 @@ static void handle_rx(const rx_msg_t *m)
             break;
         }
     }
+    if (n != NULL && n->flagged_unreach) {
+        n->flagged_unreach = false;
+        TLOG("node(%u,%u) frames resumed\n", e->node_type, e->node_id);
+    }
 
     switch (e->msg_type) {
     case MSG_HELLO:
@@ -781,6 +794,23 @@ static void proc_task(void *arg)
                 (now_ms() - n->frag_last_ms) > FRAG_TIMEOUT_MS) {
                 TLOG("CONFIG_DESC reassembly timeout — reset\n");
                 n->frag_total = 0;
+            }
+        }
+        /* harness-level liveness (the real thing is DN004 scope): warn once
+         * when a registered node goes quiet past 3x its declared cadence */
+        for (int i = 0; i < s_node_cnt; i++) {
+            node_rec_t *n = &s_nodes[i];
+            uint32_t expect_ms = (uint32_t)n->liveness_s * 3u * 1000u;
+            if (n->liveness_s == 0 || n->last_seen_ms == 0) {
+                continue;
+            }
+            if (!n->flagged_unreach &&
+                (now_ms() - n->last_seen_ms) > expect_ms) {
+                n->flagged_unreach = true;
+                TLOG("!! node(%u,%u) silent for %lus — unreachable "
+                     "(expect ~%us cadence)\n", n->type, n->id,
+                     (unsigned long)((now_ms() - n->last_seen_ms) / 1000),
+                     n->liveness_s);
             }
         }
     }
@@ -904,7 +934,7 @@ void app_main(void)
     xTaskCreate(proc_task, "proc", 8192, NULL, 2, NULL);
     xTaskCreate(button_task, "btn", 2048, NULL, 1, NULL);
     print_help();
-    printf("> ");
+    printf("> "); fflush(stdout);
     fflush(stdout);
 
     char line[80];
@@ -1003,7 +1033,7 @@ void app_main(void)
                 TLOG("unknown '%s' (h for help)\n", line);
             }
             len = 0;
-            printf("> ");
+            printf("> "); fflush(stdout);
             fflush(stdout);
             continue;
         }
