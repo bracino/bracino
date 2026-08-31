@@ -137,6 +137,8 @@ static struct {
 
 static const char *const TAG_STATE[] = { "SCANNING", "ONLINE" };
 
+static const uint8_t BCAST_MAC[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
 /* FIFO ring */
 static fifo_ent_t *s_ring;
 static uint16_t s_ring_cap;
@@ -335,6 +337,23 @@ static void set_channel(uint8_t ch)
     if (err != ESP_OK) {
         printf("comms: !! set_channel(%u) FAILED: %s — TX may stay on prior "
                "channel\n", ch, esp_err_to_name(err));
+        return;
+    }
+    /* Keep the broadcast peer's channel in sync: if the driver latches the
+     * peer's TX channel at add_peer time, every HELLO would leave on the
+     * boot channel no matter what set_channel does. (This exact symptom —
+     * heard on ch 1, silent on ch 6 — cost the first bench session.) */
+    if (esp_now_is_peer_exist(BCAST_MAC)) {
+        esp_now_peer_info_t peer = { 0 };
+        memcpy(peer.peer_addr, BCAST_MAC, 6);
+        peer.channel = ch;
+        peer.ifidx = WIFI_IF_STA;
+        peer.encrypt = false;
+        err = esp_now_mod_peer(&peer);
+        if (err != ESP_OK) {
+            printf("comms: !! peer channel sync to %u FAILED: %s\n",
+                   ch, esp_err_to_name(err));
+        }
     }
 }
 
@@ -497,8 +516,6 @@ static bool ev_pop(ev_msg_t *out)
 }
 
 /* ---- HELLO / discovery ---- */
-
-static const uint8_t BCAST_MAC[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 static size_t hello_build(uint8_t *buf)
 {

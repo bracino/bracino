@@ -146,6 +146,10 @@ static int32_t s_param_setpoint_raw = 600; /* 60.0 °C x10; p toggles ±5 */
 
 static QueueHandle_t s_rx_q;
 static SemaphoreHandle_t s_send_mu;  /* serialize esp_now_send + cb pairing */
+static SemaphoreHandle_t s_tx_done;  /* TX completion: BINARY sem — the cb
+                                      * runs in the WiFi task and giving a
+                                      * MUTEX from a non-owner asserts
+                                      * (xTaskPriorityDisinherit) */
 static SemaphoreHandle_t s_print_mu; /* console vs proc task */
 static volatile bool s_btn_hit;
 static uint32_t s_boot_ms = 0;
@@ -244,7 +248,7 @@ static void send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
     } else {
         s_ct.tx_fail++;
     }
-    xSemaphoreGive(s_send_mu); /* one give per send: send_wait consumes it */
+    xSemaphoreGive(s_tx_done); /* binary sem — NEVER the mutex (see above) */
 }
 
 static void recv_cb(const esp_now_recv_info_t *info, const uint8_t *data, int len)
@@ -261,8 +265,8 @@ static void recv_cb(const esp_now_recv_info_t *info, const uint8_t *data, int le
     }
 }
 
-/* Channel set with loud failure logging (silently-wrong channel wasted a
- * bench session once — never trust this call without checking). */
+/* Channel set with loud failure logging + keep unicast peers on the new
+ * channel (peer TX channel can latch at add_peer time). */
 static void set_channel_checked(uint8_t ch)
 {
     esp_wifi_set_promiscuous(true);
@@ -270,6 +274,18 @@ static void set_channel_checked(uint8_t ch)
     esp_wifi_set_promiscuous(false);
     if (err != ESP_OK) {
         printf("!! set_channel(%u) FAILED: %s\n", ch, esp_err_to_name(err));
+        return;
+    }
+    for (int i = 0; i < s_node_cnt; i++) {
+        if (!esp_now_is_peer_exist(s_nodes[i].mac)) {
+            continue;
+        }
+        esp_now_peer_info_t peer = { 0 };
+        memcpy(peer.peer_addr, s_nodes[i].mac, 6);
+        peer.channel = ch;
+        peer.ifidx = WIFI_IF_STA;
+        peer.encrypt = false;
+        esp_now_mod_peer(&peer);
     }
 }
 
@@ -307,10 +323,11 @@ static void ensure_peer(const uint8_t *mac)
 static bool send_wait(const uint8_t *mac, const uint8_t *buf, size_t len)
 {
     xSemaphoreTakeRecursive(s_send_mu, portMAX_DELAY);
+    xSemaphoreTake(s_tx_done, 0); /* drain stale completion */
     ensure_peer(mac);
     bool ok = esp_now_send(mac, buf, len) == ESP_OK;
     if (ok) {
-        ok = xSemaphoreTake(s_send_mu, pdMS_TO_TICKS(500)) == pdTRUE;
+        ok = xSemaphoreTake(s_tx_done, pdMS_TO_TICKS(500)) == pdTRUE;
     }
     xSemaphoreGiveRecursive(s_send_mu);
     return ok;
@@ -343,8 +360,11 @@ static size_t time_sync_tlv(uint8_t *tlv)
     tlv[1] = 6;
     if (time_set()) {
         uint64_t ms = epoch_total_ms();
+        /* value layout: epoch_s u32 LE at tlv+2, epoch_ms u16 LE at tlv+6.
+         * (Writing ms at tlv+4 clobbers the u32's high half — the first
+         * HELLO anchored a garbage epoch because of exactly that.) */
         wr_u32(tlv + 2, (uint32_t)(ms / 1000));
-        wr_u16(tlv + 4, (uint16_t)(ms % 1000));
+        wr_u16(tlv + 6, (uint16_t)(ms % 1000));
     } else {
         wr_u32(tlv + 2, 0);
         wr_u16(tlv + 4, 0); /* epoch 0: node will buffer, not transmit */
@@ -858,6 +878,8 @@ void app_main(void)
     configASSERT(s_rx_q);
     s_send_mu = xSemaphoreCreateRecursiveMutex();
     configASSERT(s_send_mu);
+    s_tx_done = xSemaphoreCreateBinary();
+    configASSERT(s_tx_done);
     s_print_mu = xSemaphoreCreateRecursiveMutex();
     configASSERT(s_print_mu);
 

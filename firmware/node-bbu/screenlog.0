@@ -1,0 +1,233 @@
+commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+> > commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+> > commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+Boots Manual. CT is loaded/not. Do not hang the real BBU pump.
+> sim TPO=54.0
+> sim tpo=on tpu=on
+  TPO=54.0 C
+  TPU=50.0 C
+> mode Auto (coil OFF, min_off then start if TPO cold)
+> comms [on|off] | ident <type> <id> | tel <sec> | ring <samples>
+> unknown 'com'  (h for help)
+> unknown 'cmms'  (h for help)
+> comms: enabled=0 state=SCANNING node(1,1) boot=16 seq=0
+  channel=11 bound=0 gw=00:00:00:00:00:00
+  anchored=0 epoch=0.000@0ms sample_period=15s
+  fifo=0/4096 outstanding=0 fails=0 admin_seq=0
+  rx=0 drop=0 tx_ok=0 fail=0 acks=0 retrans=0
+  decim=0 ev_sent=0 ev_drop=0
+> unknown 'coms on'  (h for help)
+> comms: enabled (re-discovery forced)
+> [0;32mI (141532) pp: pp rom version: 9387209[0m
+[0;32mI (141532) net80211: net80211 rom version: 9387209[0m
+I (141542) wifi:wifi driver task: 3fcbe044, prio:23, stack:6656, core=0
+I (141542) wifi:wifi firmware version: 82f54d2
+I (141542) wifi:wifi certification version: v7.0
+I (141542) wifi:config NVS flash: enabled
+I (141542) wifi:config nano formating: disabled
+I (141542) wifi:Init data frame dynamic rx buffer num: 32
+I (141542) wifi:Init static rx mgmt buffer num: 5
+I (141542) wifi:Init management short buffer num: 32
+I (141542) wifi:Init dynamic tx buffer num: 32
+I (141542) wifi:Init static tx FG buffer num: 2
+I (141542) wifi:Init static rx buffer size: 1600
+I (141542) wifi:Init static rx buffer num: 10
+I (141542) wifi:Init dynamic rx buffer num: 32
+[0;32mI (141542) wifi_init: rx ba win: 6[0m
+[0;32mI (141542) wifi_init: tcpip mbox: 32[0m
+[0;32mI (141552) wifi_init: udp mbox: 6[0m
+[0;32mI (141552) wifi_init: tcp mbox: 6[0m
+[0;32mI (141552) wifi_init: tcp tx win: 5760[0m
+[0;32mI (141552) wifi_init: tcp rx win: 5760[0m
+[0;32mI (141552) wifi_init: tcp mss: 1440[0m
+[0;32mI (141552) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (141552) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (141552) phy_init: phy_version 1180,01f2a49,Jun  4 2024,16:34:25[0m
+[0;33mW (141592) phy_init: saving new calibration data because of checksum failure, mode(0)[0m
+I (141602) wifi:mode : sta (7c:4f:ad:d1:80:50)
+I (141602) wifi:enable tsf
+I (141602) wifi:Set ps type: 0, coexist: 0
+
+I (141602) ESPNOW: espnow [version: 1.0] init
+comms: radio up, node(1,1) mac 7c:4f:ad:d1:80:50
+I (141612) wifi:ic_enable_sniffer
+I (141612) wifi:ic_disable_sniffer
+I (141862) wifi:ic_enable_sniffer
+I (141862) wifi:ic_disable_sniffer
+I (142112) wifi:ic_enable_sniffer
+I (142112) wifi:ic_disable_sniffer
+I (142362) wifi:ic_enable_sniffer
+I (142362) wifi:ic_disable_sniffer
+I (142612) wifi:ic_enable_sniffer
+I (142612) wifi:ic_disable_sniffer
+I (142862) wifi:ic_enable_sniffer
+I (142862) wifi:ic_disable_sniffer
+I (143112) wifi:ic_enable_sniffer
+I (143112) wifi:ic_disable_sniffer
+I (143362) wifi:ic_enable_sniffer
+I (143362) wifi:ic_disable_sniffer
+comms: TIME_SYNC epoch=0 — gateway has no time yet
+comms: bound gw d0:ef:76:15:6b:e0 ch=7
+RUNNING relay=ON
+comms: disabled (FIFO held, no radio work)
+> comms: enabled (re-discovery forced)
+> I (210362) wifi:ic_enable_sniffer
+I (210362) wifi:ic_disable_sniffer
+I (210612) wifi:ic_enable_sniffer
+I (210612) wifi:ic_disable_sniffer
+I (210862) wifi:ic_enable_sniffer
+I (210862) wifi:ic_disable_sniffer
+I (211112) wifi:ic_enable_sniffer
+I (211112) wifi:ic_disable_sniffer
+I (211362) wifi:ic_enable_sniffer
+I (211362) wifi:ic_disable_sniffer
+I (211612) wifi:ic_enable_sniffer
+I (211612) wifi:ic_disable_sniffer
+I (211862) wifi:ic_enable_sniffer
+I (211862) wifi:ic_disable_sniffer
+I (212112) wifi:ic_enable_sniffer
+I (212112) wifi:ic_disable_sniffer
+I (212362) wifi:ic_enable_sniffer
+I (212362) wifi:ic_disable_sniffer
+I (212612) wifi:ic_enable_sniffer
+I (212612) wifi:ic_disable_sniffer
+I (212862) wifi:ic_enable_sniffer
+I (212862) wifi:ic_disable_sniffer
+I (213112) wifi:ic_enable_sniffer
+I (213112) wifi:ic_disable_sniffer
+I (213362) wifi:ic_enable_sniffer
+I (213362) wifi:ic_disable_sniffer
+WARN no CT (commanded ON, no current) — loop unchanged
+I (223612) wifi:ic_enable_sniffer
+I (223612) wifi:ic_disable_sniffer
+I (223862) wifi:ic_enable_sniffer
+I (223862) wifi:ic_disable_sniffer
+I (224112) wifi:ic_enable_sniffer
+I (224112) wifi:ic_disable_sniffer
+I (224362) wifi:ic_enable_sniffer
+I (224362) wifi:ic_disable_sniffer
+I (224612) wifi:ic_enable_sniffer
+I (224612) wifi:ic_disable_sniffer
+I (224862) wifi:ic_enable_sniffer
+I (224862) wifi:ic_disable_sniffer
+I (225112) wifi:ic_enable_sniffer
+I (225112) wifi:ic_disable_sniffer
+I (225362) wifi:ic_enable_sniffer
+I (225362) wifi:ic_disable_sniffer
+I (225612) wifi:ic_enable_sniffer
+I (225612) wifi:ic_disable_sniffer
+I (225862) wifi:ic_enable_sniffer
+I (225862) wifi:ic_disable_sniffer
+I (226112) wifi:ic_enable_sniffer
+I (226112) wifi:ic_disable_sniffer
+I (226362) wifi:ic_enable_sniffer
+I (226362) wifi:ic_disable_sniffer
+I (226612) wifi:ic_enable_sniffer
+I (226612) wifi:ic_disable_sniffer
+comms: disabled (FIFO held, no radio work)
+> comms: enabled=0 state=SCANNING node(1,1) boot=16 seq=37
+  channel=7 bound=0 gw=d0:ef:76:15:6b:e0
+  anchored=0 epoch=0.000@0ms sample_period=15s
+  fifo=6/4096 outstanding=0 fails=0 admin_seq=0
+  rx=1 drop=0 tx_ok=62 fail=6 acks=0 retrans=0
+  decim=0 ev_sent=4 ev_drop=0
+> unknown 'r 986'  (h for help)
+> comms: ring resized to 96 samples (EMPTY — bench knob)
+> comms: enabled=0 state=SCANNING node(1,1) boot=16 seq=37
+  channel=7 bound=0 gw=d0:ef:76:15:6b:e0
+  anchored=0 epoch=0.000@0ms sample_period=15s
+  fifo=0/96 outstanding=0 fails=0 admin_seq=0
+  rx=1 drop=0 tx_ok=62 fail=6 acks=0 retrans=0
+  decim=0 ev_sent=4 ev_drop=0
+> comms: enabled (re-discovery forced)
+> I (362762) wifi:ic_enable_sniffer
+I (362762) wifi:ic_disable_sniffer
+I (363012) wifi:ic_enable_sniffer
+I (363012) wifi:ic_disable_sniffer
+comms: anchored epoch=759442.42405 at clock 363022 ms
+comms: bound gw d0:ef:76:15:6b:e0 ch=1
+comms: ack timeout — retransmit (fail 1)
+comms: ack timeout — retransmit (fail 2)
+comms: ack timeout — retransmit (fail 3)
+comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (379202) wifi:ic_enable_sniffer
+I (379202) wifi:ic_disable_sniffer
+I (379452) wifi:ic_enable_sniffer
+I (379452) wifi:ic_disable_sniffer
+I (379702) wifi:ic_enable_sniffer
+I (379702) wifi:ic_disable_sniffer
+I (379952) wifi:ic_enable_sniffer
+I (379952) wifi:ic_disable_sniffer
+I (380202) wifi:ic_enable_sniffer
+I (380202) wifi:ic_disable_sniffer
+I (380452) wifi:ic_enable_sniffer
+I (380452) wifi:ic_disable_sniffer
+I (380702) wifi:ic_enable_sniffer
+I (380702) wifi:ic_disable_sniffer
+I (380952) wifi:ic_enable_sniffer
+I (380952) wifi:ic_disable_sniffer
+I (381202) wifi:ic_enable_sniffer
+I (381202) wifi:ic_disable_sniffer
+I (381452) wifi:ic_enable_sniffer
+I (381452) wifi:ic_disable_sniffer
+I (381702) wifi:ic_enable_sniffer
+I (381702) wifi:ic_disable_sniffer
+I (381952) wifi:ic_enable_sniffer
+I (381952) wifi:ic_disable_sniffer
+I (382202) wifi:ic_enable_sniffer
+I (382202) wifi:ic_disable_sniffer
+comms: disabled (FIFO held, no radio work)
+> I (538602) wifi:ic_enable_sniffer
+I (538602) wifi:ic_disable_sniffer
+comms: HELLO burst: 100 frames on ch 6 (frame 35 B)
+comms: burst done
+> unknown '[ahel 6 100'  (h for help)
+> I (598442) wifi:ic_enable_sniffer
+I (598442) wifi:ic_disable_sniffer
+comms: HELLO burst: 100 frames on ch 6 (frame 35 B)
+comms: burst done
