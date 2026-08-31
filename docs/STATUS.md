@@ -10,6 +10,8 @@ Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08*
 
 Issue **010 closed**. Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
 
+**Plant finding (2026-08-31):** first boiler-room hookup was inconclusive — the node's contact closes a ~24 V control line to a **hidden second relay** near the breaker box, which switches the pump. Pump ON worked; OFF did not (pump kept running; suspected snubber leak through the open contacts, alternatives to rule out). **CT confirm-running is a bust** — pump current never flows through node wiring (firmware unaffected: CT is warning-only per DN002). Install (012) blocked pending the relay/snubber rework and the 009 real-pump checklist: [issues/open/014](../issues/open/014-hidden-second-relay-snubber.md).
+
 CT no-current / unusable is **warning only** — stay on the standard algorithm (same blindness as the old MES-BBU, plus a notice). `TPO_ONLY` is for TPU faults only.
 
 Design contracts settled 2026-08-30: **ESP-NOW wire law** ([DESIGN_NOTE_003](DESIGN_NOTE_003_espnow_node_schema.md)) and **gateway design + MQTT contract** ([DESIGN_NOTE_004](DESIGN_NOTE_004_gateway_design.md)). Not yet implemented in firmware. DN002 updated: boot-in-last-known-mode + NVS-persisted parameters are field-image requirements (issues 011/012/013 open; install deadline 2026-08-31).

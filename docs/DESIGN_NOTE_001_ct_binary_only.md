@@ -52,7 +52,12 @@ The 3.3 V rail was a deliberate match to the ADC (A0 must stay ≤ 3.6 V). A 5 V
 
 The real BBU pump is a plain induction motor (~350 W ≈ 1.5 A). Expect the fan-like side of the curve (clear on/off), not a linear amp reading.
 
+## Plant finding (2026-08-31)
+
+First boiler-room hookup revealed the node's contact does **not** switch the pump directly: it closes a ~24 V control line to a hidden second relay near the breaker box, which switches the pump. Pump current therefore **never flows through node wiring**, and the CT cannot see the plant motor on this node at all. The boolean-only contract above still stands as bench evidence, but the assumed plant signal is gone. Rework of the relay/snubber and the run-confirmation decision are tracked in [issues/open/014](../issues/open/014-hidden-second-relay-snubber.md).
+
 ## Related
 
 - ADR 001 already flagged 3.3 V CT swing as a risk; this note records the measured outcome.
+- 014 — hidden second pump relay; CT plant signal unavailable.
 - Relay drive is a separate hardware path (Q1 2N3904 on GPIO10 → module IN in v0.08). It does not change this current-sense decision.

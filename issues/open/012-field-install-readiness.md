@@ -11,6 +11,11 @@ In-plant deadline: **2026-08-31 EOD**. Node must control the pump
 autonomously from first power-on, boot into its last known mode, and
 require no reflash when the gateway/backend arrive later.
 
+**Update 2026-08-31:** deadline missed — first plant hookup inconclusive
+(hidden second pump relay; relay/snubber rework needed; CT run-confirmation
+bust). See [014](../open/014-hidden-second-relay-snubber.md); this install is
+blocked until 014 resolves and 009's real-pump checklist passes.
+
 ## Expected
 
 - [ ] 009 plant checklist executed on the real pump (loop proven)
