@@ -79,3 +79,51 @@ serial logs here as wire-contract evidence.
 
 All six scenarios pass on the desk pair; serial logs archived under
 `issues/fixtures/` as the wire-contract evidence for 011.
+
+## 2026-08-31 bench session addenda (bind-chase + RF leakage)
+
+Three firmware defects were found and fixed while running the harness
+(evidence: `issues/fixtures/013-{master,node}-bind-chase.log`,
+`-ch5-ghost.log`, `-rf-bisect.log`):
+
+1. **Telemetry sample size mismatch** — `bbu_telemetry_v1_t` was 11 B on
+   the wire vs DN003's stated 12 B. Fixed by adding the `rsv` reserved
+   byte; DN003 worked example updated. No schema_ver bump (wire now
+   matches the documented v1).
+2. **Bind one channel behind reality** — scan bound to `chans[i]` on any
+   HELLO_ACK popped from the rx queue, including ACKs received during the
+   *previous* dwell (master rx task busy printing sample blocks). Node
+   recorded `bound ch=5/10` while the GW sat on 6; every batch send then
+   NAK'd. Fix: rx frames carry the channel at rx time; bind requires
+   frame-channel == dwell-channel; stale rx frames flushed at
+   `go_unreachable()` (was only at `comms on`).
+3. **Unicast TX pinned to a wrong peer channel** — `add_gw_peer()` set
+   `peer.channel = s_channel`; ESP-NOW with non-zero peer channel transmits
+   on that channel, so with a bad `s_channel` all upstream TX died while
+   RX still worked. Peer channel is now 0 (follow the radio). Both sides
+   also read back the driver channel after `esp_wifi_set_channel`
+   (promiscuous-disable channel revert is a known risk; node retries
+   without the toggle and logs loudly).
+
+### Adjacent-channel leakage (bench-only observation)
+
+RF bisect via the harness (`hel 6 10` / `hel 5 10` bursts + master `w 10`
+promiscuous sniff, both devices on the desk at cm range):
+
+- `hel 6 10` burst: **10/10 HELLOs** seen by the master on ch 6.
+- `hel 5 10` burst: **1/10 HELLOs** reached the master on ch 6.
+
+So ~10% adjacent-channel leakage at cm desk range — this is exactly the
+ghost-bind mechanism of defect 2 (a leaked ch-6 frame heard on ch 5 is a
+legitimate rx-time-channel-5 frame and passes the new guard). At field
+range (rooms apart) leakage is negligible. The unreachable→rescan cycle
+(~6 s) self-heals a ghost bind; no further code change needed.
+
+Also measured: ch 6 is busy with ambient WiFi (452 frames in 10 s from AP
+`94:83:c4:86:99:ca`). Fine for bench; field channel choice should account
+for it (future DN004/gateway note).
+
+After the bisect, `comms on` bound ch=6 immediately; CONFIG_DESC (2
+frags), first BATCH_ACK watermark (w=1573), telemetry at 15 s cadence
+with sane UTC and zero malformed lines. HELLO→ACK→CONFIG→BATCH→ACK path
+is green.
