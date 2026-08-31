@@ -1,6 +1,6 @@
 # Status
 
-**As of:** 2026-08-30  
+**As of:** 2026-08-31  
 **Phase:** 1 — prototype (BBU control node + WiFi gateway)  
 **Repo:** https://github.com/bracino/bracino
 
@@ -8,9 +8,9 @@
 
 Hardware definition for the module prototype is written (ADR 001, KiCad **v0.08**). The **protoboard is soldered to v0.08** and has passed the same I/O tests as the breadboard. `firmware/node-bbu` runs the offline loop ([DESIGN_NOTE_002](DESIGN_NOTE_002_bbu_control_loop.md)): boots **Manual**, `auto` / `sim` / `halt` on the desk. Human-reported **desk `sim` walk-through passed** (2026-08-22). Human-reported (2026-08-25): dummy **AC load** validated; NTC ice/boil two-point; USB safety block fabricated; TFT+encoder on breadboard (glyphs/flicker fixed). Human-reported (2026-08-26): landscape/SPI2/ISR image **loads and runs**; encoder is **much better**; doubled 6×8 font is **unacceptable**. Human-reported (2026-08-27): TFT+encoder **on the protoboard**; Modern DOS 8×16 **readable**. Human-reported (2026-08-28): UI menus **usable** — rotate/click/hold OK; System Data / Control Program / etc. navigate; WARN amber correct (BGR palette). Issue **010 closed**. Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
 
-Issue **010 closed**. Not plant-proven; no real BBU pump. No ESP-NOW, MQTT, or compose stack.
+**ESP-NOW wire bring-up (2026-08-31):** the DN003 client is implemented in `firmware/node-bbu` (behind the `comms_enabled` NVS flag, default off — radio never in the pump path) and validated end-to-end on the desk against the throwaway bench master `firmware/bench-espnow-master` (issue **013**; the real `firmware/gateway` stays untouched per DN004). Proven on the desk pair: HELLO → HELLO_ACK+TLV time, standalone TIME_SYNC push, CONFIG_GET/DESC (2 fragments), TELEMETRY_BATCH → BATCH_ACK stop-and-wait with watermark trim, sane UTC translation, epoch-less TX gate, unreachable→rescan recovery, per-keystroke console echo (fsync). Three wire defects were found and fixed during bring-up (telemetry sample 11 B vs DN003's stated 12 B; scan bind-race binding one channel behind; pinned ESP-NOW peer channel killing upstream TX) — see the [013 addenda](../issues/open/013-bench-gateway-harness.md). Adjacent-channel leakage at cm desk range measured ~10% (ch 5↔6) — bench-only artifact, self-heals via rescan. Remaining before 013 closes: decimation drill (BENCH_NO_ACK_S=240) and frame-loss drill (BENCH_DROP_PCT=20); then 011's wire contract has its full evidence.
 
-**Plant finding (2026-08-31):** first boiler-room hookup was inconclusive — the node's contact closes a ~24 V control line to a **hidden second relay** near the breaker box, which switches the pump. Pump ON worked; OFF did not (pump kept running; suspected snubber leak through the open contacts, alternatives to rule out). **CT confirm-running is a bust** — pump current never flows through node wiring (firmware unaffected: CT is warning-only per DN002). Install (012) blocked pending the relay/snubber rework and the 009 real-pump checklist: [issues/open/014](../issues/open/014-hidden-second-relay-snubber.md).
+Issue **010 closed**. Not plant-proven; no real BBU pump. MQTT and compose stack not started. first boiler-room hookup was inconclusive — the node's contact closes a ~24 V control line to a **hidden second relay** near the breaker box, which switches the pump. Pump ON worked; OFF did not (pump kept running; suspected snubber leak through the open contacts, alternatives to rule out). **CT confirm-running is a bust** — pump current never flows through node wiring (firmware unaffected: CT is warning-only per DN002). Install (012) blocked pending the relay/snubber rework and the 009 real-pump checklist: [issues/open/014](../issues/open/014-hidden-second-relay-snubber.md).
 
 CT no-current / unusable is **warning only** — stay on the standard algorithm (same blindness as the old MES-BBU, plus a notice). `TPO_ONLY` is for TPU faults only.
 
