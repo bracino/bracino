@@ -18,12 +18,12 @@ bust). See [014](../closed/014-hidden-second-relay-snubber.md).
 **Update 2026-09-01:** 014 **closed** — contactor identified (ABB ECB24-40,
 230 VAC coil line), snubber lifted ⇒ pump switches correctly from the node,
 CT dropped from the circuit (`CT_FITTED 0`, telemetry `NOT_FITTED`). Install
-unblocks here, pending the 009 real-pump checklist and the field-image pass
-below.
+unblocks here, pending the field-image pass below. 009 closed 2026-09-01:
+Auto-start on real wells observed; charge-stop not waited (desk-proven).
 
 ## Expected
 
-- [ ] 009 plant checklist executed on the real pump (loop proven)
+- [x] 009 closed: Auto-start on real wells + pump ON when TPO cold (human). Charge-stop not waited — watch a full cycle when convenient, not a blocker
 - [x] CT dispensed with (2026-09-01, 014): firmware `CT_FITTED 0` — A0 ignored, telemetry `ct_state = NOT_FITTED`, no-CT warning gated off (`ct_fitted`); TFT shows `n/f` instead of the amber no-CT WARN; A0 reserved for a later rev. DN001 rev 2 / DN002 updated
 - [ ] Boot-mode persistence (DN002 boot behavior) implemented
 - [ ] Identity provisioned in NVS (node_type=1, node_id=1) at flash time
@@ -45,6 +45,8 @@ below.
         max_run_time_min, comms enable) — parity with the future admin
         panel; build it as the DN003 param_id table so both share one
         validated setter path
+        Diagnostics: Include following comms data: channel, gw, anchored, last EPOCH, fifo, fails, rx, tx_ok, fail, retrans, decim ev_sent
+      - System Data screen to include firmware revision/build number
       - Note: with `CT_FITTED 0` the no-CT warning never fires; `ct_confirm_s`
         stays listed (registry stability) but is inert
 - [ ] Serial `halt` + UI confirmed before leaving the pump unattended
@@ -71,9 +73,10 @@ unplugged" case. Items:
 
 ## Proposal
 
-Sequence: close 009 on the plant, then flash the install image with
+Sequence: 009 is closed (Auto-start on real wells). Flash the install image with
 identity + boot persistence, decide comms flag, verify boot → Manual/OFF →
-Auto → power-cycle → Auto on the bench before mounting.
+Auto → power-cycle → Auto on the bench before mounting. Watch a full
+charge-stop cycle on the plant when convenient.
 
 ## Fix
 

@@ -45,7 +45,7 @@ Preferred order when something has to wait:
 - [x] NTC open/short on A3 (open ≈ 13 mV, short ≈ 3283 mV, 28 °C ≈ 1760 mV)
 - [x] NTC °C conversion; treat near-0 / near-rail as fault (β=3950)
 - [x] Pump on/off logic on desk `sim` (setpoint / hysteresis / TPU hold)
-- [x] Same loop on dummy AC load (human, 2026-08-25); no real BBU pump yet
+- [x] Same loop on dummy AC load (human, 2026-08-25); Auto-start on real wells + pump (human, before 2026-09-01; 009 closed)
 - [x] Ice / boil two-point on the potted NTCs (human, 2026-08-25)
 - [ ] Field install (012 — node runs the pump; ESP-NOW client compiled in per 011, comms-enabled flag per DN003)
 - [x] TFT + encoder UI on protoboard (010 closed 2026-08-28)
