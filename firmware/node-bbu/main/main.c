@@ -43,6 +43,12 @@
 #define ADS1115_CFG_SS     0x838B
 #define ADS1115_LSB_UV     125
 
+/* CT fitted? ZMCT + snubber dropped for the plant (issue 014): the node's
+ * relay only closes a contactor coil circuit, so pump current never crosses
+ * node wiring and A0 can never see the pump. 0 = the monitor ignores A0 and
+ * reports ct_state=NOT_FITTED; flip to 1 to restore bench sensing. The
+ * serial `s0` command still bursts A0 by hand either way. */
+#define CT_FITTED          0
 #define CT_BURST_N         64
 #define CT_ON_RMS_MV       90
 #define CMD_LINE_MAX       80
@@ -743,9 +749,13 @@ static void monitor_task(void *arg)
 {
     (void)arg;
     for (;;) {
+#if CT_FITTED
         int mid0 = 0, rms0 = 0, pp0 = 0, sat0 = 0;
         bool ct_ok = burst_ch(0, &mid0, &rms0, &pp0, &sat0, true);
         bool ct_on = ct_ok && (rms0 >= CT_ON_RMS_MV);
+#else
+        bool ct_on = false; /* A0 ignored (014) */
+#endif
 
         int16_t c1 = 0, c2 = 0, c3 = 0;
         ntc_sample_t tpo = { .ok = false, .rail_fault = true };
@@ -771,12 +781,14 @@ static void monitor_task(void *arg)
         bbu_sense_t sense = {
             .tpo = tpo,
             .tpu = tpu,
+            .ct_fitted = CT_FITTED,
             .ct_present = ct_on,
             .dt_s = 1,
         };
         uint32_t ev = bbu_ctrl_tick(&s_ctrl, &sense, params_get());
         apply_ctrl();
-        ui_live_t live = { .tpo = tpo, .tpu = tpu, .ct_present = ct_on };
+        ui_live_t live = { .tpo = tpo, .tpu = tpu,
+                           .ct_fitted = CT_FITTED, .ct_present = ct_on };
         ui_set_live(&live);
 
         /* comms sample + fault-transition events (DN003 EVENT registry) */
@@ -803,8 +815,14 @@ static void monitor_task(void *arg)
         comms_sample_t sample = {
             .mode_w = mode_wire(s_ctrl.mode),
             .relay_state = s_ctrl.relay_on ? 1 : 0,
-            .ct_state = s_ctrl.relay_on ? (ct_on ? 1 : 2)
-                                        : (ct_on ? 2 : 0),
+#if CT_FITTED
+            .ct_state = s_ctrl.relay_on ? (ct_on ? BBU_CT_STATE_RUNNING
+                                                 : BBU_CT_STATE_NO_CURRENT_WARN)
+                                        : (ct_on ? BBU_CT_STATE_NO_CURRENT_WARN
+                                                 : BBU_CT_STATE_OFF),
+#else
+            .ct_state = BBU_CT_STATE_NOT_FITTED,
+#endif
             .t_tpo_x10 = tpo.ok ? (int16_t)(tpo.c * 10.0f) : -999,
             .t_tpu_x10 = tpu.ok ? (int16_t)(tpu.c * 10.0f) : -999,
             .t_amb_x10 = amb.ok ? (int16_t)(amb.c * 10.0f) : -999,

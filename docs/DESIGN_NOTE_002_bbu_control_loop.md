@@ -1,7 +1,7 @@
 # Design note 002 — BBU offline control loop (emulate MES-BBU)
 
 **Status:** Implemented. Desk `sim` walk-through passed (2026-08-22). Dummy AC load validated (2026-08-25). Thermometer / plant proof still open.  
-**Date:** 2026-08-22 (CT warn-only 2026-08-25; boot-mode persistence 2026-08-30)  
+**Date:** 2026-08-22 (CT warn-only 2026-08-25; boot-mode persistence 2026-08-30; CT dropped from circuit 2026-09-01)  
 **Applies to:** `firmware/node-bbu` local loop on the v0.08 protoboard  
 **Does not apply to:** gateway, MQTT, or a later ACS node. Local TFT/encoder is on-node I/O (not the network path).
 
@@ -9,7 +9,7 @@
 
 The failed Paradigma MES-BBU ran the boiler→buffer pump against a **stratified 1500 L store**. The boiler itself is independent: it fires from **jacket temperature**. When the BBU pump floods that jacket with cooler tank water, the boiler comes on. The controller’s job is to start a loading cycle when the **top** of the tank has gone cold, and to keep the pump on long enough that the thermocline is pushed **down**, not just to reheat the top 20 cm.
 
-The old box had a pump relay and two tank wells. It did **not** have a current sensor. Bracino adds a CT for confirm / reporting (boolean on this prototype — [DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md)).
+The old box had a pump relay and two tank wells. It did **not** have a current sensor. Bracino added a CT for confirm / reporting (boolean on this prototype — [DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md)) — but the plant wiring makes it useless: the node's contact only closes a 230 VAC contactor coil (ABB ECB24-40 in the breaker panel; issue 014), so **as of 2026-09-01 the CT and snubber are dropped from the circuit** and the node is deliberately as blind to pump current as the MES-BBU was. Run-confirmation returns via the future caldaia monitor node (phase 2).
 
 ## Sensors
 
@@ -18,7 +18,7 @@ The old box had a pump relay and two tank wells. It did **not** have a current s
 | **TPO** | Top of tank (NTC1) | TH1 → ADS1115 A1 | Start / stop |
 | **TPU** | Bottom of tank (NTC2) | TH2 → ADS1115 A2 | Stop (thermocline); inversion check |
 | **AMB** | Ambient (NTC3) | TH3 → ADS1115 A3 | **Reported only** — never start/stop/fault |
-| **CT** | Pump conductor | ZMCT → A0 | Confirm running / not; not amperes |
+| **CT** | Pump conductor | ZMCT → A0 | **Dropped 2026-09-01** (issue 014): pump current never crosses node wiring; A0 ignored (`CT_FITTED 0`) |
 
 Correct this table if the physical wells are on different TH pads.
 
@@ -44,7 +44,7 @@ Tune on site. Values below are starting guesses (old-controller memory plus new 
 | `hysteresis_c` | 3.0 | Band around the setpoint |
 | `min_on_time_s` | 180 | Anti-short-cycle once RUNNING |
 | `min_off_time_s` | 60 | Anti-short-cycle once IDLE |
-| `ct_confirm_s` | 10 | After command ON, time allowed before posting a no-CT **warning** (does not change mode) |
+| `ct_confirm_s` | 10 | After command ON, time allowed before posting a no-CT **warning** (does not change mode). **Inert on CT-less images** (CT_FITTED 0); kept in the param registry (id 5) for contract stability |
 | `min_tpo_tpu_delta_c` | 5.0 | Small top−bottom gap means the tank is largely charged |
 | `max_run_time_min` | 60 | Longest normal load; **warning only**, pump keeps its state |
 
@@ -138,11 +138,12 @@ The loop must run with USB, gateway, and broker absent.
 |-----------|-------|------|
 | TPO open, short, or not in −5–110 °C | **Critical** | `FAULT` (pump OFF) |
 | TPU open, short, not in −5–110 °C, or TPU > TPO | **Severe** | `TPO_ONLY` |
-| CT = none while RUNNING, after `ct_confirm_s` | **Warning** | stay on the standard algorithm (no `TPO_ONLY`) |
-| CT sample unusable / not a clean running-vs-not | **Warning** | same — do not change start/stop |
-| CT present while relay OFF | **Warning** | no mode change |
+| CT = none while RUNNING, after `ct_confirm_s` | **Warning** | stay on the standard algorithm (no `TPO_ONLY`) — CT-fitted images only |
+| CT sample unusable / not a clean running-vs-not | **Warning** | same — do not change start/stop — CT-fitted images only |
+| CT present while relay OFF | **Warning** | no mode change — CT-fitted images only |
+| CT not fitted (2026-09-01+, `ct_fitted = false`) | — | no CT warnings can fire; node runs blind to pump current by design (MES-BBU parity) |
 
-No overcurrent / stall class. Protoboard retest (2026-08-22) and dummy AC load (2026-08-25) confirmed DESIGN_NOTE_001: loaded vs not only; magnitude is not judged. The old MES-BBU had **no** current sensor and ran the TPO/TPU loop blind to pump current. Bracino keeps that: missing or unreasonable CT is a **notice**, not a control-law change. “CT present while relay OFF” is the same class (warning only). `TPO_ONLY` is **TPU faults only**.
+No overcurrent / stall class. Protoboard retest (2026-08-22) and dummy AC load (2026-08-25) confirmed DESIGN_NOTE_001: loaded vs not only; magnitude is not judged. The old MES-BBU had **no** current sensor and ran the TPO/TPU loop blind to pump current. While a CT was fitted, missing or unreasonable CT was a **notice**, not a control-law change. From 2026-09-01 the node ships **without** a CT (issue 014): the contact only closes a 230 VAC contactor coil, so run-confirmation is impossible on this node — blindness is deliberate, MES-BBU parity, and `warn_noct` is gated off by `ct_fitted`. `TPO_ONLY` is **TPU faults only**.
 
 `max_run_time_min` exceeded is a **warning only**.
 

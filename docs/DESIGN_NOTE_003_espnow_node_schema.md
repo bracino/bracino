@@ -637,7 +637,8 @@ struct, and constants must be derived, not hardcoded.
 typedef struct __attribute__((packed)) {
     uint8_t  mode;          // 0=AUTO 1=MANUAL 2=TEST 3=OFF
     uint8_t  relay_state;   // 0/1
-    uint8_t  ct_state;      // 0=OFF 1=RUNNING 2=NO_CURRENT_WARN
+    uint8_t  ct_state;      // BBU_CT_STATE_*: 0=OFF 1=RUNNING 2=NO_CURRENT_WARN
+                            //                 3=NOT_FITTED (A0 dropped, 2026-09-01)
     int16_t  t_tpo_x10;     // °C ×10 — sentinel on fault, see fault_flags
     int16_t  t_tpu_x10;
     int16_t  t_amb_x10;
@@ -654,6 +655,12 @@ stable while a given node type's telemetry struct evolves. `fault_flags`
 bit numbering is canonical (shared header) and is reused as the `fault_id`
 value in `FAULT_RAISED`/`FAULT_CLEARED` events, so fault naming never
 forks between telemetry and events.
+
+**`ct_state = 3` (`NOT_FITTED`, added 2026-09-01):** the first plant hookup
+proved pump current never crosses the node (hidden 230 VAC contactor coil,
+issue 014 → DN001 rev 2). Nodes with `CT_FITTED 0` always transmit 3; the
+no-CT warning cannot fire on such nodes. Gateways treat 3 as a normal
+value — surface it as "no CT in circuit", not a fault.
 
 ### BBU, `schema_ver = 2` (rev 2 hardware, real current sensing)
 

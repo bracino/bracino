@@ -280,6 +280,10 @@ acknowledged, and drain frames are covered by BATCH_ACK semantics).
  "boot_session":5,"node_ts":"2026-08-29T20:05:00Z"}
 ```
 
+`ct_state` maps 1:1 from the DN003 enum (`OFF`, `RUNNING`,
+`NO_CURRENT_WARN`, and since 2026-09-01 `NOT_FITTED` — nodes without a CT
+in circuit; surface as informational, not a fault).
+
 `boot_session` is deliberately present in the payload: Influx stitching
 across a mid-outage node reboot (per role id) needs it as a **tag**, and
 it costs one integer. Timestamp for Influx = gateway-computed `node_ts`.

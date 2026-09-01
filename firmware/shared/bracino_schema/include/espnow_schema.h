@@ -119,10 +119,18 @@ typedef struct __attribute__((packed)) {
 } telemetry_batch_hdr_t; /* 11 B */
 
 /* BBU telemetry, schema_ver = 1 (12 B). Temps are °C ×10. */
+/* BBU ct_state values (bbu_telemetry_v1_t). 3 = CT not fitted / A0 ignored —
+ * the plant drives a hidden contactor coil through the node relay (issue 014),
+ * so pump current never crosses node wiring; see DESIGN_NOTE_001. */
+#define BBU_CT_STATE_OFF             0u
+#define BBU_CT_STATE_RUNNING         1u
+#define BBU_CT_STATE_NO_CURRENT_WARN 2u
+#define BBU_CT_STATE_NOT_FITTED      3u
+
 typedef struct __attribute__((packed)) {
     uint8_t  mode;        /* bbu_mode wire encoding, see BBU_MODE_W_* */
     uint8_t  relay_state; /* 0/1 */
-    uint8_t  ct_state;    /* 0=OFF 1=RUNNING 2=NO_CURRENT_WARN */
+    uint8_t  ct_state;    /* BBU_CT_STATE_* above */
     int16_t  t_tpo_x10;
     int16_t  t_tpu_x10;
     int16_t  t_amb_x10;

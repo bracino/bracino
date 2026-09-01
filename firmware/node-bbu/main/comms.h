@@ -16,7 +16,7 @@
 typedef struct {
     uint8_t  mode_w;      /* wire mode: BBU_MODE_W_* */
     uint8_t  relay_state; /* 0/1 */
-    uint8_t  ct_state;    /* 0=OFF 1=RUNNING 2=NO_CURRENT_WARN */
+    uint8_t  ct_state;    /* BBU_CT_STATE_* (3 = NOT_FITTED, issue 014) */
     int16_t  t_tpo_x10;
     int16_t  t_tpu_x10;
     int16_t  t_amb_x10;

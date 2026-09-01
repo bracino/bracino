@@ -1,7 +1,7 @@
 # Design note 001 — Prototype CT is on/off only
 
-**Status:** Accepted for the module prototype  
-**Date:** 2026-08-14 (protoboard confirmed 2026-08-22)  
+**Status:** Accepted for the module prototype. **Amended 2026-09-01: the CT is dropped from the circuit entirely for field revs** (snubber too) — see *Revision 2* below. The bench boolean contract stands as bench history only.
+**Date:** 2026-08-14 (protoboard confirmed 2026-08-22; dropped from circuit 2026-09-01)  
 **Applies to:** breadboard / protoboard BBU node (ZMCT103C @ 3.3 V → ADS1115 A0)  
 **Does not apply to:** a later discrete or 5 V analog front-end, if one is designed
 
@@ -54,7 +54,16 @@ The real BBU pump is a plain induction motor (~350 W ≈ 1.5 A). Expect the fan-
 
 ## Plant finding (2026-08-31)
 
-First boiler-room hookup revealed the node's contact does **not** switch the pump directly: it closes a ~24 V control line to a hidden second relay near the breaker box, which switches the pump. Pump current therefore **never flows through node wiring**, and the CT cannot see the plant motor on this node at all. The boolean-only contract above still stands as bench evidence, but the assumed plant signal is gone. Rework of the relay/snubber and the run-confirmation decision are tracked in [issues/open/014](../issues/open/014-hidden-second-relay-snubber.md).
+First boiler-room hookup revealed the node's contact does **not** switch the pump directly: it closes a control line to a hidden second relay in the breaker panel, which switches the pump. Pump current therefore **never flows through node wiring**, and the CT cannot see the plant motor on this node at all. The boolean-only contract above still stands as bench evidence, but the assumed plant signal is gone.
+
+**Resolved 2026-09-01 (boiler room + bench):** the hidden relay is an **ABB ECB24-40** contactor in the breaker panel; the line our contact closes is **230 VAC** (the earlier ~24 V note was wrong), i.e. the coil current is so small the ZMCT sees nothing — the node would show `NO_CURRENT_WARN` forever. With the RC snubber lifted from our contacts, the pump switches correctly from the node (the earlier stuck-ON failure was the snubber leak holding the contactor coil, as suspected). Decision: **both the CT and the snubber are left out of the circuit**; the next schematic bump reflects that; firmware ignores A0 and reports `ct_state = NOT_FITTED`. A0 stays reserved for repurposing in a later rev. Run-confirmation returns with the future **caldaia monitor node** (phase 2): multiple CTs on pump / fuel auger / blower plus extra thermals, which also restores true pump-current sensing the BBU node lost. Tracked in issues/open/014 (now closed) and issues/open/012.
+
+## Revision 2 (2026-09-01) — CT dropped from the circuit
+
+- The ZMCT103C + potential divider come **off the board** (v0.09+); **A0 is unconnected / reserved**.
+- Firmware: `CT_FITTED 0` in `main.c` — the monitor skips A0 sampling, telemetry reports `ct_state = 3 (NOT_FITTED)` (DN003), and the no-CT warning can never fire (`ct_fitted` gate in the control loop).
+- The snubber across the relay contacts is also removed (plant-proven above): across open contacts in series with a coil it is a permanent leak path. If suppression is ever needed, it goes **across the coil**, never across our contacts.
+- The boolean bench contract (thresholds, tables above) remains the record of what the CT *could* do on the bench; it is **not** a field capability of this node any more.
 
 ## Related
 

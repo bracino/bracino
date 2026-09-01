@@ -210,6 +210,7 @@ static const char *ct_name(uint8_t v)
     case 0: return "OFF";
     case 1: return "RUNNING";
     case 2: return "NO_CURRENT_WARN";
+    case 3: return "NOT_FITTED";
     default: return "?";
     }
 }

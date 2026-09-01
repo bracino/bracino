@@ -66,10 +66,7 @@ Recreate directories when work actually starts.
 
 - **Harden** — PCB (`hardware/bbu-controller`); ACS pump loop node (new `firmware/…` when named)
 - **Energy accounting** — monitor-only board for fuel-in vs BTU-delivered.
-  (Sketched 2026-08-31 as a **boiler monitor** node: split-core CT on one
-  pump leg, flue + water-jacket inlet/outlet temps, blower and fuel-feed
-  current. Would also give true pump run-confirmation that the BBU node
-  lost with the 014 plant finding — see issues/open/014.)
+  **This is also the accepted fix for the BBU node's run-confirmation blindness** (decided 2026-09-01, issue 014 closed): BBU v0.09+ ships without CT or snubber — the node's contact only closes a 230 VAC contactor coil, so it cannot see pump current (MES-BBU parity, DN001 rev 2). Sketched as a **boiler monitor** node: split-core CTs on pump, fuel auger and blower legs, flue + water-jacket inlet/outlet temps — pump degradation, fuel-usage spikes, anomalous temps, and true pump run-confirmation all come from that node.
 - **Further variants** — TBD from real usefulness
 
 ## Non-goals (for now)

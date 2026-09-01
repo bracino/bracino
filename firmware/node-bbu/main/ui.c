@@ -204,7 +204,7 @@ static void draw_home(const bbu_ctrl_t *c, const ui_live_t *lv, const bbu_params
 
     cell(l, sizeof(l), "Pump %s/%s",
          c->relay_on ? "ON" : "OFF",
-         lv->ct_present ? "CT" : "none");
+         lv->ct_fitted ? (lv->ct_present ? "CT" : "none") : "n/f");
     line(3, l, COL_FG);
 
     cell(l, sizeof(l), "Set    %4.0f C", (double)p->tpo_setpoint_c);
@@ -328,7 +328,9 @@ static void draw_diag(const bbu_ctrl_t *c, const ui_live_t *lv)
     cell(items[0], sizeof(items[0]), "Sensors  %4s",
          (lv->tpo.ok && lv->tpu.ok) ? "OK" : "BAD");
     const char *ct = "OK";
-    if (c->warn_noct) {
+    if (!lv->ct_fitted) {
+        ct = "n/f";
+    } else if (c->warn_noct) {
         ct = "none";
     } else if (c->warn_stuck) {
         ct = "stuck";

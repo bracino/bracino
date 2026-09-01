@@ -42,6 +42,7 @@ enum {
 typedef struct {
     ntc_sample_t tpo;
     ntc_sample_t tpu;
+    bool ct_fitted;   /* false = no CT in circuit; warn_noct suppressed */
     bool ct_present;
     uint32_t dt_s;
 } bbu_sense_t;

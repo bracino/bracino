@@ -13,18 +13,25 @@ require no reflash when the gateway/backend arrive later.
 
 **Update 2026-08-31:** deadline missed — first plant hookup inconclusive
 (hidden second pump relay; relay/snubber rework needed; CT run-confirmation
-bust). See [014](../open/014-hidden-second-relay-snubber.md); this install is
-blocked until 014 resolves and 009's real-pump checklist passes.
+bust). See [014](../closed/014-hidden-second-relay-snubber.md).
+
+**Update 2026-09-01:** 014 **closed** — contactor identified (ABB ECB24-40,
+230 VAC coil line), snubber lifted ⇒ pump switches correctly from the node,
+CT dropped from the circuit (`CT_FITTED 0`, telemetry `NOT_FITTED`). Install
+unblocks here, pending the 009 real-pump checklist and the field-image pass
+below.
 
 ## Expected
 
 - [ ] 009 plant checklist executed on the real pump (loop proven)
+- [x] CT dispensed with (2026-09-01, 014): firmware `CT_FITTED 0` — A0 ignored, telemetry `ct_state = NOT_FITTED`, no-CT warning gated off (`ct_fitted`); TFT shows `n/f` instead of the amber no-CT WARN; A0 reserved for a later rev. DN001 rev 2 / DN002 updated
 - [ ] Boot-mode persistence (DN002 boot behavior) implemented
 - [ ] Identity provisioned in NVS (node_type=1, node_id=1) at flash time
 - [ ] ESP-NOW client compiled in; comms-enabled-vs-flag decision made (011)
 - [ ] Hardware loose ends: PPTC (F1) if stock arrived, connector/jumper
       labels, sensor runs to tank, enclosure serviceable (USB reachable —
-      no OTA transport yet, so a node bug means physical reflash)
+      no OTA transport yet, so a node bug means physical reflash);
+      **schematic bump (v0.09+) reflects snubber + CT removal** (014)
 - [ ] TFT field-image menus:
       - Main: comms status line (disabled/enabled + OK or SCANNING when
         enabled)
@@ -38,6 +45,8 @@ blocked until 014 resolves and 009's real-pump checklist passes.
         max_run_time_min, comms enable) — parity with the future admin
         panel; build it as the DN003 param_id table so both share one
         validated setter path
+      - Note: with `CT_FITTED 0` the no-CT warning never fires; `ct_confirm_s`
+        stays listed (registry stability) but is inert
 - [ ] Serial `halt` + UI confirmed before leaving the pump unattended
 
 ## Low-priority bench hardening (2026-08-31, from bare-module flash test)

@@ -1,8 +1,9 @@
 # 014 — Hidden second pump relay; node relay/snubber rework; CT direction bust
 
-- **Status:** open
+- **Status:** closed
 - **Type:** hardware / design
 - **Opened:** 2026-08-31
+- **Closed:** 2026-09-01 (decision recorded; hardware rework proven on the plant, schematic bump rides v0.09+)
 - **Refs:** DESIGN_NOTE_001, DESIGN_NOTE_002 (`ct_confirm_s`), issue 009 (plant checklist — remains open), issue 012 (field install — blocked on this)
 
 ## Context (field session 2026-08-31, boiler room)
@@ -85,12 +86,27 @@ consistent with the "would open fully if left open longer" observation.
 | Thermal evidence (TPO/TPU delta trend) | No wiring | Slow, indirect, weather-dependent |
 | Clamp a CT at the breaker box on pump wiring | True current signal | New long run to the node; out of phase-1 scope |
 
-## Fix
+## Fix (2026-09-01, human field + bench)
 
-TBD after diagnostics: hardware change on the relay/snubber (likely snubber
-removal, new protoboard rework note), DN002 parameter note for
-`ct_confirm_s` semantics if CT is repurposed or dropped, possible new input
-if aux-contact confirmation is chosen.
+- **Hidden relay identified: ABB ECB24-40** contactor, in the breaker panel.
+- **The control line is 230 VAC, not ~24 V** — the earlier note was
+  mistaken. Our contact closes the contactor's coil circuit directly.
+- **Snubber-leak hypothesis confirmed:** with the RC snubber lifted from
+  our contacts, the pump now **switches correctly from the node** (OFF
+  stops it). The earlier stuck-ON was the snubber holding the coil.
+- **Decisions:**
+  - **Snubber stays out.** Across open contacts in series with a coil it
+    is a permanent leak path. Suppression, if ever needed, goes across the
+    coil — never across our contacts.
+  - **CT stays out too.** Coil current is so small the ZMCT sees nothing;
+    the node would warn forever. Blindness is MES-BBU parity **by design**.
+    Firmware: `CT_FITTED 0` — A0 ignored, telemetry `ct_state = NOT_FITTED`
+    (wire value 3, DN003/DN004 updated), `warn_noct` gated off via
+    `ct_fitted`. A0 reserved for a later rev.
+  - **Run-confirmation defers to the caldaia monitor node** (phase 2):
+    split-core CTs on pump / fuel auger / blower + extra thermals. That
+    node also brings pump-degradation, fuel-usage and anomalous-temp
+    visibility. Recorded in ROADMAP and DN001 rev 2 / DN002.
 
 ### Investigation plan (agreed 2026-08-31, human executes)
 
@@ -117,8 +133,8 @@ BBU controller (see ROADMAP phase-2 energy accounting).
 
 ## Verify
 
-- [ ] 24 V line AC/DC measured and recorded here
-- [ ] Second relay identified (or at least its coil measured)
-- [ ] Bench test: contacts open ⇒ coil voltage < drop-out (snubber lifted)
-- [ ] Plant retest: node OFF ⇒ pump stops immediately
-- [ ] Run-confirmation decision recorded (update DN001/DN002 as needed)
+- [x] Control line identified as **230 VAC** (the 24 V question is superseded — no 24 V line exists)
+- [x] Second relay identified: **ABB ECB24-40** (breaker panel)
+- [x] Bench coil-voltage test: **superseded** — the plant retest with the snubber lifted is the decisive evidence and passed
+- [x] Plant retest: node OFF ⇒ pump **stops**; node ON ⇒ pump runs
+- [x] Run-confirmation decision recorded: dropped on this node, deferred to the caldaia monitor node (DN001/DN002 updated; ROADMAP phase-2 bullet promoted)
