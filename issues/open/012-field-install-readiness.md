@@ -27,7 +27,7 @@ Auto-start on real wells observed; charge-stop not waited (desk-proven).
 - [x] CT dispensed with (2026-09-01, 014): firmware `CT_FITTED 0` — A0 ignored, telemetry `ct_state = NOT_FITTED`, no-CT warning gated off (`ct_fitted`); TFT shows `n/f` instead of the amber no-CT WARN; A0 reserved for a later rev. DN001 rev 2 / DN002 updated
 - [ ] Boot-mode persistence (DN002 boot behavior) implemented
 - [ ] Identity provisioned in NVS (node_type=1, node_id=1) at flash time
-- [ ] ESP-NOW client compiled in; comms-enabled-vs-flag decision made (011)
+- [x] ESP-NOW client compiled in (011 closed); `comms_enabled` NVS default **off**. Enable from UI/serial only when the field logger is present
 - [ ] Hardware loose ends: PPTC (F1) if stock arrived, connector/jumper
       labels, sensor runs to tank, enclosure serviceable (USB reachable —
       no OTA transport yet, so a node bug means physical reflash);
