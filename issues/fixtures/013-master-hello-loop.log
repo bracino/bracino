@@ -1,0 +1,127 @@
+unknown '[C[Dh' (h for help)
+> bench master: HELLO_ACK+TIME_SYNC, BATCH_ACK-after-log, CONFIG_GET, canned PARAM_SET
+  n <unix_s>  set epoch (required before telemetry will flow!)
+  c <1..13>   hop channel (outage drill)
+  t           push TIME_SYNC to all nodes
+  p           PARAM_SET setpoint +/-0.5 C to first node
+  s           registry + counters (GPIO27 button too)
+  k           show driver's actual current channel
+  w [sec]         promiscuous frame count + MACs (RF sanity)
+  h           this help
+knobs (edit + rebuild): BENCH_NO_ACK_S=0 BENCH_DROP_PCT=0
+> I (217502) wifi:ic_enable_sniffer
+I (217502) wifi:ic_disable_sniffer
+channel -> 6 (driver says 6; nodes must rescan)
+> driver channel: primary=6 second=0
+> HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+config_ver=1 unknown/changed -> CONFIG_GET
+I (327622) wifi:ic_enable_sniffer
+sniffing ch 6 for 15 s (≤130 B frames, ≤40 lines)...
+  snif len=126 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len=117 type=0 a2=86:72:52:44:3d:84 fc=0040
+  snif len=117 type=0 a2=86:72:52:44:3d:84 fc=0040
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+I (342622) wifi:ic_disable_sniffer
+sniff done: 652 frames total
+> unknown '[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[A[Ac' (h for help)
+> bench master: HELLO_ACK+TIME_SYNC, BATCH_ACK-after-log, CONFIG_GET, canned PARAM_SET
+  n <unix_s>  set epoch (required before telemetry will flow!)
+  c <1..13>   hop channel (outage drill)
+  t           push TIME_SYNC to all nodes
+  p           PARAM_SET setpoint +/-0.5 C to first node
+  s           registry + counters (GPIO27 button too)
+  k           show driver's actual current channel
+  w [sec]         promiscuous frame count + MACs (RF sanity)
+  h           this help
+knobs (edit + rebuild): BENCH_NO_ACK_S=0 BENCH_DROP_PCT=0
+> I (679532) wifi:ic_enable_sniffer
+sniffing ch 6 for 15 s (≤130 B frames, ≤40 lines)...
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len=106 type=2 a2=94:83:c4:86:99:ca fc=4a88
+  snif len=106 type=2 a2=94:83:c4:86:99:ca fc=4a88
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len=126 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len=100 type=2 a2=94:83:c4:86:99:ca fc=4288
+I (694532) wifi:ic_disable_sniffer
+sniff done: 729 frames total
+> bench master: HELLO_ACK+TIME_SYNC, BATCH_ACK-after-log, CONFIG_GET, canned PARAM_SET
+  n <unix_s>  set epoch (required before telemetry will flow!)
+  c <1..13>   hop channel (outage drill)
+  t           push TIME_SYNC to all nodes
+  p           PARAM_SET setpoint +/-0.5 C to first node
+  s           registry + counters (GPIO27 button too)
+  k           show driver's actual current channel
+  w [sec]         promiscuous frame count + MACs (RF sanity)
+  h           this help
+knobs (edit + rebuild): BENCH_NO_ACK_S=0 BENCH_DROP_PCT=0
+> epoch set: 2026-08-31 15:39:55 UTC — TIME_SYNC now carries it
+> > TIME_SYNC -> node(1,1)
+> I (801302) wifi:ic_enable_sniffer
+I (801302) wifi:ic_disable_sniffer
+channel -> 11 (driver says 11; nodes must rescan)
+> driver channel: primary=11 second=0
+> driver channel: primary=11 second=0
+> I (868102) wifi:ic_enable_sniffer
+I (868102) wifi:ic_disable_sniffer
+channel -> 6 (driver says 6; nodes must rescan)
+> driver channel: primary=6 second=0
+> I (900502) wifi:ic_enable_sniffer
+sniffing ch 6 for 15 s (≤130 B frames, ≤40 lines)...
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 80 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len= 28 type=2 a2=b2:5d:c2:08:a8:b3 fc=1148
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+  snif len=100 type=2 a2=94:83:c4:86:99:ca fc=4288
+  snif len= 98 type=2 a2=94:83:c4:86:99:ca fc=4208
+I (915502) wifi:ic_disable_sniffer
+sniff done: 666 frames total
+> > TIME_SYNC -> node(1,1)
+> 

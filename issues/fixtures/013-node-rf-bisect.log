@@ -1,0 +1,44 @@
+[0;32mI (120) esp_image: segment 1: paddr=000334b0 vaddr=3fc94ah[     8.862] cmd: h[     8.862] commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+Boots Manual. CT is loaded/not. Do not hang the real BBU pump.
+> comms off[    10.802] cmd: comms off[    10.802] comms: disabled (FIFO held, no radio work)
+> auto[   120.772] cmd: auto[   120.772] mode Auto (coil OFF, min_off then start if TPO cold)
+> manual[   135.212] cmd: manual[   135.212] mode Manual
+> hel 6 10[   215.912] cmd: hel 6 10I (215912) wifi:ic_enable_sniffer
+I (215912) wifi:ic_disable_sniffer
+[   215.915] comms: HELLO burst: 10 frames on ch 6 (frame 35 B)
+[   216.912] comms: burst done
+> hel 6       hel 5 10[   262.612] cmd: hel 5 10I (262612) wifi:ic_enable_sniffer
+I (262612) wifi:ic_disable_sniffer
+[   262.614] comms: HELLO burst: 10 frames on ch 5 (frame 35 B)
+[   263.612] comms: burst done
+> comms on[   293.092] cmd: comms on[   293.092] comms: enabled (re-discovery forced, rx queue flushed)
+> I (293312) wifi:ic_enable_sniffer
+I (293312) wifi:ic_disable_sniffer
+[   293.318] comms: anchored epoch=1788205542.085 at clock 293318 ms
+[   293.319] comms: bound gw d0:ef:76:15:6b:e0 ch=6
+[   293.332] comms: CONFIG_DESC 313 bytes in 2 fragment(s)
+[   293.432] comms: ACK w=1573 fifo=0
+[   294.412] comms: ACK w=294379 fifo=0
+comms[   305.642] cmd: comms[   305.642] comms: enabled=1 state=ONLINE node(1,1) boot=151 seq=14
+[   305.643]   channel=6 bound=1 gw=d0:ef:76:15:6b:e0
+[   305.643]   anchored=1 epoch=1788205542.085@293318ms sample_period=15s
+[   305.644]   fifo=0/4096 outstanding=0 fails=0 admin_seq=0
+[   305.644]   rx=24 drop=12 tx_ok=44 fail=0 acks=2 retrans=0
+[   305.644]   decim=0 ev_sent=0 ev_drop=0
+> [   310.412] comms: ACK w=310379 fifo=0
+[   326.432] comms: ACK w=326379 fifo=0

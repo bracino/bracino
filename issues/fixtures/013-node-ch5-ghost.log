@@ -1,0 +1,90 @@
+[0;32mI (120) esp_image: segment 1: paddr=00033408 vaddr=3fc94ah[    11.812] cmd: h[    11.812] commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+Boots Manual. CT is loaded/not. Do not hang the real BBU pump.
+> comms off[    17.892] cmd: comms off> > > > comms[    26.892] cmd: comms[    26.892] comms: enabled=0 state=SCANNING node(1,1) boot=59 seq=0
+[    26.893]   channel=5 bound=0 gw=00:00:00:00:00:00
+[    26.893]   anchored=0 epoch=0.000@0ms sample_period=15s
+[    26.893]   fifo=0/4096 outstanding=0 fails=0 admin_seq=0
+[    26.893]   rx=0 drop=0 tx_ok=0 fail=0 acks=0 retrans=0
+[    26.894]   decim=0 ev_sent=0 ev_drop=0
+> comms on[    90.452] cmd: comms on[    90.452] comms: enabled (re-discovery forced, rx queue flushed)
+> [0;32mI (90522) pp: pp rom version: 9387209[0m
+[0;32mI (90522) net80211: net80211 rom version: 9387209[0m
+I (90532) wifi:wifi driver task: 3fcbe044, prio:23, stack:6656, core=0
+I (90532) wifi:wifi firmware version: 82f54d2
+I (90532) wifi:wifi certification version: v7.0
+I (90532) wifi:config NVS flash: enabled
+I (90532) wifi:config nano formating: disabled
+I (90532) wifi:Init data frame dynamic rx buffer num: 32
+I (90532) wifi:Init static rx mgmt buffer num: 5
+I (90532) wifi:Init management short buffer num: 32
+I (90532) wifi:Init dynamic tx buffer num: 32
+I (90532) wifi:Init static tx FG buffer num: 2
+I (90532) wifi:Init static rx buffer size: 1600
+I (90532) wifi:Init static rx buffer num: 10
+I (90532) wifi:Init dynamic rx buffer num: 32
+[0;32mI (90532) wifi_init: rx ba win: 6[0m
+[0;32mI (90542) wifi_init: tcpip mbox: 32[0m
+[0;32mI (90542) wifi_init: udp mbox: 6[0m
+[0;32mI (90542) wifi_init: tcp mbox: 6[0m
+[0;32mI (90542) wifi_init: tcp tx win: 5760[0m
+[0;32mI (90542) wifi_init: tcp rx win: 5760[0m
+[0;32mI (90542) wifi_init: tcp mss: 1440[0m
+[0;32mI (90542) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (90542) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (90542) phy_init: phy_version 1180,01f2a49,Jun  4 2024,16:34:25[0m
+[0;33mW (90582) phy_init: saving new calibration data because of checksum failure, mode(0)[0m
+I (90622) wifi:mode : sta (7c:4f:ad:d1:80:50)
+I (90622) wifi:enable tsf
+I (90622) wifi:Set ps type: 0, coexist: 0
+
+I (90622) ESPNOW: espnow [version: 1.0] init
+[    90.630] comms: radio up, node(1,1) mac 7c:4f:ad:d1:80:50
+I (90622) wifi:ic_enable_sniffer
+I (90622) wifi:ic_disable_sniffer
+[    90.651] comms: anchored epoch=1788205346.845 at clock 90651 ms
+[    90.652] comms: bound gw d0:ef:76:15:6b:e0 ch=5
+[    90.672] comms: CONFIG_DESC 313 bytes in 2 fragment(s)
+[    90.706] comms: CONFIG_DESC frag 0 send failed
+[    91.219] comms: batch send failed (fail 3)
+[    91.220] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (101232) wifi:ic_enable_sniffer
+I (101232) wifi:ic_disable_sniffer
+I (101482) wifi:ic_enable_sniffer
+I (101482) wifi:ic_disable_sniffer
+I (101732) wifi:ic_enable_sniffer
+I (101732) wifi:ic_disable_sniffer
+I (101982) wifi:ic_enable_sniffer
+I (101982) wifi:ic_disable_sniffer
+I (102232) wifi:ic_enable_sniffer
+I (102232) wifi:ic_disable_sniffer
+I (102482) wifi:ic_enable_sniffer
+I (102482) wifi:ic_disable_sniffer
+I (102732) wifi:ic_enable_sniffer
+I (102732) wifi:ic_disable_sniffer
+I (102982) wifi:ic_enable_sniffer
+I (102982) wifi:ic_disable_sniffer
+I (103232) wifi:ic_enable_sniffer
+I (103232) wifi:ic_disable_sniffer
+I (103482) wifi:ic_enable_sniffer
+I (103482) wifi:ic_disable_sniffer
+I (103732) wifi:ic_enable_sniffer
+I (103732) wifi:ic_disable_sniffer
+I (103982) wifi:ic_enable_sniffer
+I (103982) wifi:ic_disable_sniffer
+I (104232) wifi:ic_enable_sniffer
+I (104232) wifi:ic_disable_sniffer

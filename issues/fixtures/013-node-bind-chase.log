@@ -1,0 +1,668 @@
+[0;32mI (120) esp_image: segment 1: paddr=000333c0 vaddr=3fc94ah[   171.882] cmd: h[   171.882] commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+Boots Manual. CT is loaded/not. Do not hang the real BBU pump.
+> comms[   174.222] cmd: comms[   174.222] comms: enabled=1 state=SCANNING node(1,1) boot=226 seq=58
+[   174.223]   channel=6 bound=0 gw=d0:ef:76:15:6b:e0
+[   174.223]   anchored=1 epoch=1788203218.278@13597ms sample_period=15s
+[   174.223]   fifo=5/4096 outstanding=0 fails=3 admin_seq=0
+[   174.223]   rx=12 drop=0 tx_ok=87 fail=3 acks=6 retrans=12
+[   174.224]   decim=0 ev_sent=2 ev_drop=0
+> I (175052) wifi:ic_enable_sniffer
+I (175052) wifi:ic_disable_sniffer
+[   175.058] comms: TIME_SYNC epoch=0 — gateway has no time yet
+[   175.059] comms: bound gw d0:ef:76:15:6b:e0 ch=6
+[   177.072] comms: ack timeout — retransmit (fail 1)
+[   179.072] comms: ack timeout — retransmit (fail 2)
+[   181.072] comms: ack timeout — retransmit (fail 3)
+[   181.072] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (191092) wifi:ic_enable_sniffer
+I (191092) wifi:ic_disable_sniffer
+[   191.097] comms: TIME_SYNC epoch=0 — gateway has no time yet
+[   191.098] comms: bound gw d0:ef:76:15:6b:e0 ch=6
+[   193.112] comms: ack timeout — retransmit (fail 1)
+[   195.112] comms: ack timeout — retransmit (fail 2)
+[   197.112] comms: ack timeout — retransmit (fail 3)
+[   197.112] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (207132) wifi:ic_enable_sniffer
+I (207132) wifi:ic_disable_sniffer
+I (207382) wifi:ic_enable_sniffer
+I (207382) wifi:ic_disable_sniffer
+I (207632) wifi:ic_enable_sniffer
+I (207632) wifi:ic_disable_sniffer
+I (207882) wifi:ic_enable_sniffer
+I (207882) wifi:ic_disable_sniffer
+I (208132) wifi:ic_enable_sniffer
+I (208132) wifi:ic_disable_sniffer
+I (208382) wifi:ic_enable_sniffer
+I (208382) wifi:ic_disable_sniffer
+I (208632) wifi:ic_enable_sniffer
+I (208632) wifi:ic_disable_sniffer
+[   208.663] comms: TIME_SYNC epoch=0 — gateway has no time yet
+[   208.672] comms: bound gw d0:ef:76:15:6b:e0 ch=5
+[   208.717] comms: batch send failed (fail 1)
+[   210.692] comms: ack timeout — retransmit (fail 2)
+[   210.717] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (220732) wifi:ic_enable_sniffer
+I (220732) wifi:ic_disable_sniffer
+I (220982) wifi:ic_enable_sniffer
+I (220982) wifi:ic_disable_sniffer
+I (221232) wifi:ic_enable_sniffer
+I (221232) wifi:ic_disable_sniffer
+[   221.241] comms: TIME_SYNC epoch=0 — gateway has no time yet
+[   221.252] comms: bound gw d0:ef:76:15:6b:e0 ch=6
+[   223.272] comms: ack timeout — retransmit (fail 1)
+[   225.272] comms: ack timeout — retransmit (fail 2)
+[   227.272] comms: ack timeout — retransmit (fail 3)
+[   227.272] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (237292) wifi:ic_enable_sniffer
+I (237292) wifi:ic_disable_sniffer
+[   237.300] comms: anchored epoch=1788203428.189 at clock 237300 ms
+[   237.301] comms: bound gw d0:ef:76:15:6b:e0 ch=6
+[   237.452] comms: ACK w=225579 fifo=0
+[   241.612] comms: ACK w=241579 fifo=0
+[   257.612] comms: ACK w=257579 fifo=0
+[   273.612] comms: ACK w=273579 fifo=0
+[   289.612] comms: ACK w=289579 fifo=0
+[   305.612] comms: ACK w=305579 fifo=0
+[0;33mW (338) phy_init: saving new calibration data because of h[    41.198] cmd: h[    41.198] commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+Boots Manual. CT is loaded/not. Do not hang the real BBU pump.
+> comms[    43.778] cmd: comms[    43.778] comms: enabled=1 state=ONLINE node(1,1) boot=252 seq=26
+[    43.779]   channel=6 bound=1 gw=d0:ef:76:15:6b:e0
+[    43.779]   anchored=1 epoch=1788203501.785@464ms sample_period=15s
+[    43.779]   fifo=0/4096 outstanding=0 fails=0 admin_seq=0
+[    43.779]   rx=4 drop=0 tx_ok=26 fail=1 acks=3 retrans=1
+[    43.780]   decim=0 ev_sent=2 ev_drop=0
+> sim [    49.718] comms: ACK w=49675 fifo=0
+comms off[    60.438] cmd: sim comms off[    60.438] sim tpo|tpu <degC>
+> [    65.718] comms: ACK w=65675 fifo=0
+comms off[    77.058] cmd: comms off[    77.058] comms: disabled (FIFO held, no radio work)
+> comms on[    93.068] cmd: comms on[    93.068] comms: enabled (re-discovery forced, rx queue flushed)
+I (93078) wifi:ic_enable_sniffer
+> I (93078) wifi:ic_disable_sniffer
+I (93328) wifi:ic_enable_sniffer
+I (93328) wifi:ic_disable_sniffer
+I (93578) wifi:ic_enable_sniffer
+I (93578) wifi:ic_disable_sniffer
+I (93828) wifi:ic_enable_sniffer
+I (93828) wifi:ic_disable_sniffer
+I (94078) wifi:ic_enable_sniffer
+I (94078) wifi:ic_disable_sniffer
+I (94328) wifi:ic_enable_sniffer
+I (94328) wifi:ic_disable_sniffer
+I (94578) wifi:ic_enable_sniffer
+I (94578) wifi:ic_disable_sniffer
+I (94828) wifi:ic_enable_sniffer
+I (94828) wifi:ic_disable_sniffer
+I (95078) wifi:ic_enable_sniffer
+I (95078) wifi:ic_disable_sniffer
+I (95328) wifi:ic_enable_sniffer
+I (95328) wifi:ic_disable_sniffer
+I (95578) wifi:ic_enable_sniffer
+I (95578) wifi:ic_disable_sniffer
+I (95828) wifi:ic_enable_sniffer
+I (95828) wifi:ic_disable_sniffer
+I (96078) wifi:ic_enable_sniffer
+I (96078) wifi:ic_disable_sniffer
+comI (106328) wifi:ic_enable_sniffer
+I (106328) wifi:ic_disable_sniffer
+msI (106578) wifi:ic_enable_sniffer
+I (106578) wifi:ic_disable_sniffer
+[   106.598] cmd: comms[   106.598] comms: enabled=1 state=SCANNING node(1,1) boot=252 seq=47
+[   106.599]   channel=6 bound=0 gw=d0:ef:76:15:6b:e0
+[   106.599]   anchored=1 epoch=1788203501.785@464ms sample_period=15s
+[   106.599]   fifo=1/4096 outstanding=0 fails=0 admin_seq=0
+[   106.599]   rx=6 drop=0 tx_ok=60 fail=1 acks=5 retrans=1
+[   106.600]   decim=0 ev_sent=2 ev_drop=0
+> I (106828) wifi:ic_enable_sniffer
+I (106828) wifi:ic_disable_sniffer
+I (107078) wifi:ic_enable_sniffer
+I (107078) wifi:ic_disable_sniffer
+I (107328) wifi:ic_enable_sniffer
+I (107328) wifi:ic_disable_sniffer
+I (107578) wifi:ic_enable_sniffer
+I (107578) wifi:ic_disable_sniffer
+I (107828) wifi:ic_enable_sniffer
+I (107828) wifi:ic_disable_sniffer
+I (108078) wifi:ic_enable_sniffer
+I (108078) wifi:ic_disable_sniffer
+I (108328) wifi:ic_enable_sniffer
+I (108328) wifi:ic_disable_sniffer
+I (108578) wifi:ic_enable_sniffer
+I (108578) wifi:ic_disable_sniffer
+I (108828) wifi:ic_enable_sniffer
+I (108828) wifi:ic_disable_sniffer
+I (109078) wifi:ic_enable_sniffer
+I (109078) wifi:ic_disable_sniffer
+I (109328) wifi:ic_enable_sniffer
+I (109328) wifi:ic_disable_sniffer
+I (119578) wifi:ic_enable_sniffer
+I (119578) wifi:ic_disable_sniffer
+I (119828) wifi:ic_enable_sniffer
+I (119828) wifi:ic_disable_sniffer
+I (120078) wifi:ic_enable_sniffer
+I (120078) wifi:ic_disable_sniffer
+I (120328) wifi:ic_enable_sniffer
+I (120328) wifi:ic_disable_sniffer
+I (120578) wifi:ic_enable_sniffer
+I (120578) wifi:ic_disable_sniffer
+I (120828) wifi:ic_enable_sniffer
+I (120828) wifi:ic_disable_sniffer
+I (121078) wifi:ic_enable_sniffer
+I (121078) wifi:ic_disable_sniffer
+[   121.085] comms: anchored epoch=1788203622.404 at clock 121085 ms
+[   121.088] comms: bound gw d0:ef:76:15:6b:e0 ch=5
+[   121.136] comms: batch send failed (fail 1)
+[   123.108] comms: ack timeout — retransmit (fail 2)
+[   123.133] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (133148) wifi:ic_enable_sniffer
+I (133148) wifi:ic_disable_sniffer
+I (133398) wifi:ic_enable_sniffer
+I (133398) wifi:ic_disable_sniffer
+I (133648) wifi:ic_enable_sniffer
+I (133648) wifi:ic_disable_sniffer
+I (133898) wifi:ic_enable_sniffer
+I (133898) wifi:ic_disable_sniffer
+I (134148) wifi:ic_enable_sniffer
+I (134148) wifi:ic_disable_sniffer
+I (134398) wifi:ic_enable_sniffer
+I (134398) wifi:ic_disable_sniffer
+I (134648) wifi:ic_enable_sniffer
+I (134648) wifi:ic_disable_sniffer
+I (134898) wifi:ic_enable_sniffer
+I (134898) wifi:ic_disable_sniffer
+I (135148) wifi:ic_enable_sniffer
+I (135148) wifi:ic_disable_sniffer
+I (135398) wifi:ic_enable_sniffer
+I (135398) wifi:ic_disable_sniffer
+I (135648) wifi:ic_enable_sniffer
+I (135648) wifi:ic_disable_sniffer
+I (135898) wifi:ic_enable_sniffer
+I (135898) wifi:ic_disable_sniffer
+I (136148) wifi:ic_enable_sniffer
+I (136148) wifi:ic_disable_sniffer
+I (146398) wifi:ic_enable_sniffer
+I (146398) wifi:ic_disable_sniffer
+[   146.403] comms: anchored epoch=1788203647.721 at clock 146403 ms
+[   146.405] comms: bound gw d0:ef:76:15:6b:e0 ch=5
+[   146.461] comms: batch send failed (fail 1)
+[   148.418] comms: ack timeout — retransmit (fail 2)
+[   148.448] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (158468) wifi:ic_enable_sniffer
+I (158468) wifi:ic_disable_sniffer
+I (158718) wifi:ic_enable_sniffer
+I (158718) wifi:ic_disable_sniffer
+I (158968) wifi:ic_enable_sniffer
+I (158968) wifi:ic_disable_sniffer
+I (159218) wifi:ic_enable_sniffer
+I (159218) wifi:ic_disable_sniffer
+I (159468) wifi:ic_enable_sniffer
+I (159468) wifi:ic_disable_sniffer
+I (159718) wifi:ic_enable_sniffer
+I (159718) wifi:ic_disable_sniffer
+I (159968) wifi:ic_enable_sniffer
+I (159968) wifi:ic_disable_sniffer
+I (160218) wifi:ic_enable_sniffer
+I (160218) wifi:ic_disable_sniffer
+I (160468) wifi:ic_enable_sniffer
+I (160468) wifi:ic_disable_sniffer
+I (160718) wifi:ic_enable_sniffer
+I (160718) wifi:ic_disable_sniffer
+I (160968) wifi:ic_enable_sniffer
+I (160968) wifi:ic_disable_sniffer
+I (161218) wifi:ic_enable_sniffer
+I (161218) wifi:ic_disable_sniffer
+I (161468) wifi:ic_enable_sniffer
+I (161468) wifi:ic_disable_sniffer
+I (171718) wifi:ic_enable_sniffer
+I (171718) wifi:ic_disable_sniffer
+I (171968) wifi:ic_enable_sniffer
+I (171968) wifi:ic_disable_sniffer
+I (172218) wifi:ic_enable_sniffer
+I (172218) wifi:ic_disable_sniffer
+I (172468) wifi:ic_enable_sniffer
+I (172468) wifi:ic_disable_sniffer
+I (172718) wifi:ic_enable_sniffer
+I (172718) wifi:ic_disable_sniffer
+I (172968) wifi:ic_enable_sniffer
+I (172968) wifi:ic_disable_sniffer
+I (173218) wifi:ic_enable_sniffer
+I (173218) wifi:ic_disable_sniffer
+I (173468) wifi:ic_enable_sniffer
+I (173468) wifi:ic_disable_sniffer
+I (173718) wifi:ic_enable_sniffer
+I (173718) wifi:ic_disable_sniffer
+I (173968) wifi:ic_enable_sniffer
+I (173968) wifi:ic_disable_sniffer
+I (174218) wifi:ic_enable_sniffer
+I (174218) wifi:ic_disable_sniffer
+[   174.230] comms: TIME_SYNC epoch=0 — gateway has no time yet
+[   174.238] comms: bound gw d0:ef:76:15:6b:e0 ch=10
+[   174.276] comms: batch send failed (fail 1)
+[   176.268] comms: ack timeout — retransmit (fail 2)
+[   176.285] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (186298) wifi:ic_enable_sniffer
+I (186298) wifi:ic_disable_sniffer
+I (186548) wifi:ic_enable_sniffer
+I (186548) wifi:ic_disable_sniffer
+I (186798) wifi:ic_enable_sniffer
+I (186798) wifi:ic_disable_sniffer
+I (187048) wifi:ic_enable_sniffer
+I (187048) wifi:ic_disable_sniffer
+I (187298) wifi:ic_enable_sniffer
+I (187298) wifi:ic_disable_sniffer
+I (187548) wifi:ic_enable_sniffer
+I (187548) wifi:ic_disable_sniffer
+I (187798) wifi:ic_enable_sniffer
+I (187798) wifi:ic_disable_sniffer
+I (188048) wifi:ic_enable_sniffer
+I (188048) wifi:ic_disable_sniffer
+I (188298) wifi:ic_enable_sniffer
+I (188298) wifi:ic_disable_sniffer
+I (188548) wifi:ic_enable_sniffer
+I (188548) wifi:ic_disable_sniffer
+I (188798) wifi:ic_enable_sniffer
+I (188798) wifi:ic_disable_sniffer
+I (189048) wifi:ic_enable_sniffer
+I (189048) wifi:ic_disable_sniffer
+I (189298) wifi:ic_enable_sniffer
+I (189298) wifi:ic_disable_sniffer
+I (199548) wifi:ic_enable_sniffer
+I (199548) wifi:ic_disable_sniffer
+I (199798) wifi:ic_enable_sniffer
+I (199798) wifi:ic_disable_sniffer
+I (200048) wifi:ic_enable_sniffer
+I (200048) wifi:ic_disable_sniffer
+I (200298) wifi:ic_enable_sniffer
+I (200298) wifi:ic_disable_sniffer
+I (200548) wifi:ic_enable_sniffer
+I (200548) wifi:ic_disable_sniffer
+I (200798) wifi:ic_enable_sniffer
+I (200798) wifi:ic_disable_sniffer
+I (201048) wifi:ic_enable_sniffer
+I (201048) wifi:ic_disable_sniffer
+I (201298) wifi:ic_enable_sniffer
+I (201298) wifi:ic_disable_sniffer
+I (201548) wifi:ic_enable_sniffer
+I (201548) wifi:ic_disable_sniffer
+I (201798) wifi:ic_enable_sniffer
+I (201798) wifi:ic_disable_sniffer
+I (202048) wifi:ic_enable_sniffer
+I (202048) wifi:ic_disable_sniffer
+I (202298) wifi:ic_enable_sniffer
+I (202298) wifi:ic_disable_sniffer
+cI (202548) wifi:ic_enable_sniffer
+I (202548) wifi:ic_disable_sniffer
+omms off[   206.558] cmd: comms off[   206.558] comms: disabled (FIFO held, no radio work)
+> comms on[   213.468] cmd: comms on[   213.468] comms: enabled (re-discovery forced, rx queue flushed)
+> I (213578) wifi:ic_enable_sniffer
+I (213578) wifi:ic_disable_sniffer
+I (213828) wifi:ic_enable_sniffer
+I (213828) wifi:ic_disable_sniffer
+I (214078) wifi:ic_enable_sniffer
+I (214078) wifi:ic_disable_sniffer
+I (214328) wifi:ic_enable_sniffer
+I (214328) wifi:ic_disable_sniffer
+I (214578) wifi:ic_enable_sniffer
+I (214578) wifi:ic_disable_sniffer
+I (214828) wifi:ic_enable_sniffer
+I (214828) wifi:ic_disable_sniffer
+I (215078) wifi:ic_enable_sniffer
+I (215078) wifi:ic_disable_sniffer
+I (215328) wifi:ic_enable_sniffer
+I (215328) wifi:ic_disable_sniffer
+I (215578) wifi:ic_enable_sniffer
+I (215578) wifi:ic_disable_sniffer
+I (215828) wifi:ic_enable_sniffer
+I (215828) wifi:ic_disable_sniffer
+I (216078) wifi:ic_enable_sniffer
+I (216078) wifi:ic_disable_sniffer
+I (216328) wifi:ic_enable_sniffer
+I (216328) wifi:ic_disable_sniffer
+I (216578) wifi:ic_enable_sniffer
+I (216578) wifi:ic_disable_sniffer
+I (226828) wifi:ic_enable_sniffer
+I (226828) wifi:ic_disable_sniffer
+I (227078) wifi:ic_enable_sniffer
+I (227078) wifi:ic_disable_sniffer
+I (227328) wifi:ic_enable_sniffer
+I (227328) wifi:ic_disable_sniffer
+I (227578) wifi:ic_enable_sniffer
+I (227578) wifi:ic_disable_sniffer
+I (227828) wifi:ic_enable_sniffer
+I (227828) wifi:ic_disable_sniffer
+I (228078) wifi:ic_enable_sniffer
+I (228078) wifi:ic_disable_sniffer
+I (228328) wifi:ic_enable_sniffer
+I (228328) wifi:ic_disable_sniffer
+I (228578) wifi:ic_enable_sniffer
+I (228578) wifi:ic_disable_sniffer
+I (228828) wifi:ic_enable_sniffer
+I (228828) wifi:ic_disable_sniffer
+I (229078) wifi:ic_enable_sniffer
+I (229078) wifi:ic_disable_sniffer
+I (229328) wifi:ic_enable_sniffer
+I (229328) wifi:ic_disable_sniffer
+I (229578) wifi:ic_enable_sniffer
+I (229578) wifi:ic_disable_sniffer
+I (229828) wifi:ic_enable_sniffer
+I (229828) wifi:ic_disable_sniffer
+comI (240078) wifi:ic_enable_sniffer
+mI (240078) wifi:ic_disable_sniffer
+sI (240328) wifi:ic_enable_sniffer
+I (240328) wifi:ic_disable_sniffer
+[   240.358] cmd: comms[   240.358] comms: enabled=1 state=SCANNING node(1,1) boot=252 seq=60
+[   240.359]   channel=10 bound=0 gw=d0:ef:76:15:6b:e0
+[   240.359]   anchored=1 epoch=1788203647.721@146403ms sample_period=15s
+[   240.359]   fifo=10/4096 outstanding=0 fails=3 admin_seq=0
+[   240.359]   rx=9 drop=0 tx_ok=170 fail=7 acks=5 retrans=4
+[   240.359]   decim=0 ev_sent=2 ev_drop=0
+> I (240578) wifi:ic_enable_sniffer
+I (240578) wifi:ic_disable_sniffer
+I (240828) wifi:ic_enable_sniffer
+I (240828) wifi:ic_disable_sniffer
+I (241078) wifi:ic_enable_sniffer
+I (241078) wifi:ic_disable_sniffer
+I (241328) wifi:ic_enable_sniffer
+I (241328) wifi:ic_disable_sniffer
+I (241578) wifi:ic_enable_sniffer
+I (241578) wifi:ic_disable_sniffer
+I (241828) wifi:ic_enable_sniffer
+I (241828) wifi:ic_disable_sniffer
+I (242078) wifi:ic_enable_sniffer
+I (242078) wifi:ic_disable_sniffer
+I (242328) wifi:ic_enable_sniffer
+I (242328) wifi:ic_disable_sniffer
+I (242578) wifi:ic_enable_sniffer
+I (242578) wifi:ic_disable_sniffer
+I (242828) wifi:ic_enable_sniffer
+I (242828) wifi:ic_disable_sniffer
+I (243078) wifi:ic_enable_sniffer
+I (243078) wifi:ic_disable_sniffer
+I (253328) wifi:ic_enable_sniffer
+I (253328) wifi:ic_disable_sniffer
+[   253.338] comms: TIME_SYNC epoch=0 — gateway has no time yet
+[   253.339] comms: bound gw d0:ef:76:15:6b:e0 ch=10
+[   253.377] comms: batch send failed (fail 1)
+[   255.368] comms: ack timeout — retransmit (fail 2)
+[   255.388] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (265408) wifi:ic_enable_sniffer
+I (265408) wifi:ic_disable_sniffer
+I (265658) wifi:ic_enable_sniffer
+I (265658) wifi:ic_disable_sniffer
+I (265908) wifi:ic_enable_sniffer
+I (265908) wifi:ic_disable_sniffer
+I (266158) wifi:ic_enable_sniffer
+I (266158) wifi:ic_disable_sniffer
+I (266408) wifi:ic_enable_sniffer
+I (266408) wifi:ic_disable_sniffer
+I (266658) wifi:ic_enable_sniffer
+I (266658) wifi:ic_disable_sniffer
+I (266908) wifi:ic_enable_sniffer
+I (266908) wifi:ic_disable_sniffer
+I (267158) wifi:ic_enable_sniffer
+I (267158) wifi:ic_disable_sniffer
+I (267408) wifi:ic_enable_sniffer
+I (267408) wifi:ic_disable_sniffer
+I (267658) wifi:ic_enable_sniffer
+I (267658) wifi:ic_disable_sniffer
+I (267908) wifi:ic_enable_sniffer
+I (267908) wifi:ic_disable_sniffer
+I (268158) wifi:ic_enable_sniffer
+I (268158) wifi:ic_disable_sniffer
+I (268408) wifi:ic_enable_sniffer
+I (268408) wifi:ic_disable_sniffer
+ring 96[   273.138] cmd: ring 96[   273.139] comms: ring resized to 96 samples (EMPTY — bench knob)
+> h[   275.158] cmd: h[   275.158] commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+Boots Manual. CT is loaded/not. Do not hang the real BBU pump.
+> I (278658) wifi:ic_enable_sniffer
+I (278658) wifi:ic_disable_sniffer
+I (278908) wifi:ic_enable_sniffer
+I (278908) wifi:ic_disable_sniffer
+I (279158) wifi:ic_enable_sniffer
+I (279158) wifi:ic_disable_sniffer
+I (279408) wifi:ic_enable_sniffer
+I (279408) wifi:ic_disable_sniffer
+I (279658) wifi:ic_enable_sniffer
+I (279658) wifi:ic_disable_sniffer
+I (279908) wifi:ic_enable_sniffer
+I (279908) wifi:ic_disable_sniffer
+I (280158) wifi:ic_enable_sniffer
+I (280158) wifi:ic_disable_sniffer
+I (280408) wifi:ic_enable_sniffer
+I (280408) wifi:ic_disable_sniffer
+I (280658) wifi:ic_enable_sniffer
+I (280658) wifi:ic_disable_sniffer
+I (280908) wifi:ic_enable_sniffer
+I (280908) wifi:ic_disable_sniffer
+I (281158) wifi:ic_enable_sniffer
+I (281158) wifi:ic_disable_sniffer
+I (281408) wifi:ic_enable_sniffer
+I (281408) wifi:ic_disable_sniffer
+I (281658) wifi:ic_enable_sniffer
+I (281658) wifi:ic_disable_sniffer
+I (291908) wifi:ic_enable_sniffer
+I (291908) wifi:ic_disable_sniffer
+I (292158) wifi:ic_enable_sniffer
+I (292158) wifi:ic_disable_sniffer
+I (292408) wifi:ic_enable_sniffer
+I (292408) wifi:ic_disable_sniffer
+I (292658) wifi:ic_enable_sniffer
+I (292658) wifi:ic_disable_sniffer
+I (292908) wifi:ic_enable_sniffer
+I (292908) wifi:ic_disable_sniffer
+I (293158) wifi:ic_enable_sniffer
+I (293158) wifi:ic_disable_sniffer
+I (293408) wifi:ic_enable_sniffer
+I (293408) wifi:ic_disable_sniffer
+I (293658) wifi:ic_enable_sniffer
+I (293658) wifi:ic_disable_sniffer
+I (293908) wifi:ic_enable_sniffer
+I (293908) wifi:ic_disable_sniffer
+I (294158) wifi:ic_enable_sniffer
+I (294158) wifi:ic_disable_sniffer
+I (294408) wifi:ic_enable_sniffer
+I (294408) wifi:ic_disable_sniffer
+I (294658) wifi:ic_enable_sniffer
+I (294658) wifi:ic_disable_sniffer
+I (294908) wifi:ic_enable_sniffer
+I (294908) wifi:ic_disable_sniffer
+I (305158) wifi:ic_enable_sniffer
+I (305158) wifi:ic_disable_sniffer
+I (305408) wifi:ic_enable_sniffer
+I (305408) wifi:ic_disable_sniffer
+I (305658) wifi:ic_enable_sniffer
+I (305658) wifi:ic_disable_sniffer
+I (305908) wifi:ic_enable_sniffer
+I (305908) wifi:ic_disable_sniffer
+I (306158) wifi:ic_enable_sniffer
+I (306158) wifi:ic_disable_sniffer
+I (306408) wifi:ic_enable_sniffer
+I (306408) wifi:ic_disable_sniffer
+I (306658) wifi:ic_enable_sniffer
+I (306658) wifi:ic_disable_sniffer
+I (306908) wifi:ic_enable_sniffer
+I (306908) wifi:ic_disable_sniffer
+[   306.927] comms: TIME_SYNC epoch=0 — gateway has no time yet
+[   306.939] comms: bound gw d0:ef:76:15:6b:e0 ch=5
+[   306.958] comms: CONFIG_DESC 313 bytes in 2 fragment(s)
+[   306.992] comms: CONFIG_DESC frag 0 send failed
+[   309.008] comms: ack timeout — retransmit (fail 1)
+[   311.008] comms: ack timeout — retransmit (fail 3)
+[   311.008] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+comms off[   313.198] cmd: comms off[   313.198] comms: disabled (FIFO held, no radio work)
+> h[   315.028] cmd: h[   315.028] commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+Boots Manual. CT is loaded/not. Do not hang the real BBU pump.
+> tel 4[   329.968] cmd: tel 4[   329.968] comms: sample period 4s
+> comms[   336.548] cmd: comms[   336.548] comms: enabled=0 state=SCANNING node(1,1) boot=252 seq=68
+[   336.549]   channel=5 bound=0 gw=d0:ef:76:15:6b:e0
+[   336.549]   anchored=1 epoch=1788203647.721@146403ms sample_period=4s
+[   336.549]   fifo=2/96 outstanding=0 fails=3 admin_seq=0
+[   336.550]   rx=12 drop=0 tx_ok=230 fail=11 acks=5 retrans=7
+[   336.550]   decim=0 ev_sent=2 ev_drop=0
+> comms[   410.028] cmd: comms[   410.028] comms: enabled=0 state=SCANNING node(1,1) boot=252 seq=68
+[   410.029]   channel=5 bound=0 gw=d0:ef:76:15:6b:e0
+[   410.029]   anchored=1 epoch=1788203647.721@146403ms sample_period=4s
+[   410.029]   fifo=2/96 outstanding=0 fails=3 admin_seq=0
+[   410.029]   rx=13 drop=0 tx_ok=230 fail=11 acks=5 retrans=7
+[   410.029]   decim=0 ev_sent=2 ev_drop=0
+> sim tpo 55[   414.608] cmd: sim tpo 55[   414.608] sim TPO=55.0
+> sim t[   416.085] mode Manual
+u pu 45[   420.608] cmd: sim tpu 45[   420.885] sim TPU=45.0
+> sim[   423.778] cmd: sim[   424.085] sim tpo=on tpu=on
+[   424.085]   TPO=55.0 C
+[   424.085]   TPU=45.0 C
+> m auto[   430.638] cmd: auto[   430.638] mode Auto (coil OFF, min_off then start if TPO cold)
+> comms[   440.918] cmd: comms[   440.918] comms: enabled=0 state=SCANNING node(1,1) boot=252 seq=68
+[   440.919]   channel=5 bound=0 gw=d0:ef:76:15:6b:e0
+[   440.919]   anchored=1 epoch=1788203647.721@146403ms sample_period=4s
+[   440.919]   fifo=2/96 outstanding=0 fails=3 admin_seq=0
+[   440.919]   rx=13 drop=0 tx_ok=230 fail=11 acks=5 retrans=7
+[   440.920]   decim=0 ev_sent=2 ev_drop=0
+> comms on[   498.878] cmd: comms on[   498.878] comms: enabled (re-discovery forced, rx queue flushed)
+> I (498958) wifi:ic_enable_sniffer
+I (498958) wifi:ic_disable_sniffer
+I (499208) wifi:ic_enable_sniffer
+I (499208) wifi:ic_disable_sniffer
+I (499458) wifi:ic_enable_sniffer
+I (499458) wifi:ic_disable_sniffer
+I (499708) wifi:ic_enable_sniffer
+I (499708) wifi:ic_disable_sniffer
+I (499958) wifi:ic_enable_sniffer
+I (499958) wifi:ic_disable_sniffer
+I (500208) wifi:ic_enable_sniffer
+I (500208) wifi:ic_disable_sniffer
+I (500458) wifi:ic_enable_sniffer
+I (500458) wifi:ic_disable_sniffer
+I (500708) wifi:ic_enable_sniffer
+I (500708) wifi:ic_disable_sniffer
+I (500958) wifi:ic_enable_sniffer
+I (500958) wifi:ic_disable_sniffer
+I (501208) wifi:ic_enable_sniffer
+I (501208) wifi:ic_disable_sniffer
+I (501458) wifi:ic_enable_sniffer
+I (501458) wifi:ic_disable_sniffer
+I (501708) wifi:ic_enable_sniffer
+I (501708) wifi:ic_disable_sniffer
+I (501958) wifi:ic_enable_sniffer
+I (501958) wifi:ic_disable_sniffer
+I (512208) wifi:ic_enable_sniffer
+I (512208) wifi:ic_disable_sniffer
+I (512458) wifi:ic_enable_sniffer
+I (512458) wifi:ic_disable_sniffer
+I (512708) wifi:ic_enable_sniffer
+I (512708) wifi:ic_disable_sniffer
+I (512958) wifi:ic_enable_sniffer
+I (512958) wifi:ic_disable_sniffer
+I (513208) wifi:ic_enable_sniffer
+I (513208) wifi:ic_disable_sniffer
+I (513458) wifi:ic_enable_sniffer
+I (513458) wifi:ic_disable_sniffer
+I (513708) wifi:ic_enable_sniffer
+I (513708) wifi:ic_disable_sniffer
+I (513958) wifi:ic_enable_sniffer
+I (513958) wifi:ic_disable_sniffer
+I (514208) wifi:ic_enable_sniffer
+I (514208) wifi:ic_disable_sniffer
+I (514458) wifi:ic_enable_sniffer
+I (514458) wifi:ic_disable_sniffer
+I (514708) wifi:ic_enable_sniffer
+I (514708) wifi:ic_disable_sniffer
+I (514958) wifi:ic_enable_sniffer
+I (514958) wifi:ic_disable_sniffer
+I (515208) wifi:ic_enable_sniffer
+I (515208) wifi:ic_disable_sniffer
+I (525458) wifi:ic_enable_sniffer
+I (525458) wifi:ic_disable_sniffer
+I (525708) wifi:ic_enable_sniffer
+I (525708) wifi:ic_disable_sniffer
+I (525958) wifi:ic_enable_sniffer
+I (525958) wifi:ic_disable_sniffer
+I (526208) wifi:ic_enable_sniffer
+I (526208) wifi:ic_disable_sniffer
+I (526458) wifi:ic_enable_sniffer
+I (526458) wifi:ic_disable_sniffer
+[   526.488] RUNNING relay=ON
+I (526708) wifi:ic_enable_sniffer
+I (526708) wifi:ic_disable_sniffer
+I (526958) wifi:ic_enable_sniffer
+I (526958) wifi:ic_disable_sniffer
+I (527208) wifi:ic_enable_sniffer
+I (527208) wifi:ic_disable_sniffer
+I (527458) wifi:ic_enable_sniffer
+I (527458) wifi:ic_disable_sniffer
+I (527708) wifi:ic_enable_sniffer
+I (527708) wifi:ic_disable_sniffer
+I (527958) wifi:ic_enable_sniffer
+I (527958) wifi:ic_disable_sniffer
+I (528208) wifi:ic_enable_sniffer
+I (528208) wifi:ic_disable_sniffer
+I (528458) wifi:ic_enable_sniffer
+I (528458) wifi:ic_disable_sniffer
+comms off[   531.608] cmd: comms off[   531.608] comms: disabled (FIFO held, no radio work)
+> comms[   534.598] cmd: comms[   534.598] comms: enabled=0 state=SCANNING node(1,1) boot=252 seq=71
+[   534.599]   channel=5 bound=0 gw=d0:ef:76:15:6b:e0
+[   534.599]   anchored=1 epoch=1788203647.721@146403ms sample_period=4s
+[   534.599]   fifo=9/96 outstanding=0 fails=3 admin_seq=0
+[   534.600]   rx=14 drop=0 tx_ok=269 fail=11 acks=5 retrans=7
+[   534.600]   decim=0 ev_sent=2 ev_drop=0
+> [   542.495] WARN no CT (commanded ON, no current) — loop unchanged
+tq  

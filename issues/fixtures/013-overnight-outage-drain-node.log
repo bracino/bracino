@@ -1,0 +1,285 @@
+h[ 39886.805] cmd: h[ 39886.806] commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+Boots Manual. CT is loaded/not. Do not hang the real BBU pump.
+> comI (39888715) wifi:ic_enable_sniffer
+I (39888715) wifi:ic_disable_sniffer
+msI (39888965) wifi:ic_enable_sniffer
+I (39888965) wifi:ic_disable_sniffer
+I (39889215) wifi:ic_enable_sniffer
+I (39889215) wifi:ic_disable_sniffer
+I (39889465) wifi:ic_enable_sniffer
+I (39889465) wifi:ic_disable_sniffer
+I (39889715) wifi:ic_enable_sniffer
+I (39889715) wifi:ic_disable_sniffer
+I (39889965) wifi:ic_enable_sniffer
+I (39889965) wifi:ic_disable_sniffer
+I (39890215) wifi:ic_enable_sniffer
+I (39890215) wifi:ic_disable_sniffer
+[ 39890.365] cmd: comms[ 39890.366] comms: enabled=1 state=SCANNING node(1,1) boot=210 seq=3287
+[ 39890.366]   channel=11 bound=0 gw=d0:ef:76:15:6b:e0
+[ 39890.366]   anchored=1 epoch=1788219813.899@2278921ms sample_period=15s
+[ 39890.367]   fifo=3928/4096 outstanding=0 fails=3 admin_seq=0
+[ 39890.367]   rx=56 drop=0 tx_ok=36445 fail=11 acks=40 retrans=0
+[ 39890.367]   decim=7 ev_sent=0 ev_drop=0
+> I (39890465) wifi:ic_enable_sniffer
+I (39890465) wifi:ic_disable_sniffer
+I (39890715) wifi:ic_enable_sniffer
+I (39890715) wifi:ic_disable_sniffer
+I (39890965) wifi:ic_enable_sniffer
+I (39890965) wifi:ic_disable_sniffer
+I (39891215) wifi:ic_enable_sniffer
+I (39891215) wifi:ic_disable_sniffer
+I (39891465) wifi:ic_enable_sniffer
+I (39891465) wifi:ic_disable_sniffer
+I (39891715) wifi:ic_enable_sniffer
+I (39891715) wifi:ic_disable_sniffer
+comms[ 39896.785] cmd: comms[ 39896.786] comms: enabled=1 state=SCANNING node(1,1) boot=210 seq=3287
+[ 39896.786]   channel=11 bound=0 gw=d0:ef:76:15:6b:e0
+[ 39896.786]   anchored=1 epoch=1788219813.899@2278921ms sample_period=15s
+[ 39896.787]   fifo=3928/4096 outstanding=0 fails=3 admin_seq=0
+[ 39896.787]   rx=56 drop=0 tx_ok=36451 fail=11 acks=40 retrans=0
+[ 39896.787]   decim=7 ev_sent=0 ev_drop=0
+> comms off[ 39898.805] cmd: comms off[ 39898.806] comms: disabled (FIFO held, no radio work)
+> comms on[ 40072.895] cmd: comms on[ 40072.896] comms: enabled (re-discovery forced, rx queue flushed)
+> I (40073075) wifi:ic_enable_sniffer
+I (40073075) wifi:ic_disable_sniffer
+I (40073325) wifi:ic_enable_sniffer
+I (40073325) wifi:ic_disable_sniffer
+[ 40073.333] comms: anchored epoch=1788257601.477 at clock 40073333 ms
+[ 40073.336] comms: bound gw d0:ef:76:15:6b:e0 ch=1
+[ 40073.355] comms: CONFIG_DESC 313 bytes in 2 fragment(s)
+[ 40073.615] comms: ACK w=16212792 fifo=3911
+[ 40073.815] comms: ACK w=22766402 fifo=3893
+[ 40073.995] comms: ACK w=27593603 fifo=3875
+[ 40074.195] comms: ACK w=28310403 fifo=3858
+[ 40074.375] comms: ACK w=28771204 fifo=3840
+[ 40074.575] comms: ACK w=29232002 fifo=3822
+[ 40074.755] comms: ACK w=29692802 fifo=3804
+[ 40074.955] comms: ACK w=29948802 fifo=3786
+[ 40075.135] comms: ACK w=30179202 fifo=3768
+[ 40075.335] comms: ACK w=30409602 fifo=3750
+[ 40075.535] comms: ACK w=30640004 fifo=3732
+[ 40075.715] comms: ACK w=30870402 fifo=3714
+[ 40075.915] comms: ACK w=31100802 fifo=3696
+[ 40076.095] comms: ACK w=31331204 fifo=3678
+[ 40076.295] comms: ACK w=31472012 fifo=3660
+[ 40076.475] comms: ACK w=31587212 fifo=3642
+[ 40076.675] comms: ACK w=31702414 fifo=3624
+[ 40076.875] comms: ACK w=31817612 fifo=3606
+[ 40077.055] comms: ACK w=31932812 fifo=3588
+[ 40077.255] comms: ACK w=32048012 fifo=3570
+[ 40077.435] comms: ACK w=32163214 fifo=3552
+[ 40077.635] comms: ACK w=32278412 fifo=3534
+[ 40077.815] comms: ACK w=32393612 fifo=3516
+[ 40078.015] comms: ACK w=32508814 fifo=3498
+[ 40078.195] comms: ACK w=32624012 fifo=3480
+[ 40078.395] comms: ACK w=32739212 fifo=3462
+[ 40078.575] comms: ACK w=32854414 fifo=3444
+[ 40078.775] comms: ACK w=32969612 fifo=3426
+[ 40078.955] comms: ACK w=33052814 fifo=3408
+[ 40079.155] comms: ACK w=33110412 fifo=3390
+[ 40079.335] comms: ACK w=33168012 fifo=3372
+[ 40079.535] comms: ACK w=33225613 fifo=3354
+[ 40079.735] comms: ACK w=33283212 fifo=3336
+[ 40079.915] comms: ACK w=33340812 fifo=3318
+[ 40080.115] comms: ACK w=33398414 fifo=3300
+[ 40080.295] comms: ACK w=33456012 fifo=3282
+[ 40080.495] comms: ACK w=33513612 fifo=3264
+[ 40080.675] comms: ACK w=33571212 fifo=3246
+[ 40080.875] comms: ACK w=33628812 fifo=3228
+[ 40081.055] comms: ACK w=33686412 fifo=3210
+[ 40081.255] comms: ACK w=33744012 fifo=3192
+[ 40081.435] comms: ACK w=33801612 fifo=3174
+[ 40081.635] comms: ACK w=33859214 fifo=3156
+[ 40081.835] comms: ACK w=33916812 fifo=3138
+[ 40082.015] comms: ACK w=33974412 fifo=3120
+[ 40082.215] comms: ACK w=34032014 fifo=3102
+[ 40082.395] comms: ACK w=34089612 fifo=3084
+[ 40082.595] comms: ACK w=34147212 fifo=3066
+[ 40082.775] comms: ACK w=34204814 fifo=3048
+[ 40082.975] comms: ACK w=34262412 fifo=3030
+[ 40083.155] comms: ACK w=34320012 fifo=3012
+[ 40083.355] comms: ACK w=34377613 fifo=2994
+[ 40083.535] comms: ACK w=34435212 fifo=2976
+[ 40083.735] comms: ACK w=34492812 fifo=2958
+[ 40083.935] comms: ACK w=34550414 fifo=2940
+[ 40084.115] comms: ACK w=34608012 fifo=2922
+[ 40084.315] comms: ACK w=34662412 fifo=2904
+[ 40084.495] comms: ACK w=34691212 fifo=2886
+[ 40084.695] comms: ACK w=34720012 fifo=2868
+[ 40084.875] comms: ACK w=34748814 fifo=2850
+[ 40085.075] comms: ACK w=34777612 fifo=2832
+[ 40085.255] comms: ACK w=34806412 fifo=2814
+[ 40085.455] comms: ACK w=34835212 fifo=2796
+[ 40085.635] comms: ACK w=34864012 fifo=2778
+[ 40085.835] comms: ACK w=34892814 fifo=2760
+[ 40086.035] comms: ACK w=34921613 fifo=2742
+[ 40086.216] comms: ACK w=34950412 fifo=2724
+[ 40086.415] comms: ACK w=34979212 fifo=2706
+[ 40086.595] comms: ACK w=35008012 fifo=2688
+[ 40086.795] comms: ACK w=35036812 fifo=2670
+[ 40086.975] comms: ACK w=35065613 fifo=2652
+[ 40087.175] comms: ACK w=35094414 fifo=2634
+[ 40087.355] comms: ACK w=35123212 fifo=2616
+[ 40087.555] comms: ACK w=35152012 fifo=2598
+[ 40087.735] comms: ACK w=35180812 fifo=2580
+[ 40087.935] comms: ACK w=35209612 fifo=2562
+[ 40088.135] comms: ACK w=35238414 fifo=2544
+[ 40088.315] comms: ACK w=35267212 fifo=2526
+[ 40088.515] comms: ACK w=35296012 fifo=2508
+[ 40088.695] comms: ACK w=35324812 fifo=2490
+[ 40088.895] comms: ACK w=35353612 fifo=2472
+[ 40089.075] comms: ACK w=35382412 fifo=2454
+[ 40089.276] comms: ACK w=35411214 fifo=2436
+[ 40089.455] comms: ACK w=35440012 fifo=2418
+[ 40089.655] comms: ACK w=35468812 fifo=2400
+[ 40089.835] comms: ACK w=35497612 fifo=2382
+[ 40090.035] comms: ACK w=35526412 fifo=2365
+[ 40090.235] comms: ACK w=35555214 fifo=2347
+[ 40090.415] comms: ACK w=35584014 fifo=2329
+[ 40090.615] comms: ACK w=35612812 fifo=2311
+[ 40090.795] comms: ACK w=35641612 fifo=2293
+[ 40090.995] comms: ACK w=35670412 fifo=2275
+[ 40091.175] comms: ACK w=35699212 fifo=2257
+[ 40091.375] comms: ACK w=35728014 fifo=2239
+[ 40091.555] comms: ACK w=35756814 fifo=2221
+[ 40091.755] comms: ACK w=35785612 fifo=2203
+[ 40091.935] comms: ACK w=35814412 fifo=2185
+[ 40092.135] comms: ACK w=35843212 fifo=2167
+[ 40092.335] comms: ACK w=35872012 fifo=2149
+[ 40092.515] comms: ACK w=35900814 fifo=2131
+[ 40092.715] comms: ACK w=35929613 fifo=2113
+[ 40092.895] comms: ACK w=35958412 fifo=2095
+[ 40093.095] comms: ACK w=35987212 fifo=2077
+[ 40093.276] comms: ACK w=36016012 fifo=2059
+[ 40093.475] comms: ACK w=36044812 fifo=2041
+[ 40093.655] comms: ACK w=36073613 fifo=2023
+[ 40093.855] comms: ACK w=36102412 fifo=2005
+[ 40094.035] comms: ACK w=36131212 fifo=1987
+[ 40094.235] comms: ACK w=36160012 fifo=1969
+[ 40094.435] comms: ACK w=36188812 fifo=1951
+[ 40094.635] comms: ACK w=36217613 fifo=1933
+[ 40094.815] comms: ACK w=36246414 fifo=1915
+[ 40095.015] comms: ACK w=36275212 fifo=1897
+[ 40095.195] comms: ACK w=36304022 fifo=1879
+[ 40095.395] comms: ACK w=36332822 fifo=1861
+[ 40095.575] comms: ACK w=36361622 fifo=1843
+[ 40095.775] comms: ACK w=36390423 fifo=1825
+[ 40095.955] comms: ACK w=36419223 fifo=1807
+[ 40096.155] comms: ACK w=36448022 fifo=1789
+[ 40096.335] comms: ACK w=36476822 fifo=1771
+[ 40096.535] comms: ACK w=36505622 fifo=1753
+[ 40096.715] comms: ACK w=36534422 fifo=1735
+[ 40096.915] comms: ACK w=36563223 fifo=1717
+[ 40097.095] comms: ACK w=36592023 fifo=1699
+[ 40097.295] comms: ACK w=36620822 fifo=1681
+[ 40097.475] comms: ACK w=36649622 fifo=1663
+[ 40097.675] comms: ACK w=36678422 fifo=1645
+[ 40097.855] comms: ACK w=36707222 fifo=1627
+[ 40098.055] comms: ACK w=36736024 fifo=1609
+[ 40098.255] comms: ACK w=36764822 fifo=1591
+[ 40098.435] comms: ACK w=36793622 fifo=1573
+[ 40098.635] comms: ACK w=36822422 fifo=1555
+[ 40098.835] comms: ACK w=36851222 fifo=1537
+[ 40099.016] comms: ACK w=36880022 fifo=1519
+[ 40099.215] comms: ACK w=36908824 fifo=1501
+[ 40099.395] comms: ACK w=36937622 fifo=1483
+[ 40099.595] comms: ACK w=36966422 fifo=1465
+[ 40099.775] comms: ACK w=36995222 fifo=1447
+[ 40099.975] comms: ACK w=37024022 fifo=1429
+[ 40100.155] comms: ACK w=37052824 fifo=1411
+[ 40100.355] comms: ACK w=37081624 fifo=1393
+[ 40100.535] comms: ACK w=37110422 fifo=1375
+[ 40100.735] comms: ACK w=37139222 fifo=1357
+[ 40100.915] comms: ACK w=37168022 fifo=1339
+[ 40101.115] comms: ACK w=37196822 fifo=1321
+[ 40101.295] comms: ACK w=37225624 fifo=1303
+[ 40101.495] comms: ACK w=37254423 fifo=1285
+[ 40101.675] comms: ACK w=37283222 fifo=1267
+[ 40101.875] comms: ACK w=37312022 fifo=1249
+[ 40102.055] comms: ACK w=37340822 fifo=1231
+[ 40102.255] comms: ACK w=37369622 fifo=1213
+[ 40102.435] comms: ACK w=37398424 fifo=1195
+[ 40102.635] comms: ACK w=37427222 fifo=1177
+[ 40102.835] comms: ACK w=37456022 fifo=1159
+[ 40103.015] comms: ACK w=37484822 fifo=1141
+[ 40103.215] comms: ACK w=37513622 fifo=1123
+[ 40103.395] comms: ACK w=37542422 fifo=1105
+[ 40103.595] comms: ACK w=37571224 fifo=1087
+[ 40103.775] comms: ACK w=37600022 fifo=1069
+[ 40103.975] comms: ACK w=37628822 fifo=1051
+[ 40104.155] comms: ACK w=37657622 fifo=1033
+[ 40104.355] comms: ACK w=37686422 fifo=1015
+[ 40104.535] comms: ACK w=37715224 fifo=997
+[ 40104.735] comms: ACK w=37744024 fifo=979
+[ 40104.935] comms: ACK w=37772822 fifo=961
+[ 40105.115] comms: ACK w=37801622 fifo=943
+[ 40105.315] comms: ACK w=37830422 fifo=925
+[ 40105.495] comms: ACK w=37859222 fifo=907
+[ 40105.695] comms: ACK w=37888024 fifo=889
+[ 40105.875] comms: ACK w=37916823 fifo=871
+[ 40106.075] comms: ACK w=37945622 fifo=854
+[ 40106.255] comms: ACK w=37974422 fifo=836
+[ 40106.455] comms: ACK w=38003222 fifo=818
+[ 40106.635] comms: ACK w=38032022 fifo=800
+[ 40106.835] comms: ACK w=38060824 fifo=782
+[ 40107.035] comms: ACK w=38089622 fifo=764
+[ 40107.215] comms: ACK w=38118422 fifo=746
+[ 40107.415] comms: ACK w=38147222 fifo=728
+[ 40107.595] comms: ACK w=38176022 fifo=710
+[ 40107.795] comms: ACK w=38204822 fifo=692
+[ 40107.975] comms: ACK w=38233624 fifo=674
+[ 40108.175] comms: ACK w=38262422 fifo=656
+[ 40108.355] comms: ACK w=38291222 fifo=638
+[ 40108.555] comms: ACK w=38320022 fifo=620
+[ 40108.735] comms: ACK w=38348822 fifo=602
+[ 40108.935] comms: ACK w=38377624 fifo=584
+[ 40109.135] comms: ACK w=38406424 fifo=566
+[ 40109.315] comms: ACK w=38435222 fifo=548
+[ 40109.515] comms: ACK w=38464022 fifo=530
+[ 40109.715] comms: ACK w=38492822 fifo=512
+[ 40109.895] comms: ACK w=38521622 fifo=494
+[ 40110.095] comms: ACK w=38550424 fifo=476
+[ 40110.276] comms: ACK w=38579223 fifo=458
+[ 40110.475] comms: ACK w=38608022 fifo=440
+[ 40110.655] comms: ACK w=38636822 fifo=422
+[ 40110.855] comms: ACK w=38665622 fifo=404
+[ 40111.035] comms: ACK w=38694422 fifo=386
+[ 40111.235] comms: ACK w=38723224 fifo=368
+[ 40111.415] comms: ACK w=38752022 fifo=350
+[ 40111.615] comms: ACK w=38780822 fifo=332
+[ 40111.795] comms: ACK w=38809622 fifo=314
+[ 40111.995] comms: ACK w=38838422 fifo=296
+[ 40112.175] comms: ACK w=38867222 fifo=278
+[ 40112.375] comms: ACK w=38896024 fifo=260
+[ 40112.555] comms: ACK w=38924822 fifo=242
+[ 40112.755] comms: ACK w=38953622 fifo=224
+[ 40112.935] comms: ACK w=38982422 fifo=206
+[ 40113.135] comms: ACK w=39011222 fifo=188
+[ 40113.335] comms: ACK w=39040024 fifo=170
+[ 40113.515] comms: ACK w=39068824 fifo=152
+[ 40113.715] comms: ACK w=39097622 fifo=134
+[ 40113.896] comms: ACK w=39126422 fifo=116
+[ 40114.095] comms: ACK w=39155222 fifo=98
+[ 40114.276] comms: ACK w=39184022 fifo=80
+[ 40114.475] comms: ACK w=39212824 fifo=62
+[ 40114.655] comms: ACK w=39241624 fifo=44
+[ 40114.855] comms: ACK w=39529623 fifo=26
+[ 40115.035] comms: ACK w=39817623 fifo=8
+[ 40115.135] comms: ACK w=40106024 fifo=0
+[ 40122.055] comms: ACK w=40122023 fifo=0
+[ 40138.055] comms: ACK w=40138023 fifo=0

@@ -123,6 +123,41 @@ Also measured: ch 6 is busy with ambient WiFi (452 frames in 10 s from AP
 `94:83:c4:86:99:ca`). Fine for bench; field channel choice should account
 for it (future DN004/gateway note).
 
+## 2026-09-01 addenda (overnight outage + drain — unattended scenarios 3/4/5)
+
+Human ran the accumulation/drain for real instead of the scripted Drill A:
+gateway off **all night** (~11 h) while the node ran AUTO on sim temps.
+Evidence: `issues/fixtures/013-overnight-outage-drain-{node,master}.log`.
+
+- **Accumulate:** node SCANNING unbound all night, `fifo=3928/4096`,
+  `decim_passes=7`, ~36.4k unbound HELLO TX. Pump loop (AUTO) unaffected
+  the whole time — non-blocking contract holds in the field, not just bench.
+- **Preserve across disable:** `comms off` → "FIFO held, no radio work";
+  buffer intact through the off/on cycle.
+- **Drain:** after gateway up + epoch + `comms on` → re-anchor + CONFIG_DESC
+  (313 B, 2 frags) → **3928 samples drained in ~42 s** (221 frames of 18,
+  acked ~180 ms), watermarks strictly monotonic, **zero retransmits,
+  NAKs, or malformed lines**; apparent seq gaps are interleaved HEARTBEATs
+  (seq is a shared message counter). Live cadence resumed (16 s spans).
+- **UTC:** translation verified quantitatively (master epoch → HB clock
+  correlation → last drained frame = 10:14:26 UTC, matches log wall time
+  ±1 s) and locally contiguous (16 s span-to-span gaps = one capture
+  period; first retained sample decodes to node boot + 51 min, consistent
+  with uptime math).
+- **Decimation signature:** drained spans show graded spacing — ~728 s per
+  retained sample in the oldest region down to 15.1 s at the newest —
+  exactly the DN003 "drop every other entry of the oldest half on
+  ring-full" policy accumulating passes (`decim_passes=7`). Scenario 5's
+  span-vs-count evidence.
+
+Status vs the scripted drills: this **supersedes Drill A** (real 11 h
+outage + drain, stronger than a 240 s ack-suppression window). **Drill B
+(BENCH_DROP_PCT=20 retransmit-under-loss) is still the remaining item**
+before 013 closes.
+
+Note: node firmware now reports `ct_state = NOT_FITTED` (3) on the wire
+(CT/snubber dropped, 014 — DN003/DN004 updated); the bench master decodes it.
+
 After the bisect, `comms on` bound ch=6 immediately; CONFIG_DESC (2
 frags), first BATCH_ACK watermark (w=1573), telemetry at 15 s cadence
 with sane UTC and zero malformed lines. HELLO→ACK→CONFIG→BATCH→ACK path

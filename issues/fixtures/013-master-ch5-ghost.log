@@ -1,0 +1,20 @@
+h[    43.542] cmd: h[    43.542] bench master: HELLO_ACK+TIME_SYNC, BATCH_ACK-after-log, CONFIG_GET, canned PARAM_SET
+  n <unix_s>  set epoch (required before telemetry will flow!)
+  c <1..13>   hop channel (outage drill)
+  t           push TIME_SYNC to all nodes
+  p           PARAM_SET setpoint +/-0.5 C to first node
+  s           registry + counters (GPIO27 button too)
+  k           show driver's actual current channel
+  w [sec]         promiscuous frame count + MACs (RF sanity)
+  h           this help
+knobs (edit + rebuild): BENCH_NO_ACK_S=0 BENCH_DROP_PCT=0
+> n 1788205333[    65.912] cmd: n 1788205333[    65.913] epoch set: 2026-08-31 19:42:13 UTC — TIME_SYNC now carries it
+> t[    70.052] cmd: t[    70.052] no nodes registered yet
+> [    79.756] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=0
+[    79.783] config_ver=1 unknown/changed -> CONFIG_GET
+[    79.881] EVENT FAULT_RAISED value=02 [    79.881] 
+[    85.972] !! node(1,1) silent for 6s — unreachable (expect ~2s cadence)
+[    91.107] node(1,1) frames resumed
+[    91.107] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=5
+[    91.126] config_ver=1 unknown/changed -> CONFIG_GET
+[    97.142] !! node(1,1) silent for 6s — unreachable (expect ~2s cadence)
