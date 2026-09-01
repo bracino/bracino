@@ -49,7 +49,7 @@ Preferred order when something has to wait:
 - [x] Ice / boil two-point on the potted NTCs (human, 2026-08-25)
 - [ ] Field install (012 — node runs the pump; ESP-NOW client compiled in per 011, comms-enabled flag per DN003)
 - [x] TFT + encoder UI on protoboard (010 closed 2026-08-28)
-- [ ] 2-ESP bench wire test: node client vs bench gateway harness (011 + 013) — wire path proven on desk pair 2026-08-31; remaining: decimation + frame-loss drills (013 addenda), then close
+- [x] 2-ESP bench wire test: node client vs bench gateway harness (011 + 013 closed 2026-09-01) — discovery, live telemetry, overnight drain, decimation, 20% frame loss, unreachable→rescan in tens of ms
 - [ ] Gateway builds; ESP-NOW bring-up with control node
 - [ ] MQTT publish path + retained state / LWT
 - [ ] Commit service (DN005): MQTT → Influx with commit watermarks; chain-health + notifications

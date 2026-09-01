@@ -1,8 +1,9 @@
 # 011 — node-bbu ESP-NOW client (DESIGN_NOTE_003)
 
-- **Status:** open
+- **Status:** closed
 - **Type:** firmware
 - **Opened:** 2026-08-30
+- **Closed:** 2026-09-01 (wire contract evidenced via 013)
 - **Refs:** `firmware/node-bbu/`, DESIGN_NOTE_003, DESIGN_NOTE_004, issue 006
 
 ## Context
@@ -58,3 +59,13 @@ Deferred to 012 field-image pass: UI-menu parity for comms status and
 param editing (serial covers both today).
 
 ## Verify
+
+Desk pair vs throwaway bench master (issue 013, closed 2026-09-01):
+HELLO→ACK+sync, CONFIG_DESC, stop-and-wait BATCH_ACK, overnight 11 h
+accumulation + drain, 20% frame-loss retransmit, unreachable→rescan in
+tens of ms on the cached channel. Wire defects found during bring-up
+(11 B vs 12 B sample, scan bind-race, pinned peer channel, 10 s rest
+before first scan) all fixed. `comms_enabled` NVS default off — radio
+never in the pump path.
+
+UI-menu parity remains 012.

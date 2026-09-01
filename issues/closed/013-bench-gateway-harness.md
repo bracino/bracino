@@ -1,8 +1,9 @@
 # 013 — Minimal bench gateway (DN003 wire-contract test harness)
 
-- **Status:** open
+- **Status:** closed
 - **Type:** firmware / test
 - **Opened:** 2026-08-30
+- **Closed:** 2026-09-01 (wire contract evidenced; scan-on-unreachable fix confirmed on iron)
 - **Refs:** `firmware/gateway/`, DESIGN_NOTE_003, issue 006 (skeletons), issue 011 (node client)
 
 ## Context
@@ -152,9 +153,7 @@ Evidence: `issues/fixtures/013-overnight-outage-drain-{node,master}.log`.
 
 Status vs the scripted drills: this **supersedes Drill A** (real 11 h
 outage + drain, stronger than a 240 s ack-suppression window). Drill B
-landed the same day — see the addenda below. Remaining before 013 closes:
-reflash the node with the scan-on-unreachable fix and confirm a 3-fail
-rebind is ~dwell, not ~50 s.
+and the scan-on-unreachable fix both confirmed 2026-09-01 — 013 closed.
 
 Note: node firmware now reports `ct_state = NOT_FITTED` (3) on the wire
 (CT/snubber dropped, 014 — DN003/DN004 updated); the bench master decodes it.
@@ -196,3 +195,42 @@ After the bisect, `comms on` bound ch=6 immediately; CONFIG_DESC (2
 frags), first BATCH_ACK watermark (w=1573), telemetry at 15 s cadence
 with sane UTC and zero malformed lines. HELLO→ACK→CONFIG→BATCH→ACK path
 is green.
+
+## 2026-09-01 addenda (scan-on-unreachable fix, confirmed on iron)
+
+Evidence: `issues/fixtures/013-scan-fix-rebind-{node,master}.log`.
+Master still had `BENCH_DROP_PCT=20` in flash (source already reverted),
+so 3-fails kept happening — that's what we wanted for the rebind timing.
+
+| Event (node uptime s) | Scan start | Bound | dt | notes |
+|---|---|---|---|---|
+| 109.106 3-fail | 109.118 | 136.174 ch=7 | ~27 s | cached 7, master was on 6 (leakage bind); two full attempts + rest |
+| 151.858 3-fail | 151.878 | 151.912 ch=7 | **34 ms** | cached channel, master unmoved |
+| 162.098 3-fail | 162.118 | 162.147 ch=7 | **49 ms** | same |
+| 193.766 3-fail | 193.778 | 194.618 ch=11 | 840 ms | master had just `c 11`; a few dwells |
+| 279.355 3-fail | 279.368 | 279.661 ch=1 | 293 ms | master `c 1` |
+| 403.748 3-fail | 403.768 | 403.791 ch=1 | **43 ms** | cached 1 |
+| 464.948 3-fail | 464.968 | 464.991 ch=1 | **43 ms** | cached 1 |
+
+Scan starts 12–20 ms after 3-fail (was 10 s). Cached-channel rebind is
+one dwell. Channel-hop recovery is a few dwells, not 50 s. Epoch-0
+HELLO_ACK correctly refused at 54.224; bound with a real epoch at 69.094
+after `n`. UTC sane (`2026-09-01 19:37:07`). `ct=NOT_FITTED` throughout.
+
+Ghost-bind ch=7 while master sat on 6 is the known cm-range adjacent
+leakage; it self-healed (3-fail → rescan). Not a regression.
+
+## Fix
+
+Throwaway bench master `firmware/bench-espnow-master/` + node DN003
+client, exercised through discovery, live telemetry, overnight outage
+drain, decimation, 20% frame loss, and unreachable→rescan. Three wire
+defects and the 10 s-before-first-scan miss found and fixed during
+bring-up (see addenda).
+
+## Verify
+
+- [x] Discovery HELLO→ACK+sync, CONFIG_DESC 2 frags, live BATCH_ACK
+- [x] Overnight outage: 3928 samples / 11 h / 7 decim passes, drain 42 s
+- [x] Drill B: retransmit recovers 1- and 2-drops; triple-drop rescans
+- [x] 3-fail rebind on cached channel in tens of ms (2026-09-01 reflash)

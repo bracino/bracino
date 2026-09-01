@@ -1,0 +1,474 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:7172
+load:0x40078000,len:15540
+load:0x40080400,len:4
+ho 8 tail 4 room 4
+load:0x40080404,len:3904
+entry 0x40080640
+[0;32mI (31) boot: ESP-IDF v5.2.3 2nd stage bootloader[0m
+[0;32mI (31) boot: compile time Sep  1 2026 11:39:46[0m
+[0;32mI (31) boot: Multicore bootloader[0m
+[0;32mI (35) boot: chip revision: v3.1[0m
+[0;32mI (39) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (44) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (48) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (53) boot: Enabling RNG early entropy source...[0m
+[0;32mI (58) boot: Partition Table:[0m
+[0;32mI (62) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (69) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (77) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (84) boot:  2 factory          factory app      00 00 00010000 00100000[0m
+[0;32mI (92) boot: End of partition table[0m
+[0;32mI (96) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=20004h (131076) map[0m
+[0;32mI (149) esp_image: segment 1: paddr=0003002c vaddr=3ffb0000 size=03d84h ( 15748) load[0m
+[0;32mI (155) esp_image: segment 2: paddr=00033db8 vaddr=40080000 size=0c260h ( 49760) load[0m
+[0;32mI (175) esp_image: segment 3: paddr=00040020 vaddr=400d0020 size=85f78h (548728) map[0m
+[0;32mI (363) esp_image: segment 4: paddr=000c5fa0 vaddr=4008c260 size=0a8b8h ( 43192) load[0m
+[0;32mI (392) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (392) boot: Disabling RNG early entropy source...[0m
+[0;32mI (403) cpu_start: Multicore app[0m
+[0;32mI (413) cpu_start: Pro cpu start user code[0m
+[0;32mI (413) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (413) cpu_start: Application information:[0m
+[0;32mI (416) cpu_start: Project name:     bench-espnow-master[0m
+[0;32mI (422) cpu_start: App version:      24695ab-dirty[0m
+[0;32mI (427) cpu_start: Compile time:     Sep  1 2026 17:03:43[0m
+[0;32mI (433) cpu_start: ELF file SHA256:  f50312da6...[0m
+[0;32mI (439) cpu_start: ESP-IDF:          v5.2.3[0m
+[0;32mI (443) cpu_start: Min chip rev:     v0.0[0m
+[0;32mI (448) cpu_start: Max chip rev:     v3.99 [0m
+[0;32mI (453) cpu_start: Chip rev:         v3.1[0m
+[0;32mI (458) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (465) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (471) heap_init: At 3FFB89A0 len 00027660 (157 KiB): DRAM[0m
+[0;32mI (477) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (484) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (490) heap_init: At 40096B18 len 000094E8 (37 KiB): IRAM[0m
+[0;32mI (498) spi_flash: detected chip: generic[0m
+[0;32mI (501) spi_flash: flash io: dio[0m
+[0;33mW (505) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (519) main_task: Started on CPU0[0m
+[0;32mI (529) main_task: Calling app_main()[0m
+[0;32mI (529) gpio: GPIO[27]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+I (559) wifi:wifi driver task: 3ffc0e70, prio:23, stack:6656, core=0
+I (559) wifi:wifi firmware version: 82f54d2
+I (569) wifi:wifi certification version: v7.0
+I (569) wifi:config NVS flash: enabled
+I (569) wifi:config nano formating: disabled
+I (569) wifi:Init data frame dynamic rx buffer num: 32
+I (569) wifi:Init static rx mgmt buffer num: 5
+I (579) wifi:Init management short buffer num: 32
+I (579) wifi:Init dynamic tx buffer num: 32
+I (589) wifi:Init static rx buffer size: 1600
+I (589) wifi:Init static rx buffer num: 10
+I (589) wifi:Init dynamic rx buffer num: 32
+[0;32mI (599) wifi_init: rx ba win: 6[0m
+[0;32mI (599) wifi_init: tcpip mbox: 32[0m
+[0;32mI (609) wifi_init: udp mbox: 6[0m
+[0;32mI (609) wifi_init: tcp mbox: 6[0m
+[0;32mI (609) wifi_init: tcp tx win: 5760[0m
+[0;32mI (619) wifi_init: tcp rx win: 5760[0m
+[0;32mI (619) wifi_init: tcp mss: 1440[0m
+[0;32mI (629) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (629) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (639) phy_init: phy_version 4840,a40f0ac,Aug 16 2024,16:48:06[0m
+I (719) wifi:mode : sta (d0:ef:76:15:6b:e0)
+I (719) wifi:enable tsf
+I (719) wifi:Set ps type: 0, coexist: 0
+
+I (729) wifi:ic_enable_sniffer
+I (729) wifi:ic_disable_sniffer
+I (729) ESPNOW: espnow [version: 1.0] init
+[     0.238] 
+# bench-espnow-master ch=6 button=GPIO27 NO_ACK=0s DROP=20%
+[     0.244] bench master: HELLO_ACK+TIME_SYNC, BATCH_ACK-after-log, CONFIG_GET, canned PARAM_SET
+  n <unix_s>  set epoch (required before telemetry will flow!)
+  c <1..13>   hop channel (outage drill)
+  t           push TIME_SYNC to all nodes
+  p           PARAM_SET setpoint +/-0.5 C to first node
+  s           registry + counters (GPIO27 button too)
+  k           show driver's actual current channel
+  w [sec]         promiscuous frame count + MACs (RF sanity)
+  h           this help
+knobs (edit + rebuild): BENCH_NO_ACK_S=0 BENCH_DROP_PCT=20
+> [    71.239] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=1 (driver ch 6)
+[    71.245] config_ver=1 unknown/changed -> CONFIG_GET
+[    71.788] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=1 (driver ch 6)
+[    71.821] config_ver=1 unknown/changed -> CONFIG_GET
+[    77.852] !! node(1,1) silent for 6s — unreachable (expect ~2s cadence)
+n 1788291427.822909[    80.892] cmd: n 1788291427.822909[    80.893] epoch set: 2026-09-01 19:37:07 UTC — TIME_SYNC now carries it
+[    80.893]   (note: ignored trailing '.822909' — integer seconds only)
+> [    86.108] node(1,1) frames resumed
+[    86.108] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=2 (driver ch 6)
+[    86.113] config_ver=1 unknown/changed -> CONFIG_GET
+[    86.206] $ committed node(1,1) seq=4 span=[40736..56035] ms=2 count=24 utc=[2026-09-01 19:36:45 .. 2026-09-01 19:37:01] boot=163
+[    86.207]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.9 tpu=26.9 amb=25.9 faults=00[    86.208] 
+[    86.217]   [ 1] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.9 tpu=26.9 amb=26.0 faults=00[    86.217] 
+[    88.130] HB node(1,1) seq=5 clk=71098 ms
+[    88.390] $ committed node(1,1) seq=6 span=[71335..71335] ms=1 count=12 utc=[2026-09-01 19:37:16 .. 2026-09-01 19:37:16] boot=163
+[    88.391]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.8 tpu=26.9 amb=26.0 faults=00[    88.392] 
+[    90.128] HB node(1,1) seq=7 clk=73108 ms
+[    92.128] HB node(1,1) seq=8 clk=75108 ms
+[    94.131] HB node(1,1) seq=9 clk=77108 ms
+[    96.145] HB node(1,1) seq=10 clk=79108 ms
+[    98.137] HB node(1,1) seq=11 clk=81108 ms
+[   100.147] HB node(1,1) seq=12 clk=83118 ms
+[   102.149] HB node(1,1) seq=13 clk=85128 ms
+[   103.701] $ committed node(1,1) seq=14 span=[86635..86635] ms=1 count=12 utc=[2026-09-01 19:37:31 .. 2026-09-01 19:37:31] boot=163
+[   103.702]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.9 tpu=26.9 amb=26.0 faults=00[   103.702] 
+[   104.153] HB node(1,1) seq=15 clk=87128 ms
+[   106.157] HB node(1,1) seq=16 clk=89138 ms
+[   108.184] HB node(1,1) seq=17 clk=91148 ms
+[   110.177] HB node(1,1) seq=18 clk=93158 ms
+[   112.185] HB node(1,1) seq=19 clk=95158 ms
+[   114.177] HB node(1,1) seq=20 clk=97158 ms
+[   116.178] HB node(1,1) seq=21 clk=99158 ms
+[   118.187] HB node(1,1) seq=22 clk=101168 ms
+[   118.962] $ committed node(1,1) seq=23 span=[101935..101935] ms=1 count=12 utc=[2026-09-01 19:37:46 .. 2026-09-01 19:37:46] boot=163
+[   118.963]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.0 tpu=26.9 amb=26.0 faults=00[   118.964] 
+[   120.187] HB node(1,1) seq=24 clk=103168 ms
+[   122.197] HB node(1,1) seq=25 clk=105178 ms
+[   124.069] TELEMETRY_BATCH seq=26 DROPPED (bench knob)
+[   126.085] TELEMETRY_BATCH seq=26 DROPPED (bench knob)
+[   132.182] !! node(1,1) silent for 6s — unreachable (expect ~2s cadence)
+[   141.827] node(1,1) frames resumed
+[   141.828] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=28 (driver ch 6)
+[   141.859] config_ver=1 unknown/changed -> CONFIG_GET
+[   147.842] !! node(1,1) silent for 6s — unreachable (expect ~2s cadence)
+[   153.177] node(1,1) frames resumed
+[   153.177] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=29 (driver ch 6)
+[   153.193] config_ver=1 unknown/changed -> CONFIG_GET
+[   153.220] $ committed node(1,1) seq=30 span=[107035..132535] ms=6 count=72 utc=[2026-09-01 19:37:50 .. 2026-09-01 19:38:15] boot=163
+[   153.221]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.9 tpu=26.9 amb=26.0 faults=00[   153.222] 
+[   153.231]   [ 1] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.8 tpu=26.9 amb=26.0 faults=00[   153.231] 
+[   153.240]   [ 2] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.9 tpu=27.0 amb=26.0 faults=00[   153.241] 
+[   153.250]   [ 3] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.9 tpu=27.0 amb=26.0 faults=00[   153.250] 
+[   153.259]   [ 4] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.0 tpu=27.0 amb=26.0 faults=00[   153.260] 
+[   153.269]   [ 5] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.9 tpu=27.0 amb=26.0 faults=00[   153.270] 
+[   153.294] CONFIG_DESC frag 0/2 (235 B, more)
+[   153.315] CONFIG_DESC complete (313 B):
+[   153.316]   id= 1 tpo_setpoint_c           type=2 flags=1 min=20.0 max=90.0 step=0.5
+[   153.317]   id= 2 hysteresis_c             type=2 flags=1 min=0.5 max=15.0 step=0.5
+[   153.323]   id= 3 min_on_time_s            type=1 flags=1 min=0 max=3600 step=1
+[   153.330]   id= 4 min_off_time_s           type=1 flags=1 min=0 max=3600 step=1
+[   153.338]   id= 5 ct_confirm_s             type=1 flags=1 min=1 max=120 step=1
+[   153.345]   id= 6 min_tpo_tpu_delta_c      type=2 flags=1 min=0.0 max=30.0 step=0.5
+[   153.353]   id= 7 max_run_time_min         type=1 flags=1 min=1 max=240 step=1
+[   153.360]   id= 8 user_mode                type=3 flags=1 min=0 max=3 step=1
+[   153.367]   id= 9 manual_relay             type=3 flags=1 min=0 max=1 step=1
+[   153.374]   id=10 comms_enable             type=3 flags=1 min=0 max=1 step=1
+[   154.668] $ committed node(1,1) seq=33 span=[137635..137635] ms=1 count=12 utc=[2026-09-01 19:38:20 .. 2026-09-01 19:38:20] boot=163
+[   154.670]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.9 tpu=27.0 amb=26.0 faults=00[   154.670] 
+[   155.206] HB node(1,1) seq=34 clk=138188 ms
+[   157.220] HB node(1,1) seq=35 clk=140198 ms
+[   159.216] HB node(1,1) seq=36 clk=142198 ms
+[   159.759] $ committed node(1,1) seq=37 span=[142735..142735] ms=1 count=12 utc=[2026-09-01 19:38:25 .. 2026-09-01 19:38:25] boot=163
+[   159.760]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.9 tpu=26.9 amb=26.1 faults=00[   159.761] 
+[   161.245] HB node(1,1) seq=38 clk=144208 ms
+[   163.226] HB node(1,1) seq=39 clk=146208 ms
+[   164.873] TELEMETRY_BATCH seq=40 DROPPED (bench knob)
+[   166.877] TELEMETRY_BATCH seq=40 DROPPED (bench knob)
+[   168.919] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=41 (driver ch 6)
+[   168.949] $ committed node(1,1) seq=42 span=[147835..147835] ms=1 count=12 utc=[2026-09-01 19:38:30 .. 2026-09-01 19:38:30] boot=163
+[   168.951]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=26.8 tpu=26.9 amb=26.1 faults=00[   168.951] 
+[   169.967] $ committed node(1,1) seq=43 span=[152935..152935] ms=1 count=12 utc=[2026-09-01 19:38:36 .. 2026-09-01 19:38:36] boot=163
+[   169.968]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.0 tpu=27.0 amb=26.1 faults=00[   169.969] 
+[   170.947] HB node(1,1) seq=44 clk=153918 ms
+[   172.946] HB node(1,1) seq=45 clk=155928 ms
+[   174.956] HB node(1,1) seq=46 clk=157938 ms
+[   175.059] TELEMETRY_BATCH seq=47 DROPPED (bench knob)
+[   177.067] TELEMETRY_BATCH seq=47 DROPPED (bench knob)
+k[   178.252] cmd: k[   178.253] driver channel: primary=6 second=0
+> [   179.087] $ committed node(1,1) seq=47 span=[158035..158035] ms=1 count=12 utc=[2026-09-01 19:38:41 .. 2026-09-01 19:38:41] boot=163
+[   179.088]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.1 amb=26.1 faults=00[   179.089] 
+[   179.159] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=48 (driver ch 6)
+[   179.189] $ committed node(1,1) seq=49 span=[158035..158035] ms=1 count=12 utc=[2026-09-01 19:38:41 .. 2026-09-01 19:38:41] boot=163
+[   179.190]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.1 amb=26.1 faults=00[   179.191] 
+[   180.165] $ committed node(1,1) seq=50 span=[163135..163135] ms=1 count=12 utc=[2026-09-01 19:38:46 .. 2026-09-01 19:38:46] boot=163
+[   180.167]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   180.167] 
+[   181.172] HB node(1,1) seq=51 clk=164148 ms
+[   183.192] HB node(1,1) seq=52 clk=166158 ms
+[   185.176] HB node(1,1) seq=53 clk=168158 ms
+[   185.273] $ committed node(1,1) seq=54 span=[168235..168235] ms=1 count=12 utc=[2026-09-01 19:38:51 .. 2026-09-01 19:38:51] boot=163
+[   185.274]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.1 amb=26.0 faults=00[   185.275] 
+[   187.182] HB node(1,1) seq=55 clk=170158 ms
+[   189.177] HB node(1,1) seq=56 clk=172158 ms
+[   190.359] $ committed node(1,1) seq=57 span=[173335..173335] ms=1 count=12 utc=[2026-09-01 19:38:56 .. 2026-09-01 19:38:56] boot=163
+[   190.360]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.1 amb=26.0 faults=00[   190.360] 
+[   191.180] HB node(1,1) seq=58 clk=174158 ms
+[   193.186] HB node(1,1) seq=59 clk=176158 ms
+[   195.179] HB node(1,1) seq=60 clk=178158 ms
+[   195.458] TELEMETRY_BATCH seq=61 DROPPED (bench knob)
+[   197.467] $ committed node(1,1) seq=61 span=[178435..178435] ms=1 count=12 utc=[2026-09-01 19:39:01 .. 2026-09-01 19:39:01] boot=163
+[   197.468]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.0 faults=00[   197.469] 
+[   197.528] HB node(1,1) seq=62 clk=180508 ms
+k[   198.462] cmd: k[   198.463] driver channel: primary=6 second=0
+> [   199.541] HB node(1,1) seq=63 clk=182508 ms
+[   200.566] $ committed node(1,1) seq=64 span=[183535..183535] ms=1 count=12 utc=[2026-09-01 19:39:06 .. 2026-09-01 19:39:06] boot=163
+[   200.567]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.1 amb=26.1 faults=00[   200.568] 
+[   201.536] HB node(1,1) seq=65 clk=184518 ms
+[   203.535] HB node(1,1) seq=66 clk=186518 ms
+[   205.535] HB node(1,1) seq=67 clk=188518 ms
+[   205.658] $ committed node(1,1) seq=68 span=[188635..188635] ms=1 count=12 utc=[2026-09-01 19:39:11 .. 2026-09-01 19:39:11] boot=163
+[   205.659]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.0 faults=00[   205.660] 
+c 11[   206.802] cmd: c 11I (207299) wifi:ic_enable_sniffer
+I (207299) wifi:ic_disable_sniffer
+[   206.805] channel -> 11 (driver says 11; nodes must rescan)
+> [   211.626] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=72 (driver ch 11)
+[   211.656] $ committed node(1,1) seq=73 span=[193735..193735] ms=1 count=12 utc=[2026-09-01 19:39:17 .. 2026-09-01 19:39:17] boot=163
+[   211.657]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.4 tpu=27.2 amb=26.0 faults=00[   211.658] 
+[   213.635] HB node(1,1) seq=74 clk=196618 ms
+[   215.635] HB node(1,1) seq=75 clk=198618 ms
+[   215.858] $ committed node(1,1) seq=76 span=[198835..198835] ms=1 count=12 utc=[2026-09-01 19:39:22 .. 2026-09-01 19:39:22] boot=163
+[   215.859]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.2 amb=26.0 faults=00[   215.860] 
+[   217.635] HB node(1,1) seq=77 clk=200618 ms
+[   219.635] HB node(1,1) seq=78 clk=202618 ms
+[   220.956] $ committed node(1,1) seq=79 span=[203935..203935] ms=1 count=12 utc=[2026-09-01 19:39:27 .. 2026-09-01 19:39:27] boot=163
+[   220.957]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.1 amb=26.1 faults=00[   220.957] 
+[   221.637] HB node(1,1) seq=80 clk=204618 ms
+[   223.635] HB node(1,1) seq=81 clk=206618 ms
+[   225.635] HB node(1,1) seq=82 clk=208618 ms
+[   226.056] $ committed node(1,1) seq=83 span=[209035..209035] ms=1 count=12 utc=[2026-09-01 19:39:32 .. 2026-09-01 19:39:32] boot=163
+[   226.057]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.1 amb=26.1 faults=00[   226.058] 
+[   227.635] HB node(1,1) seq=84 clk=210618 ms
+[   229.636] HB node(1,1) seq=85 clk=212618 ms
+[   231.155] $ committed node(1,1) seq=86 span=[214135..214135] ms=1 count=12 utc=[2026-09-01 19:39:38 .. 2026-09-01 19:39:38] boot=163
+[   231.157]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   231.157] 
+[   231.635] HB node(1,1) seq=87 clk=214618 ms
+[   233.635] HB node(1,1) seq=88 clk=216618 ms
+[   235.635] HB node(1,1) seq=89 clk=218618 ms
+[   236.256] $ committed node(1,1) seq=90 span=[219235..219235] ms=1 count=12 utc=[2026-09-01 19:39:43 .. 2026-09-01 19:39:43] boot=163
+[   236.258]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.0 amb=26.1 faults=00[   236.258] 
+[   237.640] HB node(1,1) seq=91 clk=220618 ms
+[   239.635] HB node(1,1) seq=92 clk=222618 ms
+[   241.355] $ committed node(1,1) seq=93 span=[224335..224335] ms=1 count=12 utc=[2026-09-01 19:39:48 .. 2026-09-01 19:39:48] boot=163
+[   241.356]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.0 amb=26.1 faults=00[   241.357] 
+[   241.635] HB node(1,1) seq=94 clk=224618 ms
+[   243.635] HB node(1,1) seq=95 clk=226618 ms
+[   245.635] HB node(1,1) seq=96 clk=228618 ms
+[   246.455] $ committed node(1,1) seq=97 span=[229435..229435] ms=1 count=12 utc=[2026-09-01 19:39:53 .. 2026-09-01 19:39:53] boot=163
+[   246.456]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   246.457] 
+[   247.635] HB node(1,1) seq=98 clk=230618 ms
+[   249.635] HB node(1,1) seq=99 clk=232618 ms
+[   251.555] $ committed node(1,1) seq=100 span=[234535..234535] ms=1 count=12 utc=[2026-09-01 19:39:58 .. 2026-09-01 19:39:58] boot=163
+[   251.556]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   251.557] 
+[   251.636] HB node(1,1) seq=101 clk=234618 ms
+[   253.634] HB node(1,1) seq=102 clk=236618 ms
+[   255.634] HB node(1,1) seq=103 clk=238618 ms
+[   256.657] $ committed node(1,1) seq=104 span=[239635..239635] ms=1 count=12 utc=[2026-09-01 19:40:03 .. 2026-09-01 19:40:03] boot=163
+[   256.658]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   256.659] 
+[   257.634] HB node(1,1) seq=105 clk=240618 ms
+[   259.634] HB node(1,1) seq=106 clk=242618 ms
+[   261.635] HB node(1,1) seq=107 clk=244618 ms
+[   261.755] $ committed node(1,1) seq=108 span=[244735..244735] ms=1 count=12 utc=[2026-09-01 19:40:08 .. 2026-09-01 19:40:08] boot=163
+[   261.756]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   261.757] 
+[   263.634] HB node(1,1) seq=109 clk=246618 ms
+[   265.634] HB node(1,1) seq=110 clk=248618 ms
+[   266.855] $ committed node(1,1) seq=111 span=[249835..249835] ms=1 count=12 utc=[2026-09-01 19:40:13 .. 2026-09-01 19:40:13] boot=163
+[   266.856]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   266.857] 
+[   267.635] HB node(1,1) seq=112 clk=250618 ms
+[   269.634] HB node(1,1) seq=113 clk=252618 ms
+[   271.634] HB node(1,1) seq=114 clk=254618 ms
+[   271.955] $ committed node(1,1) seq=115 span=[254935..254935] ms=1 count=12 utc=[2026-09-01 19:40:18 .. 2026-09-01 19:40:18] boot=163
+[   271.956]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.0 tpu=27.1 amb=26.1 faults=00[   271.957] 
+[   273.634] HB node(1,1) seq=116 clk=256618 ms
+[   275.634] HB node(1,1) seq=117 clk=258618 ms
+[   277.061] TELEMETRY_BATCH seq=118 DROPPED (bench knob)
+[   279.055] $ committed node(1,1) seq=118 span=[260035..260035] ms=1 count=12 utc=[2026-09-01 19:40:23 .. 2026-09-01 19:40:23] boot=163
+[   279.056]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   279.057] 
+[   279.075] HB node(1,1) seq=119 clk=262058 ms
+[   281.074] HB node(1,1) seq=120 clk=264058 ms
+[   282.154] $ committed node(1,1) seq=121 span=[265135..265135] ms=1 count=12 utc=[2026-09-01 19:40:29 .. 2026-09-01 19:40:29] boot=163
+[   282.156]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   282.156] 
+[   283.074] HB node(1,1) seq=122 clk=266058 ms
+[   285.074] HB node(1,1) seq=123 clk=268058 ms
+[   287.074] HB node(1,1) seq=124 clk=270058 ms
+[   287.257] $ committed node(1,1) seq=125 span=[270235..270235] ms=1 count=12 utc=[2026-09-01 19:40:34 .. 2026-09-01 19:40:34] boot=163
+[   287.258]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.0 faults=00[   287.259] 
+[   289.074] HB node(1,1) seq=126 clk=272058 ms
+[   291.074] HB node(1,1) seq=127 clk=274058 ms
+[   292.354] TELEMETRY_BATCH seq=128 DROPPED (bench knob)
+c[   294.354] TELEMETRY_BATCH seq=128 DROPPED (bench knob)
+ 1[   295.202] cmd: c 1I (295699) wifi:ic_enable_sniffer
+I (295699) wifi:ic_disable_sniffer
+[   295.205] channel -> 1 (driver says 1; nodes must rescan)
+> [   296.674] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=129 (driver ch 1)
+[   296.706] $ committed node(1,1) seq=130 span=[275335..275335] ms=1 count=12 utc=[2026-09-01 19:40:38 .. 2026-09-01 19:40:38] boot=163
+[   296.707]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.0 faults=00[   296.708] 
+[   297.464] $ committed node(1,1) seq=131 span=[280435..280435] ms=1 count=12 utc=[2026-09-01 19:40:43 .. 2026-09-01 19:40:43] boot=163
+[   297.466]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.2 amb=26.1 faults=00[   297.466] 
+[   298.686] HB node(1,1) seq=132 clk=281668 ms
+[   300.684] HB node(1,1) seq=133 clk=283668 ms
+[   302.564] $ committed node(1,1) seq=134 span=[285535..285535] ms=1 count=12 utc=[2026-09-01 19:40:48 .. 2026-09-01 19:40:48] boot=163
+[   302.565]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.5 tpu=27.3 amb=26.1 faults=00[   302.566] 
+[   302.684] HB node(1,1) seq=135 clk=285668 ms
+[   304.683] HB node(1,1) seq=136 clk=287668 ms
+[   306.683] HB node(1,1) seq=137 clk=289668 ms
+[   307.664] $ committed node(1,1) seq=138 span=[290635..290635] ms=1 count=12 utc=[2026-09-01 19:40:54 .. 2026-09-01 19:40:54] boot=163
+[   307.665]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.5 tpu=27.4 amb=26.1 faults=00[   307.666] 
+[   308.684] HB node(1,1) seq=139 clk=291668 ms
+[   310.684] HB node(1,1) seq=140 clk=293668 ms
+[   312.683] HB node(1,1) seq=141 clk=295668 ms
+[   312.764] $ committed node(1,1) seq=142 span=[295735..295735] ms=1 count=12 utc=[2026-09-01 19:40:59 .. 2026-09-01 19:40:59] boot=163
+[   312.765]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.5 tpu=27.3 amb=26.1 faults=00[   312.766] 
+[   314.683] HB node(1,1) seq=143 clk=297668 ms
+[   316.683] HB node(1,1) seq=144 clk=299668 ms
+[   317.864] $ committed node(1,1) seq=145 span=[300835..300835] ms=1 count=12 utc=[2026-09-01 19:41:04 .. 2026-09-01 19:41:04] boot=163
+[   317.865]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.4 tpu=27.3 amb=26.1 faults=00[   317.866] 
+[   318.683] HB node(1,1) seq=146 clk=301668 ms
+[   320.683] HB node(1,1) seq=147 clk=303668 ms
+[   322.683] HB node(1,1) seq=148 clk=305668 ms
+[   322.964] $ committed node(1,1) seq=149 span=[305935..305935] ms=1 count=12 utc=[2026-09-01 19:41:09 .. 2026-09-01 19:41:09] boot=163
+[   322.965]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.4 tpu=27.2 amb=26.1 faults=00[   322.965] 
+[   324.683] HB node(1,1) seq=150 clk=307668 ms
+[   326.683] HB node(1,1) seq=151 clk=309668 ms
+[   328.064] $ committed node(1,1) seq=152 span=[311035..311035] ms=1 count=12 utc=[2026-09-01 19:41:14 .. 2026-09-01 19:41:14] boot=163
+[   328.065]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.4 tpu=27.2 amb=26.1 faults=00[   328.065] 
+[   328.683] HB node(1,1) seq=153 clk=311668 ms
+[   330.683] HB node(1,1) seq=154 clk=313668 ms
+[   332.683] HB node(1,1) seq=155 clk=315668 ms
+[   333.164] $ committed node(1,1) seq=156 span=[316135..316135] ms=1 count=12 utc=[2026-09-01 19:41:19 .. 2026-09-01 19:41:19] boot=163
+[   333.165]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.5 tpu=27.4 amb=26.1 faults=00[   333.165] 
+[   334.683] HB node(1,1) seq=157 clk=317668 ms
+[   336.683] HB node(1,1) seq=158 clk=319668 ms
+[   338.263] $ committed node(1,1) seq=159 span=[321235..321235] ms=1 count=12 utc=[2026-09-01 19:41:24 .. 2026-09-01 19:41:24] boot=163
+[   338.265]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.3 amb=26.1 faults=00[   338.265] 
+[   338.683] HB node(1,1) seq=160 clk=321668 ms
+[   340.683] HB node(1,1) seq=161 clk=323668 ms
+[   342.683] HB node(1,1) seq=162 clk=325668 ms
+[   343.363] $ committed node(1,1) seq=163 span=[326335..326335] ms=1 count=12 utc=[2026-09-01 19:41:29 .. 2026-09-01 19:41:29] boot=163
+[   343.365]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.0 faults=00[   343.365] 
+[   344.683] HB node(1,1) seq=164 clk=327668 ms
+[   346.683] HB node(1,1) seq=165 clk=329668 ms
+[   348.463] $ committed node(1,1) seq=166 span=[331435..331435] ms=1 count=12 utc=[2026-09-01 19:41:34 .. 2026-09-01 19:41:34] boot=163
+[   348.464]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.0 amb=26.0 faults=00[   348.465] 
+[   348.683] HB node(1,1) seq=167 clk=331668 ms
+[   350.683] HB node(1,1) seq=168 clk=333668 ms
+[   352.682] HB node(1,1) seq=169 clk=335668 ms
+[   353.563] $ committed node(1,1) seq=170 span=[336535..336535] ms=1 count=12 utc=[2026-09-01 19:41:39 .. 2026-09-01 19:41:39] boot=163
+[   353.564]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.0 tpu=27.0 amb=26.0 faults=00[   353.565] 
+[   354.683] HB node(1,1) seq=171 clk=337668 ms
+[   356.682] HB node(1,1) seq=172 clk=339668 ms
+[   358.663] $ committed node(1,1) seq=173 span=[341635..341635] ms=1 count=12 utc=[2026-09-01 19:41:45 .. 2026-09-01 19:41:45] boot=163
+[   358.664]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.0 tpu=27.1 amb=26.0 faults=00[   358.665] 
+[   358.683] HB node(1,1) seq=174 clk=341668 ms
+[   360.682] HB node(1,1) seq=175 clk=343668 ms
+[   362.682] HB node(1,1) seq=176 clk=345668 ms
+[   363.763] $ committed node(1,1) seq=177 span=[346735..346735] ms=1 count=12 utc=[2026-09-01 19:41:50 .. 2026-09-01 19:41:50] boot=163
+[   363.764]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.0 tpu=27.0 amb=26.0 faults=00[   363.765] 
+[   364.682] HB node(1,1) seq=178 clk=347668 ms
+[   366.682] HB node(1,1) seq=179 clk=349668 ms
+[   368.682] HB node(1,1) seq=180 clk=351668 ms
+[   368.863] $ committed node(1,1) seq=181 span=[351835..351835] ms=1 count=12 utc=[2026-09-01 19:41:55 .. 2026-09-01 19:41:55] boot=163
+[   368.864]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.1 amb=26.1 faults=00[   368.865] 
+[   370.682] HB node(1,1) seq=182 clk=353668 ms
+[   372.682] HB node(1,1) seq=183 clk=355668 ms
+[   373.963] $ committed node(1,1) seq=184 span=[356935..356935] ms=1 count=12 utc=[2026-09-01 19:42:00 .. 2026-09-01 19:42:00] boot=163
+[   373.964]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.1 faults=00[   373.965] 
+[   374.682] HB node(1,1) seq=185 clk=357668 ms
+[   376.682] HB node(1,1) seq=186 clk=359668 ms
+[   378.682] HB node(1,1) seq=187 clk=361668 ms
+[   379.062] TELEMETRY_BATCH seq=188 DROPPED (bench knob)
+[   381.063] $ committed node(1,1) seq=188 span=[362035..362035] ms=1 count=12 utc=[2026-09-01 19:42:05 .. 2026-09-01 19:42:05] boot=163
+[   381.065]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.0 faults=00[   381.065] 
+[   381.083] HB node(1,1) seq=189 clk=364068 ms
+[   383.082] HB node(1,1) seq=190 clk=366068 ms
+[   384.162] $ committed node(1,1) seq=191 span=[367135..367135] ms=1 count=12 utc=[2026-09-01 19:42:10 .. 2026-09-01 19:42:10] boot=163
+[   384.164]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.0 amb=26.0 faults=00[   384.164] 
+[   385.082] HB node(1,1) seq=192 clk=368068 ms
+[   387.082] HB node(1,1) seq=193 clk=370068 ms
+[   389.082] HB node(1,1) seq=194 clk=372068 ms
+[   389.262] $ committed node(1,1) seq=195 span=[372235..372235] ms=1 count=12 utc=[2026-09-01 19:42:15 .. 2026-09-01 19:42:15] boot=163
+[   389.264]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.0 amb=26.1 faults=00[   389.264] 
+[   391.082] HB node(1,1) seq=196 clk=374068 ms
+[   393.082] HB node(1,1) seq=197 clk=376068 ms
+[   394.362] $ committed node(1,1) seq=198 span=[377335..377335] ms=1 count=12 utc=[2026-09-01 19:42:20 .. 2026-09-01 19:42:20] boot=163
+[   394.364]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.0 tpu=27.0 amb=26.0 faults=00[   394.364] 
+[   395.082] HB node(1,1) seq=199 clk=378068 ms
+[   397.082] HB node(1,1) seq=200 clk=380068 ms
+[   399.082] HB node(1,1) seq=201 clk=382068 ms
+[   399.462] $ committed node(1,1) seq=202 span=[382435..382435] ms=1 count=12 utc=[2026-09-01 19:42:25 .. 2026-09-01 19:42:25] boot=163
+[   399.463]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.0 amb=26.0 faults=00[   399.464] 
+[   401.082] HB node(1,1) seq=203 clk=384068 ms
+[   403.082] HB node(1,1) seq=204 clk=386068 ms
+[   404.562] $ committed node(1,1) seq=205 span=[387535..387535] ms=1 count=12 utc=[2026-09-01 19:42:30 .. 2026-09-01 19:42:30] boot=163
+[   404.563]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.1 tpu=27.1 amb=26.0 faults=00[   404.564] 
+[   405.082] HB node(1,1) seq=206 clk=388068 ms
+[   407.081] HB node(1,1) seq=207 clk=390068 ms
+[   409.081] HB node(1,1) seq=208 clk=392068 ms
+[   409.662] TELEMETRY_BATCH seq=209 DROPPED (bench knob)
+[   411.663] $ committed node(1,1) seq=209 span=[392635..392635] ms=1 count=12 utc=[2026-09-01 19:42:36 .. 2026-09-01 19:42:36] boot=163
+[   411.664]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.1 amb=26.0 faults=00[   411.665] 
+[   411.682] HB node(1,1) seq=210 clk=394668 ms
+[   413.682] HB node(1,1) seq=211 clk=396668 ms
+[   414.762] TELEMETRY_BATCH seq=212 DROPPED (bench knob)
+[   416.762] TELEMETRY_BATCH seq=212 DROPPED (bench knob)
+[   418.762] TELEMETRY_BATCH seq=212 DROPPED (bench knob)
+[   420.801] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=213 (driver ch 1)
+[   420.822] $ committed node(1,1) seq=214 span=[397735..402835] ms=2 count=24 utc=[2026-09-01 19:42:40 .. 2026-09-01 19:42:45] boot=163
+[   420.823]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.1 amb=26.0 faults=00[   420.824] 
+[   420.833]   [ 1] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.2 tpu=27.1 amb=26.0 faults=00[   420.833] 
+[   422.821] HB node(1,1) seq=215 clk=405808 ms
+[   424.822] HB node(1,1) seq=216 clk=407808 ms
+[   424.962] $ committed node(1,1) seq=217 span=[407935..407935] ms=1 count=12 utc=[2026-09-01 19:42:51 .. 2026-09-01 19:42:51] boot=163
+[   424.963]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.2 amb=26.0 faults=00[   424.964] 
+[   426.821] HB node(1,1) seq=218 clk=409808 ms
+[   428.821] HB node(1,1) seq=219 clk=411808 ms
+[   430.062] $ committed node(1,1) seq=220 span=[413035..413035] ms=1 count=12 utc=[2026-09-01 19:42:56 .. 2026-09-01 19:42:56] boot=163
+[   430.063]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.4 tpu=27.3 amb=26.0 faults=00[   430.064] 
+[   430.821] HB node(1,1) seq=221 clk=413808 ms
+[   432.821] HB node(1,1) seq=222 clk=415808 ms
+[   434.821] HB node(1,1) seq=223 clk=417808 ms
+[   435.161] TELEMETRY_BATCH seq=224 DROPPED (bench knob)
+[   437.162] $ committed node(1,1) seq=224 span=[418135..418135] ms=1 count=12 utc=[2026-09-01 19:43:01 .. 2026-09-01 19:43:01] boot=163
+[   437.163]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.4 tpu=27.2 amb=26.0 faults=00[   437.164] 
+[   437.182] HB node(1,1) seq=225 clk=420168 ms
+[   439.181] HB node(1,1) seq=226 clk=422168 ms
+[   440.261] $ committed node(1,1) seq=227 span=[423235..423235] ms=1 count=12 utc=[2026-09-01 19:43:06 .. 2026-09-01 19:43:06] boot=163
+[   440.263]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.4 tpu=27.2 amb=25.9 faults=00[   440.263] 
+[   441.181] HB node(1,1) seq=228 clk=424168 ms
+[   443.181] HB node(1,1) seq=229 clk=426168 ms
+[   445.181] HB node(1,1) seq=230 clk=428168 ms
+[   445.361] $ committed node(1,1) seq=231 span=[428335..428335] ms=1 count=12 utc=[2026-09-01 19:43:11 .. 2026-09-01 19:43:11] boot=163
+[   445.363]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.2 amb=25.9 faults=00[   445.363] 
+[   447.181] HB node(1,1) seq=232 clk=430168 ms
+[   449.181] HB node(1,1) seq=233 clk=432168 ms
+[   450.461] $ committed node(1,1) seq=234 span=[433435..433435] ms=1 count=12 utc=[2026-09-01 19:43:16 .. 2026-09-01 19:43:16] boot=163
+[   450.462]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.2 amb=26.0 faults=00[   450.463] 
+[   451.181] HB node(1,1) seq=235 clk=434168 ms
+[   453.180] HB node(1,1) seq=236 clk=436168 ms
+[   455.180] HB node(1,1) seq=237 clk=438168 ms
+[   455.561] $ committed node(1,1) seq=238 span=[438535..438535] ms=1 count=12 utc=[2026-09-01 19:43:21 .. 2026-09-01 19:43:21] boot=163
+[   455.562]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.2 amb=26.0 faults=00[   455.563] 
+[   457.180] HB node(1,1) seq=239 clk=440168 ms
+[   459.180] HB node(1,1) seq=240 clk=442168 ms
+[   460.661] $ committed node(1,1) seq=241 span=[443635..443635] ms=1 count=12 utc=[2026-09-01 19:43:26 .. 2026-09-01 19:43:26] boot=163
+[   460.662]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.1 amb=25.9 faults=00[   460.663] 
+[   461.180] HB node(1,1) seq=242 clk=444168 ms
+[   463.180] HB node(1,1) seq=243 clk=446168 ms
+[   465.180] HB node(1,1) seq=244 clk=448168 ms
+[   465.761] $ committed node(1,1) seq=245 span=[448735..448735] ms=1 count=12 utc=[2026-09-01 19:43:31 .. 2026-09-01 19:43:31] boot=163
+[   465.762]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.2 amb=25.9 faults=00[   465.763] 
+[   467.180] HB node(1,1) seq=246 clk=450168 ms
+[   469.180] HB node(1,1) seq=247 clk=452168 ms
+[   470.861] $ committed node(1,1) seq=248 span=[453835..453835] ms=1 count=12 utc=[2026-09-01 19:43:36 .. 2026-09-01 19:43:36] boot=163
+[   470.862]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.2 amb=25.9 faults=00[   470.863] 
+[   471.180] HB node(1,1) seq=249 clk=454168 ms
+[   473.180] HB node(1,1) seq=250 clk=456168 ms
+[   475.180] HB node(1,1) seq=251 clk=458168 ms
+[   475.960] TELEMETRY_BATCH seq=252 DROPPED (bench knob)
+[   477.961] TELEMETRY_BATCH seq=252 DROPPED (bench knob)
+[   479.961] TELEMETRY_BATCH seq=252 DROPPED (bench knob)
+[   482.000] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=253 (driver ch 1)
+[   482.021] $ committed node(1,1) seq=254 span=[458935..464035] ms=2 count=24 utc=[2026-09-01 19:43:42 .. 2026-09-01 19:43:47] boot=163
+[   482.022]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.4 tpu=27.2 amb=25.9 faults=00[   482.023] 
+[   482.032]   [ 1] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.4 tpu=27.2 amb=25.9 faults=00[   482.032] 
+[   484.020] HB node(1,1) seq=255 clk=467008 ms
+[   486.020] HB node(1,1) seq=256 clk=469008 ms
+[   486.161] $ committed node(1,1) seq=257 span=[469135..469135] ms=1 count=12 utc=[2026-09-01 19:43:52 .. 2026-09-01 19:43:52] boot=163
+[   486.162]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=27.3 tpu=27.2 amb=25.9 faults=00[   486.162] 
