@@ -1,0 +1,227 @@
+$ tio /dev/ttyACM0 -b 115200
+[17:29:25.308] tio 3.9
+[17:29:25.308] Press ctrl-t q to quit
+[17:29:25.310] Connected to /dev/ttyACM0
+I (120) esp_image: segment 1: paddr=000334b0 vaddr=3fc94ah[   164.352] cmd: h[   164.352] commands:
+  on / off / t     relay (forces Manual)
+  auto / manual / test / halt
+  r / r0..r3       sample (TPO/TPU/AMB °C+mV; A0 mV)
+  s / s0..s3       64-sample burst
+  sim              show overrides
+  sim tpo 55       inject TPO °C (desk loop proof)
+  sim tpu 30       inject TPU °C
+  sim clear        use real NTCs again
+  comms [on|off]   ESP-NOW client (DN003); 'comms' = status
+  ident T I        provision node_type/id (NVS)
+  tel <sec>        telemetry capture period (default 15)
+  ring <n>         resize FIFO ring EMPTY (bench decimation)
+  hel <ch> [n]     bench: HELLO burst on fixed channel
+  prog / st / scan / enc / h
+GPIO8: idle 100/900, RUNNING steady, alert 300/300.
+Boots Manual. CT is loaded/not. Do not hang the real BBU pump.
+> comms[   184.672] cmd: comms[   184.672] comms: enabled=1 state=ONLINE node(1,1) boot=120 seq=95
+[   184.673]   channel=6 bound=1 gw=d0:ef:76:15:6b:e0
+[   184.673]   anchored=0 epoch=0.000@0ms sample_period=15s
+[   184.673]   fifo=13/4096 outstanding=0 fails=0 admin_seq=0
+[   184.674]   rx=2 drop=0 tx_ok=96 fail=0 acks=0 retrans=0
+[   184.674]   decim=0 ev_sent=0 ev_drop=0
+> comms[   326.932] cmd: comms[   326.932] comms: enabled=1 state=ONLINE node(1,1) boot=120 seq=166
+[   326.933]   channel=6 bound=1 gw=d0:ef:76:15:6b:e0
+[   326.933]   anchored=0 epoch=0.000@0ms sample_period=15s
+[   326.934]   fifo=22/4096 outstanding=0 fails=0 admin_seq=0
+[   326.934]   rx=2 drop=0 tx_ok=166 fail=1 acks=0 retrans=0
+[   326.934]   decim=0 ev_sent=0 ev_drop=0
+> [   344.668] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (354682) wifi:ic_enable_sniffer
+I (354682) wifi:ic_disable_sniffer
+I (354932) wifi:ic_enable_sniffer
+I (354932) wifi:ic_disable_sniffer
+I (355182) wifi:ic_enable_sniffer
+I (355182) wifi:ic_disable_sniffer
+[   355.189] comms: anchored epoch=702966874.047 at clock 355189 ms
+[   355.193] comms: bound gw d0:ef:76:15:6b:e0 ch=11
+[   355.212] comms: CONFIG_DESC 313 bytes in 2 fragment(s)
+[   355.482] comms: ACK w=261110 fifo=6
+[   355.562] comms: ACK w=352910 fifo=0
+[   368.242] comms: ACK w=368210 fifo=0
+[   383.542] comms: ACK w=383510 fifo=0
+tel 5[   397.472] cmd: tel 5[   397.473] comms: sample period 5s
+> [   399.802] comms: ack timeout — retransmit (fail 1)
+comms[   401.652] cmd: comms[   401.652] comms: enabled=1 state=ONLINE node(1,1) boot=120 seq=204
+[   401.653]   channel=11 bound=1 gw=d0:ef:76:15:6b:e0
+[   401.653]   anchored=1 epoch=702966874.047@355189ms sample_period=5s
+[   401.654]   fifo=1/4096 outstanding=1 fails=1 admin_seq=0
+[   401.654]   rx=8 drop=0 tx_ok=204 fail=4 acks=4 retrans=1
+[   401.654]   decim=0 ev_sent=0 ev_drop=0
+> [   401.802] comms: ack timeout — retransmit (fail 2)
+[   401.822] comms: ACK w=397790 fifo=0
+[   402.922] comms: ACK w=402890 fifo=0
+[   408.022] comms: ACK w=407990 fifo=0
+[   415.102] comms: ack timeout — retransmit (fail 1)
+[   417.102] comms: ack timeout — retransmit (fail 2)
+[   417.122] comms: ACK w=413090 fifo=0
+[   418.222] comms: ACK w=418190 fifo=0
+[   425.302] comms: ack timeout — retransmit (fail 1)
+[   427.302] comms: ack timeout — retransmit (fail 2)
+[   427.322] comms: ACK w=423290 fifo=0
+[   428.422] comms: ACK w=428390 fifo=0
+[   433.522] comms: ACK w=433490 fifo=0
+[   438.622] comms: ACK w=438590 fifo=0
+[   443.722] comms: ACK w=443690 fifo=0
+[   450.802] comms: ack timeout — retransmit (fail 1)
+[   450.822] comms: ACK w=448790 fifo=0
+[   453.922] comms: ACK w=453890 fifo=0
+[   459.022] comms: ACK w=458990 fifo=0
+[   464.122] comms: ACK w=464090 fifo=0
+[   469.222] comms: ACK w=469190 fifo=0
+[   474.322] comms: ACK w=474290 fifo=0
+auto[   477.872] cmd: auto[   477.872] mode Auto (coil OFF, min_off then start if TPO cold)
+> [   479.422] comms: ACK w=479390 fifo=0
+[   484.522] comms: ACK w=484490 fifo=0
+[   489.622] comms: ACK w=489590 fifo=0
+[   494.722] comms: ACK w=494690 fifo=0
+[   499.822] comms: ACK w=499790 fifo=0
+[   504.922] comms: ACK w=504890 fifo=0
+[   510.022] comms: ACK w=509990 fifo=0
+[   515.122] comms: ACK w=515090 fifo=0
+[   520.222] comms: ACK w=520190 fifo=0
+[   525.322] comms: ACK w=525290 fifo=0
+[   532.402] comms: ack timeout — retransmit (fail 1)
+[   532.422] comms: ACK w=530390 fifo=0
+[   535.522] comms: ACK w=535490 fifo=0
+[   538.550] RUNNING relay=ON
+[   540.622] comms: ACK w=540590 fifo=0
+[   547.702] comms: ack timeout — retransmit (fail 1)
+[   549.702] comms: ack timeout — retransmit (fail 2)
+[   549.742] comms: ACK w=545690 fifo=0
+[   550.822] comms: ACK w=550790 fifo=0
+[   555.922] comms: ACK w=555890 fifo=0
+[   561.022] comms: ACK w=560990 fifo=0
+[   566.122] comms: ACK w=566090 fifo=0
+[   571.222] comms: ACK w=571190 fifo=0
+[   576.332] comms: ACK w=576290 fifo=0
+[   581.412] comms: ACK w=581390 fifo=0
+[   586.512] comms: ACK w=586490 fifo=0
+[   591.612] comms: ACK w=591590 fifo=0
+[   596.712] comms: ACK w=596690 fifo=0
+[   601.812] comms: ACK w=601790 fifo=0
+[   606.932] comms: ACK w=606890 fifo=0
+[   612.012] comms: ACK w=611990 fifo=0
+[   617.112] comms: ACK w=617090 fifo=0
+[   622.212] comms: ACK w=622190 fifo=0
+[   627.322] comms: ACK w=627290 fifo=0
+[   634.402] comms: ack timeout — retransmit (fail 1)
+[   634.422] comms: ACK w=632390 fifo=0
+[   637.522] comms: ACK w=637490 fifo=0
+[   642.642] comms: ACK w=642590 fifo=0
+[   647.722] comms: ACK w=647690 fifo=0
+[   652.842] comms: ACK w=652790 fifo=0
+[   657.942] comms: ACK w=657890 fifo=0
+[   664.992] comms: ack timeout — retransmit (fail 1)
+[   665.032] comms: ACK w=662990 fifo=0
+[   670.092] comms: ack timeout — retransmit (fail 1)
+[   672.092] comms: ack timeout — retransmit (fail 2)
+[   674.102] comms: ack timeout — retransmit (fail 3)
+[   674.102] comms: gateway unreachable after 3 failed exchanges — buffering, rescanning
+I (684122) wifi:ic_enable_sniffer
+I (684122) wifi:ic_disable_sniffer
+I (684372) wifi:ic_enable_sniffer
+I (684372) wifi:ic_disable_sniffer
+I (684622) wifi:ic_enable_sniffer
+I (684622) wifi:ic_disable_sniffer
+I (684872) wifi:ic_enable_sniffer
+I (684872) wifi:ic_disable_sniffer
+I (685122) wifi:ic_enable_sniffer
+I (685122) wifi:ic_disable_sniffer
+I (685372) wifi:ic_enable_sniffer
+I (685372) wifi:ic_disable_sniffer
+I (685622) wifi:ic_enable_sniffer
+I (685622) wifi:ic_disable_sniffer
+I (685872) wifi:ic_enable_sniffer
+I (685872) wifi:ic_disable_sniffer
+I (686122) wifi:ic_enable_sniffer
+I (686122) wifi:ic_disable_sniffer
+I (686372) wifi:ic_enable_sniffer
+I (686372) wifi:ic_disable_sniffer
+I (686622) wifi:ic_enable_sniffer
+I (686622) wifi:ic_disable_sniffer
+I (686872) wifi:ic_enable_sniffer
+I (686872) wifi:ic_disable_sniffer
+I (687122) wifi:ic_enable_sniffer
+I (687122) wifi:ic_disable_sniffer
+I (697372) wifi:ic_enable_sniffer
+I (697372) wifi:ic_disable_sniffer
+I (697622) wifi:ic_enable_sniffer
+I (697622) wifi:ic_disable_sniffer
+I (697872) wifi:ic_enable_sniffer
+I (697872) wifi:ic_disable_sniffer
+I (698122) wifi:ic_enable_sniffer
+I (698122) wifi:ic_disable_sniffer
+I (698372) wifi:ic_enable_sniffer
+I (698372) wifi:ic_disable_sniffer
+I (698622) wifi:ic_enable_sniffer
+I (698622) wifi:ic_disable_sniffer
+I (698872) wifi:ic_enable_sniffer
+I (698872) wifi:ic_disable_sniffer
+I (699122) wifi:ic_enable_sniffer
+I (699122) wifi:ic_disable_sniffer
+I (699372) wifi:ic_enable_sniffer
+I (699372) wifi:ic_disable_sniffer
+I (699622) wifi:ic_enable_sniffer
+I (699622) wifi:ic_disable_sniffer
+I (699872) wifi:ic_enable_sniffer
+I (699872) wifi:ic_disable_sniffer
+I (700122) wifi:ic_enable_sniffer
+I (700122) wifi:ic_disable_sniffer
+I (700372) wifi:ic_enable_sniffer
+I (700372) wifi:ic_disable_sniffer
+I (710622) wifi:ic_enable_sniffer
+I (710622) wifi:ic_disable_sniffer
+I (710872) wifi:ic_enable_sniffer
+I (710872) wifi:ic_disable_sniffer
+I (711122) wifi:ic_enable_sniffer
+I (711122) wifi:ic_disable_sniffer
+I (711372) wifi:ic_enable_sniffer
+I (711372) wifi:ic_disable_sniffer
+I (711622) wifi:ic_enable_sniffer
+I (711622) wifi:ic_disable_sniffer
+I (711872) wifi:ic_enable_sniffer
+I (711872) wifi:ic_disable_sniffer
+I (712122) wifi:ic_enable_sniffer
+I (712122) wifi:ic_disable_sniffer
+I (712372) wifi:ic_enable_sniffer
+I (712372) wifi:ic_disable_sniffer
+I (712622) wifi:ic_enable_sniffer
+I (712622) wifi:ic_disable_sniffer
+I (712872) wifi:ic_enable_sniffer
+I (712872) wifi:ic_disable_sniffer
+I (713122) wifi:ic_enable_sniffer
+I (713122) wifi:ic_disable_sniffer
+I (713372) wifi:ic_enable_sniffer
+I (713372) wifi:ic_disable_sniffer
+I (713622) wifi:ic_enable_sniffer
+I (713622) wifi:ic_disable_sniffer
+comms[   723.352] cmd: comms[   723.352] comms: enabled=1 state=SCANNING node(1,1) boot=120 seq=387
+[   723.353]   channel=11 bound=0 gw=d0:ef:76:15:6b:e0
+[   723.353]   anchored=1 epoch=702966874.047@355189ms sample_period=5s
+[   723.354]   fifo=11/4096 outstanding=0 fails=3 admin_seq=0
+[   723.354]   rx=61 drop=0 tx_ok=436 fail=4 acks=57 retrans=15
+[   723.355]   decim=0 ev_sent=0 ev_drop=0
+> I (723872) wifi:ic_enable_sniffer
+I (723872) wifi:ic_disable_sniffer
+[   723.878] comms: anchored epoch=702967242.729 at clock 723878 ms
+[   723.879] comms: bound gw d0:ef:76:15:6b:e0 ch=11
+[   724.012] comms: ACK w=719090 fifo=0
+[   724.212] comms: ACK w=724190 fifo=0
+[   729.312] comms: ACK w=729290 fifo=0
+[   736.392] comms: ack timeout — retransmit (fail 1)
+[   736.412] comms: ACK w=734390 fifo=0
+[   739.522] comms: ACK w=739490 fifo=0
+[   744.632] comms: ACK w=744590 fifo=0
+[   749.712] comms: ACK w=749690 fifo=0
+[   754.822] comms: ACK w=754790 fifo=0
+[   759.922] comms: ACK w=759890 fifo=0
+[   765.022] comms: ACK w=764990 fifo=0
+[   770.112] comms: ACK w=770090 fifo=0
+
+[17:39:37.778] Disconnected

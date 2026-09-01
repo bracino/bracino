@@ -598,8 +598,16 @@ static bool parse_hello_ack(const rx_msg_t *m, uint8_t expect_ch)
     bool got_sync = false;
     while (tlv_next(&c, &tag, &val, &vlen)) {
         if (tag == TLV_TIME_SYNC && vlen == 6) {
-            apply_time_sync(rd_u32(val), rd_u16(val + 4));
-            got_sync = true;
+            uint32_t epoch_s = rd_u32(val);
+            if (epoch_s == 0) {
+                /* Master has no epoch yet (`n` not set). Binding here
+                 * leaves us ONLINE/unanchored, sending HBs at a gateway
+                 * that will not BATCH_ACK — fifo grows until 3 HB NAKs. */
+                TLOG("comms: HELLO_ACK TIME_SYNC epoch=0 — not binding\n");
+            } else {
+                apply_time_sync(epoch_s, rd_u16(val + 4));
+                got_sync = true;
+            }
         } else if (tag == TLV_REJECT_REASON && vlen == 1) {
             TLOG("comms: HELLO rejected, reason=%u\n", val[0]);
         }
@@ -648,13 +656,19 @@ static void scan_attempt(void)
     uint8_t buf[ESPNOW_MAX_PAYLOAD];
     size_t len = hello_build(buf);
     uint32_t t0 = now_ms();
+    TLOG("comms: scan %d ch, first=%u (budget %d ms)\n",
+           nch, chans[0], SCAN_BUDGET_MS);
 
     for (int i = 0; i < nch && (now_ms() - t0) < SCAN_BUDGET_MS; i++) {
         set_channel(chans[i]);
-        esp_err_t send_err = esp_now_send(BCAST_MAC, buf, len);
-        if (send_err != ESP_OK) {
-            TLOG("comms: !! HELLO send on ch %u FAILED: %s\n",
-                   chans[i], esp_err_to_name(send_err));
+        /* Settle after the promiscuous toggle, then wait for the HELLO
+         * to actually leave. Fire-and-forget meant a HELLO could still
+         * be queued while we had already hopped (and the 013 bind-chase
+         * logs showed HELLOs silently not reaching a gateway sitting on
+         * the cached channel). */
+        vTaskDelay(pdMS_TO_TICKS(20));
+        if (!send_wait(BCAST_MAC, buf, len)) {
+            TLOG("comms: !! HELLO send on ch %u failed\n", chans[i]);
         }
         rx_msg_t m;
         while (xQueueReceive(s_rx_q, &m, pdMS_TO_TICKS(SCAN_DWELL_MS)) == pdTRUE) {
@@ -684,7 +698,10 @@ static void go_unreachable(void)
     s_bound = false;
     s_batch_out = false; /* entries stay in the FIFO and drain on rebind */
     s_state = CS_SCANNING;
-    s_next_scan_ms = now_ms() + SCAN_REST_MS;
+    /* DN003 rest is *between* attempts, not before the first. A 10 s
+     * delay here made a 3-fail rescan look wedged (~50 s of sniffer
+     * dwells + rests) until the next attempt happened to start. */
+    s_next_scan_ms = now_ms();
     rx_msg_t stale;
     while (xQueueReceive(s_rx_q, &stale, 0) == pdTRUE) {
         /* drop frames that pre-date the outage: a stale HELLO_ACK sitting

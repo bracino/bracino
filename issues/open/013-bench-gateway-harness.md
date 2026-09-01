@@ -151,12 +151,46 @@ Evidence: `issues/fixtures/013-overnight-outage-drain-{node,master}.log`.
   span-vs-count evidence.
 
 Status vs the scripted drills: this **supersedes Drill A** (real 11 h
-outage + drain, stronger than a 240 s ack-suppression window). **Drill B
-(BENCH_DROP_PCT=20 retransmit-under-loss) is still the remaining item**
-before 013 closes.
+outage + drain, stronger than a 240 s ack-suppression window). Drill B
+landed the same day — see the addenda below. Remaining before 013 closes:
+reflash the node with the scan-on-unreachable fix and confirm a 3-fail
+rebind is ~dwell, not ~50 s.
 
 Note: node firmware now reports `ct_state = NOT_FITTED` (3) on the wire
 (CT/snubber dropped, 014 — DN003/DN004 updated); the bench master decodes it.
+
+## 2026-09-01 addenda (Drill B — BENCH_DROP_PCT=20)
+
+Evidence: `issues/fixtures/013-drill-b-drop-{node,master}.log`.
+
+**Drop/retransmit path: pass.** At `tel 5`, ~18 drops across ~70 committed
+frames; 15 retransmits recovered 1- and 2-drop sequences (seq 203, 212,
+218, 300, …). Spans stayed 5 s, fifo ≤1 while ONLINE, loop reached
+RUNNING, `ct=NOT_FITTED` on the wire. One triple-drop of the *same* seq
+(383, p=0.2³ ≈ 0.8 %) tripped `MAX_CONSEC_FAIL` — that's the knob doing
+what it says, not a loss bug. FIFO held 11 samples through the outage
+and drained on rebind (w=668090..719090).
+
+**Scan after 3-fail looked wedged (~50 s) until a typed `comms`.** It
+wasn't the status command. Timeline:
+
+- `go_unreachable()` waited `SCAN_REST_MS` (10 s) *before the first
+  attempt* — DN003 rest is between attempts, not before the first.
+- Then 3 s scan + 10 s rest, three times. Cached ch 11 was first every
+  attempt; attempt 1's HELLOs never appeared in the master log (master
+  sat on 11 the whole time). Attempt 4 started at 723.872 — 500 ms after
+  the `comms` status print at 723.352 — and bound in 6 ms on ch 11.
+  Coincidence, not causation.
+
+Firmware follow-up (same day): `go_unreachable` scans immediately; HELLO
+dwell waits for the TX callback + 20 ms settle; HELLO_ACK with epoch=0
+does not bind (that left the node ONLINE/unanchored at the start of this
+run after the master reboot, fifo growing, acks=0). `BENCH_DROP_PCT`
+reverted to 0.
+
+Also in this log, not a firmware bug: `n 17882835999` (extra 9) set the
+epoch to 2536-09-07 — that's why the committed UTC is nonsense. Integer
+seconds only, and check the printed date.
 
 After the bisect, `comms on` bound ch=6 immediately; CONFIG_DESC (2
 frags), first BATCH_ACK watermark (w=1573), telemetry at 15 s cadence

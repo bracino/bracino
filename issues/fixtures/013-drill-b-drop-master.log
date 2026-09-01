@@ -1,0 +1,674 @@
+[17:26:59.239] tio 3.9
+[17:26:59.239] Press ctrl-t q to quit
+[17:26:59.243] Connected to /dev/ttyUSB0
+��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x��x[    29.098] HB node(1,1) seq=10 clk=16622 ms
+[    31.097] HB node(1,1) seq=11 clk=18622 ms
+[    33.097] HB node(1,1) seq=12 clk=20622 ms
+n [    35.097] HB node(1,1) seq=13 clk=22622 ms
+[    37.097] HB node(1,1) seq=14 clk=24622 ms
+idf.py -p /dev/ttyUSB0 flash[    39.097] HB node(1,1) seq=15 clk=26622 ms
+[    41.097] HB node(1,1) seq=16 clk=28622 ms
+[    43.098] HB node(1,1) seq=17 clk=30622 ms
+[    44.852] cmd: n idf.py -p /dev/ttyUSB0 flash[    44.853] unknown 'n idf.py -p /dev/ttyUSB0 flash' (h for help)
+> [    45.097] HB node(1,1) seq=18 clk=32622 ms
+[    47.097] HB node(1,1) seq=19 clk=34622 ms
+[    49.097] HB node(1,1) seq=20 clk=36622 ms
+[    51.099] HB node(1,1) seq=21 clk=38622 ms
+[    53.097] HB node(1,1) seq=22 clk=40622 ms
+n[    55.097] HB node(1,1) seq=23 clk=42622 ms
+ [    57.097] HB node(1,1) seq=24 clk=44622 ms
+1788283593[    57.712] cmd: n 1788283593[    57.713] epoch set: 2026-09-01 17:26:33 UTC — TIME_SYNC now carries it
+> [    59.097] HB node(1,1) seq=25 clk=46622 ms
+[    61.097] HB node(1,1) seq=26 clk=48622 ms
+[    63.098] HB node(1,1) seq=27 clk=50622 ms
+[    65.097] HB node(1,1) seq=28 clk=52622 ms
+[    67.097] HB node(1,1) seq=29 clk=54622 ms
+[    69.097] HB node(1,1) seq=30 clk=56622 ms
+[    71.097] HB node(1,1) seq=31 clk=58622 ms
+[    73.097] HB node(1,1) seq=32 clk=60622 ms
+[    75.097] HB node(1,1) seq=33 clk=62622 ms
+[    77.097] HB node(1,1) seq=34 clk=64622 ms
+[    79.097] HB node(1,1) seq=35 clk=66622 ms
+[    81.096] HB node(1,1) seq=36 clk=68622 ms
+[    83.096] HB node(1,1) seq=37 clk=70622 ms
+[    85.096] HB node(1,1) seq=38 clk=72622 ms
+[    87.096] HB node(1,1) seq=39 clk=74622 ms
+[    89.098] HB node(1,1) seq=40 clk=76622 ms
+[    91.096] HB node(1,1) seq=41 clk=78622 ms
+[    93.096] HB node(1,1) seq=42 clk=80622 ms
+[    95.098] HB node(1,1) seq=43 clk=82622 ms
+[    97.096] HB node(1,1) seq=44 clk=84622 ms
+[    99.096] HB node(1,1) seq=45 clk=86622 ms
+[   101.096] HB node(1,1) seq=46 clk=88622 ms
+[   103.096] HB node(1,1) seq=47 clk=90622 ms
+[   105.096] HB node(1,1) seq=48 clk=92622 ms
+[   107.099] HB node(1,1) seq=49 clk=94622 ms
+[   109.096] HB node(1,1) seq=50 clk=96622 ms
+[   111.096] HB node(1,1) seq=51 clk=98622 ms
+[   113.096] HB node(1,1) seq=52 clk=100622 ms
+[   115.096] HB node(1,1) seq=53 clk=102622 ms
+[   117.096] HB node(1,1) seq=54 clk=104622 ms
+[   119.097] HB node(1,1) seq=55 clk=106622 ms
+[   121.096] HB node(1,1) seq=56 clk=108622 ms
+[   123.096] HB node(1,1) seq=57 clk=110622 ms
+[   125.096] HB node(1,1) seq=58 clk=112622 ms
+[   127.096] HB node(1,1) seq=59 clk=114622 ms
+[   129.096] HB node(1,1) seq=60 clk=116622 ms
+[   131.095] HB node(1,1) seq=61 clk=118622 ms
+[   133.095] HB node(1,1) seq=62 clk=120622 ms
+[   135.095] HB node(1,1) seq=63 clk=122622 ms
+[   137.095] HB node(1,1) seq=64 clk=124622 ms
+[   139.095] HB node(1,1) seq=65 clk=126622 ms
+[   141.096] HB node(1,1) seq=66 clk=128622 ms
+[   143.095] HB node(1,1) seq=67 clk=130622 ms
+[   145.095] HB node(1,1) seq=68 clk=132622 ms
+[   147.095] HB node(1,1) seq=69 clk=134622 ms
+[   149.097] HB node(1,1) seq=70 clk=136622 ms
+[   151.095] HB node(1,1) seq=71 clk=138622 ms
+[   153.095] HB node(1,1) seq=72 clk=140622 ms
+[   155.095] HB node(1,1) seq=73 clk=142622 ms
+[   157.095] HB node(1,1) seq=74 clk=144622 ms
+[   159.095] HB node(1,1) seq=75 clk=146622 ms
+[   161.095] HB node(1,1) seq=76 clk=148622 ms
+[   163.095] HB node(1,1) seq=77 clk=150622 ms
+[   165.095] HB node(1,1) seq=78 clk=152622 ms
+[   167.095] HB node(1,1) seq=79 clk=154622 ms
+[   169.095] HB node(1,1) seq=80 clk=156622 ms
+[   171.095] HB node(1,1) seq=81 clk=158622 ms
+[   173.095] HB node(1,1) seq=82 clk=160622 ms
+[   175.095] HB node(1,1) seq=83 clk=162622 ms
+[   177.095] HB node(1,1) seq=84 clk=164622 ms
+[   179.095] HB node(1,1) seq=85 clk=166622 ms
+[   181.095] HB node(1,1) seq=86 clk=168622 ms
+[   183.094] HB node(1,1) seq=87 clk=170622 ms
+[   185.094] HB node(1,1) seq=88 clk=172622 ms
+[   187.096] HB node(1,1) seq=89 clk=174622 ms
+[   189.094] HB node(1,1) seq=90 clk=176622 ms
+[   191.094] HB node(1,1) seq=91 clk=178622 ms
+[   193.094] HB node(1,1) seq=92 clk=180622 ms
+[   195.094] HB node(1,1) seq=93 clk=182622 ms
+[   197.094] HB node(1,1) seq=94 clk=184622 ms
+[   199.094] HB node(1,1) seq=95 clk=186622 ms
+[   201.094] HB node(1,1) seq=96 clk=188622 ms
+[   203.094] HB node(1,1) seq=97 clk=190622 ms
+[   205.097] HB node(1,1) seq=98 clk=192622 ms
+[   207.094] HB node(1,1) seq=99 clk=194622 ms
+[   209.094] HB node(1,1) seq=100 clk=196622 ms
+[   211.094] HB node(1,1) seq=101 clk=198622 ms
+[   213.094] HB node(1,1) seq=102 clk=200622 ms
+[   215.094] HB node(1,1) seq=103 clk=202622 ms
+[   217.096] HB node(1,1) seq=104 clk=204622 ms
+[   219.094] HB node(1,1) seq=105 clk=206622 ms
+[   221.094] HB node(1,1) seq=106 clk=208622 ms
+[   223.094] HB node(1,1) seq=107 clk=210622 ms
+[   225.094] HB node(1,1) seq=108 clk=212622 ms
+[   227.094] HB node(1,1) seq=109 clk=214622 ms
+[   229.094] HB node(1,1) seq=110 clk=216622 ms
+[   231.094] HB node(1,1) seq=111 clk=218622 ms
+[   233.094] HB node(1,1) seq=112 clk=220622 ms
+[   235.093] HB node(1,1) seq=113 clk=222622 ms
+[   237.093] HB node(1,1) seq=114 clk=224622 ms
+k[   239.094] HB node(1,1) seq=115 clk=226622 ms
+[   239.332] cmd: k[   239.333] driver channel: primary=6 second=0
+> [   241.093] HB node(1,1) seq=116 clk=228622 ms
+[   243.093] HB node(1,1) seq=117 clk=230622 ms
+[   245.093] HB node(1,1) seq=118 clk=232622 ms
+[   247.095] HB node(1,1) seq=119 clk=234622 ms
+[   249.093] HB node(1,1) seq=120 clk=236622 ms
+[   251.100] HB node(1,1) seq=121 clk=238622 ms
+[   253.093] HB node(1,1) seq=122 clk=240622 ms
+h[   254.432] cmd: h[   254.432] bench master: HELLO_ACK+TIME_SYNC, BATCH_ACK-after-log, CONFIG_GET, canned PARAM_SET
+  n <unix_s>  set epoch (required before telemetry will flow!)
+  c <1..13>   hop channel (outage drill)
+  t           push TIME_SYNC to all nodes
+  p           PARAM_SET setpoint +/-0.5 C to first node
+  s           registry + counters (GPIO27 button too)
+  k           show driver's actual current channel
+  w [sec]         promiscuous frame count + MACs (RF sanity)
+  h           this help
+knobs (edit + rebuild): BENCH_NO_ACK_S=0 BENCH_DROP_PCT=20
+> [   255.093] HB node(1,1) seq=123 clk=242622 ms
+[   257.093] HB node(1,1) seq=124 clk=244622 ms
+[   259.093] HB node(1,1) seq=125 clk=246622 ms
+[   261.093] HB node(1,1) seq=126 clk=248622 ms
+[   263.093] HB node(1,1) seq=127 clk=250622 ms
+[   265.093] HB node(1,1) seq=128 clk=252622 ms
+[   267.093] HB node(1,1) seq=129 clk=254622 ms
+[   269.093] HB node(1,1) seq=130 clk=256622 ms
+[   271.093] HB node(1,1) seq=131 clk=258622 ms
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:7172
+load:0x40078000,len:15540
+load:0x40080400,len:4
+ho 8 tail 4 room;32mI (31) boot: compile time Se;32mI (31) boot: compile time Se;32mI (31) boot: compile time Se;32mI (31) boot: compile time Se;32mI (31) boot: compile time Sep  1 2026 11:39:46
+Ip  1 2026 11:39:46
+Ip  1 2026 11:39:46
+Ip  1 2026 11:39:46
+Ip  1 2026 11:39:46
+I (31) boot: Multicore bootloader (31) boot: Multicore bootloader (31) boot: Multicore bootloader (31) boot: Multicore bootloader
+I (35) boot: chip revision: v3.1
+I (39) boot.esp32: SPI Speed      : 40MHz
+I (44) boot.esp32: SPI Mode       : DIO
+I (48) boot.esp32: SPI Flash Size : 2MB
+I (53) boot: Enabling RNG early entropy source...
+I (58) boot: Partition Table:
+I (62) boot: ## Label            Usage          Type ST Offset   Length
+I (69) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (77) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (84) boot:  2 factory          factory app      00 00 00010000 00100000
+I (92) boot: End of partition table
+I (96) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=20004h (131076) map
+I (149) esp_image: segment 1: paddr=0003002c vaddr=3ffb0000 size=03d84h ( 15748) load
+I (155) esp_image: segment 2: paddr=00033db8 vaddr=40080000 size=0c260h ( 49760) load
+I (175) esp_image: segment 3: paddr=00040020 vaddr=400d0020 size=85f78h (548728) map
+I (363) esp_image: segment 4: paddr=000c5fa0 vaddr=4008c260 size=0a8b8h ( 43192) load
+I (392) boot: Loaded app from partition at offset 0x10000
+I (392) boot: Disabling RNG early entropy source...
+I (403) cpu_start: Multicore app
+I (413) cpu_start: Pro cpu start user code
+I (413) cpu_start: cpu freq: 160000000 Hz
+I (413) cpu_start: Application information:
+I (416) cpu_start: Project name:     bench-espnow-master
+I (422) cpu_start: App version:      24695ab-dirty
+I (427) cpu_start: Compile time:     Sep  1 2026 17:03:43
+I (433) cpu_start: ELF file SHA256:  f50312da6...
+I (439) cpu_start: ESP-IDF:          v5.2.3
+I (443) cpu_start: Min chip rev:     v0.0
+I (448) cpu_start: Max chip rev:     v3.99 
+I (453) cpu_start: Chip rev:         v3.1
+I (458) heap_init: Initializing. RAM available for dynamic allocation:
+I (465) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (471) heap_init: At 3FFB89A0 len 00027660 (157 KiB): DRAM
+I (477) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (484) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (490) heap_init: At 40096B18 len 000094E8 (37 KiB): IRAM
+I (498) spi_flash: detected chip: generic
+I (501) spi_flash: flash io: dio
+W (505) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.
+I (519) main_task: Started on CPU0
+I (529) main_task: Calling app_main()
+I (529) gpio: GPIO[27]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 
+I (559) wifi:wifi driver task: 3ffc0e70, prio:23, stack:6656, core=0
+I (559) wifi:wifi firmware version: 82f54d2
+I (569) wifi:wifi certification version: v7.0
+I (569) wifi:config NVS flash: enabled
+I (569) wifi:config nano formating: disabled
+I (569) wifi:Init data frame dynamic rx buffer num: 32
+I (569) wifi:Init static rx mgmt buffer num: 5
+I (579) wifi:Init management short buffer num: 32
+I (579) wifi:Init dynamic tx buffer num: 32
+I (589) wifi:Init static rx buffer size: 1600
+I (589) wifi:Init static rx buffer num: 10
+I (589) wifi:Init dynamic rx buffer num: 32
+I (599) wifi_init: rx ba win: 6
+I (599) wifi_init: tcpip mbox: 32
+I (609) wifi_init: udp mbox: 6
+I (609) wifi_init: tcp mbox: 6
+I (609) wifi_init: tcp tx win: 5760
+I (619) wifi_init: tcp rx win: 5760
+I (619) wifi_init: tcp mss: 1440
+I (629) wifi_init: WiFi IRAM OP enabled
+I (629) wifi_init: WiFi RX IRAM OP enabled
+I (639) phy_init: phy_version 4840,a40f0ac,Aug 16 2024,16:48:06
+I (719) wifi:mode : sta (d0:ef:76:15:6b:e0)
+I (719) wifi:enable tsf
+I (729) wifi:Set ps type: 0, coexist: 0
+
+I (729) wifi:ic_enable_sniffer
+I (729) wifi:ic_disable_sniffer
+I (729) ESPNOW: espnow [version: 1.0] init
+[     0.239] 
+# bench-espnow-master ch=6 button=GPIO27 NO_ACK=0s DROP=20%
+[     0.245] bench master: HELLO_ACK+TIME_SYNC, BATCH_ACK-after-log, CONFIG_GET, canned PARAM_SET
+  n <unix_s>  set epoch (required before telemetry will flow!)
+  c <1..13>   hop channel (outage drill)
+  t           push TIME_SYNC to all nodes
+  p           PARAM_SET setpoint +/-0.5 C to first node
+  s           registry + counters (GPIO27 button too)
+  k           show driver's actual current channel
+  w [sec]         promiscuous frame count + MACs (RF sanity)
+  h           this help
+knobs (edit + rebuild): BENCH_NO_ACK_S=0 BENCH_DROP_PCT=20
+> [     1.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[     3.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[     5.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[     7.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[     9.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    11.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    13.368] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+n[    15.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+ [    17.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    19.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+1788283593[    21.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    23.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    25.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    27.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    29.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    31.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    33.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+999[    34.872] cmd: n 17882835999[    34.873] epoch set: 2536-09-07 06:26:39 UTC — TIME_SYNC now carries it
+> [    35.367] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    37.368] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    39.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    41.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    43.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    45.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    47.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    49.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    51.368] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    53.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    55.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    57.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    59.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    61.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    63.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    65.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    67.368] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    69.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+k[    71.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+ 11[    72.192] cmd: k 11[    72.192] unknown 'k 11' (h for help)
+> [    73.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+k 11[    75.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+[    75.492] cmd: k 11[    75.492] unknown 'k 11' (h for help)
+> [    77.366] HB from unregistered MAC 7c:4f:ad:d1:80:50 node(1,1) — waiting for HELLO
+c 11[    78.952] cmd: c 11I (79449) wifi:ic_enable_sniffer
+I (79449) wifi:ic_disable_sniffer
+[    78.955] channel -> 11 (driver says 11; nodes must rescan)
+> k[    81.732] cmd: k[    81.732] driver channel: primary=11 second=0
+> [    93.918] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=175 (driver ch 11)
+[    93.921] config_ver=1 unknown/changed -> CONFIG_GET
+[    93.948] CONFIG_DESC frag 0/2 (235 B, more)
+[    93.950] CONFIG_DESC complete (313 B):
+[    93.951]   id= 1 tpo_setpoint_c           type=2 flags=1 min=20.0 max=90.0 step=0.5
+[    93.953]   id= 2 hysteresis_c             type=2 flags=1 min=0.5 max=15.0 step=0.5
+[    93.960]   id= 3 min_on_time_s            type=1 flags=1 min=0 max=3600 step=1
+[    93.968]   id= 4 min_off_time_s           type=1 flags=1 min=0 max=3600 step=1
+[    93.975]   id= 5 ct_confirm_s             type=1 flags=1 min=1 max=120 step=1
+[    93.982]   id= 6 min_tpo_tpu_delta_c      type=2 flags=1 min=0.0 max=30.0 step=0.5
+[    93.990]   id= 7 max_run_time_min         type=1 flags=1 min=1 max=240 step=1
+[    93.997]   id= 8 user_mode                type=3 flags=1 min=0 max=3 step=1
+[    94.004]   id= 9 manual_relay             type=3 flags=1 min=0 max=1 step=1
+[    94.011]   id=10 comms_enable             type=3 flags=1 min=0 max=1 step=1
+[    94.019] $ committed node(1,1) seq=178 span=[1004..261110] ms=18 count=216 utc=[2536-09-07 06:21:44 .. 2536-09-07 06:26:04] boot=120
+[    94.030]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.031] 
+[    94.040]   [ 1] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.040] 
+[    94.049]   [ 2] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.050] 
+[    94.059]   [ 3] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.7 tpu=28.5 amb=26.3 faults=00[    94.059] 
+[    94.068]   [ 4] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.7 tpu=28.5 amb=26.2 faults=00[    94.069] 
+[    94.078]   [ 5] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[    94.078] 
+[    94.087]   [ 6] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.088] 
+[    94.097]   [ 7] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.097] 
+[    94.106]   [ 8] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.7 tpu=28.5 amb=26.2 faults=00[    94.107] 
+[    94.116]   [ 9] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[    94.117] 
+[    94.126]   [10] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[    94.126] 
+[    94.135]   [11] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[    94.136] 
+[    94.145]   [12] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[    94.145] 
+[    94.154]   [13] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[    94.155] 
+[    94.164]   [14] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.164] 
+[    94.173]   [15] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[    94.174] 
+[    94.183]   [16] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.183] 
+[    94.192]   [17] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.193] 
+[    94.217] $ committed node(1,1) seq=179 span=[276410..352910] ms=6 count=72 utc=[2536-09-07 06:26:19 .. 2536-09-07 06:27:36] boot=120
+[    94.218]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.219] 
+[    94.228]   [ 1] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.228] 
+[    94.237]   [ 2] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.238] 
+[    94.247]   [ 3] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.247] 
+[    94.256]   [ 4] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.257] 
+[    94.266]   [ 5] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[    94.266] 
+[    95.935] HB node(1,1) seq=180 clk=357202 ms
+[    97.935] HB node(1,1) seq=181 clk=359202 ms
+[    99.935] HB node(1,1) seq=182 clk=361202 ms
+[   101.935] HB node(1,1) seq=183 clk=363202 ms
+[   103.935] HB node(1,1) seq=184 clk=365202 ms
+[   105.936] HB node(1,1) seq=185 clk=367202 ms
+[   106.958] $ committed node(1,1) seq=186 span=[368210..368210] ms=1 count=12 utc=[2536-09-07 06:27:51 .. 2536-09-07 06:27:51] boot=120
+[   106.959]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   106.960] 
+[   107.935] HB node(1,1) seq=187 clk=369202 ms
+h[   109.712] cmd: h[   109.712] bench master: HELLO_ACK+TIME_SYNC, BATCH_ACK-after-log, CONFIG_GET, canned PARAM_SET
+  n <unix_s>  set epoch (required before telemetry will flow!)
+  c <1..13>   hop channel (outage drill)
+  t           push TIME_SYNC to all nodes
+  p           PARAM_SET setpoint +/-0.5 C to first node
+  s           registry + counters (GPIO27 button too)
+  k           show driver's actual current channel
+  w [sec]         promiscuous frame count + MACs (RF sanity)
+  h           this help
+knobs (edit + rebuild): BENCH_NO_ACK_S=0 BENCH_DROP_PCT=20
+> [   109.935] HB node(1,1) seq=188 clk=371202 ms
+[   111.935] HB node(1,1) seq=189 clk=373202 ms
+[   113.935] HB node(1,1) seq=190 clk=375202 ms
+[   115.935] HB node(1,1) seq=191 clk=377202 ms
+[   117.935] HB node(1,1) seq=192 clk=379202 ms
+[   119.935] HB node(1,1) seq=193 clk=381202 ms
+[   121.935] HB node(1,1) seq=194 clk=383202 ms
+[   122.255] $ committed node(1,1) seq=195 span=[383510..383510] ms=1 count=12 utc=[2536-09-07 06:28:06 .. 2536-09-07 06:28:06] boot=120
+[   122.257]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[   122.257] 
+[   123.935] HB node(1,1) seq=196 clk=385202 ms
+[   125.935] HB node(1,1) seq=197 clk=387202 ms
+[   127.935] HB node(1,1) seq=198 clk=389202 ms
+[   129.935] HB node(1,1) seq=199 clk=391202 ms
+[   131.935] HB node(1,1) seq=200 clk=393202 ms
+[   133.934] HB node(1,1) seq=201 clk=395202 ms
+[   135.935] HB node(1,1) seq=202 clk=397202 ms
+[   136.535] TELEMETRY_BATCH seq=203 DROPPED (bench knob)
+[   138.535] TELEMETRY_BATCH seq=203 DROPPED (bench knob)
+[   140.535] $ committed node(1,1) seq=203 span=[397790..397790] ms=1 count=12 utc=[2536-09-07 06:28:21 .. 2536-09-07 06:28:21] boot=120
+[   140.536]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[   140.537] 
+[   140.555] HB node(1,1) seq=204 clk=401822 ms
+[   141.635] $ committed node(1,1) seq=205 span=[402890..402890] ms=1 count=12 utc=[2536-09-07 06:28:26 .. 2536-09-07 06:28:26] boot=120
+[   141.636]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   141.637] 
+[   142.554] HB node(1,1) seq=206 clk=403822 ms
+[   144.554] HB node(1,1) seq=207 clk=405822 ms
+[   146.554] HB node(1,1) seq=208 clk=407822 ms
+[   146.735] $ committed node(1,1) seq=209 span=[407990..407990] ms=1 count=12 utc=[2536-09-07 06:28:31 .. 2536-09-07 06:28:31] boot=120
+[   146.736]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[   146.737] 
+[   148.554] HB node(1,1) seq=210 clk=409822 ms
+[   150.554] HB node(1,1) seq=211 clk=411822 ms
+[   151.834] TELEMETRY_BATCH seq=212 DROPPED (bench knob)
+[   153.835] TELEMETRY_BATCH seq=212 DROPPED (bench knob)
+[   155.835] $ committed node(1,1) seq=212 span=[413090..413090] ms=1 count=12 utc=[2536-09-07 06:28:36 .. 2536-09-07 06:28:36] boot=120
+[   155.836]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   155.837] 
+[   155.854] HB node(1,1) seq=213 clk=417122 ms
+[   156.935] $ committed node(1,1) seq=214 span=[418190..418190] ms=1 count=12 utc=[2536-09-07 06:28:41 .. 2536-09-07 06:28:41] boot=120
+[   156.936]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   156.937] 
+[   157.854] HB node(1,1) seq=215 clk=419122 ms
+[   159.854] HB node(1,1) seq=216 clk=421122 ms
+[   161.854] HB node(1,1) seq=217 clk=423122 ms
+[   162.034] TELEMETRY_BATCH seq=218 DROPPED (bench knob)
+[   164.035] TELEMETRY_BATCH seq=218 DROPPED (bench knob)
+[   166.035] $ committed node(1,1) seq=218 span=[423290..423290] ms=1 count=12 utc=[2536-09-07 06:28:46 .. 2536-09-07 06:28:46] boot=120
+[   166.036]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   166.037] 
+[   166.054] HB node(1,1) seq=219 clk=427322 ms
+[   167.134] $ committed node(1,1) seq=220 span=[428390..428390] ms=1 count=12 utc=[2536-09-07 06:28:51 .. 2536-09-07 06:28:51] boot=120
+[   167.136]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   167.136] 
+[   168.054] HB node(1,1) seq=221 clk=429322 ms
+[   170.054] HB node(1,1) seq=222 clk=431322 ms
+[   172.054] HB node(1,1) seq=223 clk=433322 ms
+[   172.234] $ committed node(1,1) seq=224 span=[433490..433490] ms=1 count=12 utc=[2536-09-07 06:28:56 .. 2536-09-07 06:28:56] boot=120
+[   172.236]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   172.236] 
+[   174.054] HB node(1,1) seq=225 clk=435322 ms
+[   176.054] HB node(1,1) seq=226 clk=437322 ms
+[   177.334] $ committed node(1,1) seq=227 span=[438590..438590] ms=1 count=12 utc=[2536-09-07 06:29:01 .. 2536-09-07 06:29:01] boot=120
+[   177.335]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[   177.336] 
+[   178.054] HB node(1,1) seq=228 clk=439322 ms
+[   180.054] HB node(1,1) seq=229 clk=441322 ms
+[   182.054] HB node(1,1) seq=230 clk=443322 ms
+[   182.434] $ committed node(1,1) seq=231 span=[443690..443690] ms=1 count=12 utc=[2536-09-07 06:29:07 .. 2536-09-07 06:29:07] boot=120
+[   182.435]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.3 faults=00[   182.436] 
+[   184.054] HB node(1,1) seq=232 clk=445322 ms
+[   186.053] HB node(1,1) seq=233 clk=447322 ms
+[   187.534] TELEMETRY_BATCH seq=234 DROPPED (bench knob)
+[   189.535] $ committed node(1,1) seq=234 span=[448790..448790] ms=1 count=12 utc=[2536-09-07 06:29:12 .. 2536-09-07 06:29:12] boot=120
+[   189.536]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[   189.537] 
+[   189.554] HB node(1,1) seq=235 clk=450823 ms
+[   191.553] HB node(1,1) seq=236 clk=452822 ms
+[   192.634] $ committed node(1,1) seq=237 span=[453890..453890] ms=1 count=12 utc=[2536-09-07 06:29:17 .. 2536-09-07 06:29:17] boot=120
+[   192.635]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.3 faults=00[   192.636] 
+[   193.553] HB node(1,1) seq=238 clk=454822 ms
+[   195.553] HB node(1,1) seq=239 clk=456822 ms
+[   197.553] HB node(1,1) seq=240 clk=458822 ms
+[   197.734] $ committed node(1,1) seq=241 span=[458990..458990] ms=1 count=12 utc=[2536-09-07 06:29:22 .. 2536-09-07 06:29:22] boot=120
+[   197.735]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.3 faults=00[   197.736] 
+[   199.553] HB node(1,1) seq=242 clk=460822 ms
+[   201.553] HB node(1,1) seq=243 clk=462822 ms
+[   202.834] $ committed node(1,1) seq=244 span=[464090..464090] ms=1 count=12 utc=[2536-09-07 06:29:27 .. 2536-09-07 06:29:27] boot=120
+[   202.835]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[   202.836] 
+[   203.553] HB node(1,1) seq=245 clk=464822 ms
+[   205.553] HB node(1,1) seq=246 clk=466822 ms
+[   207.553] HB node(1,1) seq=247 clk=468822 ms
+[   207.934] $ committed node(1,1) seq=248 span=[469190..469190] ms=1 count=12 utc=[2536-09-07 06:29:32 .. 2536-09-07 06:29:32] boot=120
+[   207.935]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[   207.936] 
+[   209.553] HB node(1,1) seq=249 clk=470822 ms
+[   211.553] HB node(1,1) seq=250 clk=472822 ms
+[   213.033] $ committed node(1,1) seq=251 span=[474290..474290] ms=1 count=12 utc=[2536-09-07 06:29:37 .. 2536-09-07 06:29:37] boot=120
+[   213.035]   [ 0] mode=MANUAL relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[   213.035] 
+[   213.559] HB node(1,1) seq=252 clk=474822 ms
+[   215.553] HB node(1,1) seq=253 clk=476822 ms
+[   217.554] HB node(1,1) seq=254 clk=478822 ms
+[   218.133] $ committed node(1,1) seq=255 span=[479390..479390] ms=1 count=12 utc=[2536-09-07 06:29:42 .. 2536-09-07 06:29:42] boot=120
+[   218.135]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.3 faults=00[   218.135] 
+[   219.553] HB node(1,1) seq=256 clk=480822 ms
+[   221.553] HB node(1,1) seq=257 clk=482822 ms
+[   223.233] $ committed node(1,1) seq=258 span=[484490..484490] ms=1 count=12 utc=[2536-09-07 06:29:47 .. 2536-09-07 06:29:47] boot=120
+[   223.235]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.3 faults=00[   223.235] 
+[   223.553] HB node(1,1) seq=259 clk=484822 ms
+[   225.553] HB node(1,1) seq=260 clk=486822 ms
+[   227.553] HB node(1,1) seq=261 clk=488822 ms
+[   228.333] $ committed node(1,1) seq=262 span=[489590..489590] ms=1 count=12 utc=[2536-09-07 06:29:52 .. 2536-09-07 06:29:52] boot=120
+[   228.334]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.3 faults=00[   228.335] 
+[   229.553] HB node(1,1) seq=263 clk=490822 ms
+[   231.553] HB node(1,1) seq=264 clk=492822 ms
+[   233.433] $ committed node(1,1) seq=265 span=[494690..494690] ms=1 count=12 utc=[2536-09-07 06:29:58 .. 2536-09-07 06:29:58] boot=120
+[   233.434]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.3 faults=00[   233.435] 
+[   233.553] HB node(1,1) seq=266 clk=494822 ms
+[   235.552] HB node(1,1) seq=267 clk=496822 ms
+[   237.552] HB node(1,1) seq=268 clk=498822 ms
+[   238.533] $ committed node(1,1) seq=269 span=[499790..499790] ms=1 count=12 utc=[2536-09-07 06:30:03 .. 2536-09-07 06:30:03] boot=120
+[   238.534]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.3 faults=00[   238.535] 
+[   239.552] HB node(1,1) seq=270 clk=500822 ms
+[   241.553] HB node(1,1) seq=271 clk=502822 ms
+[   243.552] HB node(1,1) seq=272 clk=504822 ms
+[   243.633] $ committed node(1,1) seq=273 span=[504890..504890] ms=1 count=12 utc=[2536-09-07 06:30:08 .. 2536-09-07 06:30:08] boot=120
+[   243.634]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   243.635] 
+[   245.552] HB node(1,1) seq=274 clk=506822 ms
+[   247.553] HB node(1,1) seq=275 clk=508822 ms
+[   248.733] $ committed node(1,1) seq=276 span=[509990..509990] ms=1 count=12 utc=[2536-09-07 06:30:13 .. 2536-09-07 06:30:13] boot=120
+[   248.734]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   248.735] 
+[   249.552] HB node(1,1) seq=277 clk=510822 ms
+[   251.552] HB node(1,1) seq=278 clk=512822 ms
+[   253.552] HB node(1,1) seq=279 clk=514822 ms
+[   253.833] $ committed node(1,1) seq=280 span=[515090..515090] ms=1 count=12 utc=[2536-09-07 06:30:18 .. 2536-09-07 06:30:18] boot=120
+[   253.834]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   253.835] 
+[   255.552] HB node(1,1) seq=281 clk=516822 ms
+[   257.552] HB node(1,1) seq=282 clk=518822 ms
+[   258.933] $ committed node(1,1) seq=283 span=[520190..520190] ms=1 count=12 utc=[2536-09-07 06:30:23 .. 2536-09-07 06:30:23] boot=120
+[   258.934]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   258.935] 
+[   259.552] HB node(1,1) seq=284 clk=520822 ms
+[   261.552] HB node(1,1) seq=285 clk=522822 ms
+[   263.552] HB node(1,1) seq=286 clk=524822 ms
+[   264.032] $ committed node(1,1) seq=287 span=[525290..525290] ms=1 count=12 utc=[2536-09-07 06:30:28 .. 2536-09-07 06:30:28] boot=120
+[   264.034]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   264.034] 
+[   265.552] HB node(1,1) seq=288 clk=526822 ms
+[   267.552] HB node(1,1) seq=289 clk=528822 ms
+[   269.132] TELEMETRY_BATCH seq=290 DROPPED (bench knob)
+[   271.133] $ committed node(1,1) seq=290 span=[530390..530390] ms=1 count=12 utc=[2536-09-07 06:30:33 .. 2536-09-07 06:30:33] boot=120
+[   271.134]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.3 faults=00[   271.135] 
+[   271.152] HB node(1,1) seq=291 clk=532423 ms
+[   273.154] HB node(1,1) seq=292 clk=534422 ms
+[   274.232] $ committed node(1,1) seq=293 span=[535490..535490] ms=1 count=12 utc=[2536-09-07 06:30:38 .. 2536-09-07 06:30:38] boot=120
+[   274.234]   [ 0] mode=AUTO   relay=0 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   274.234] 
+[   275.152] HB node(1,1) seq=294 clk=536422 ms
+[   277.152] HB node(1,1) seq=295 clk=538422 ms
+[   279.152] HB node(1,1) seq=296 clk=540422 ms
+[   279.332] $ committed node(1,1) seq=297 span=[540590..540590] ms=1 count=12 utc=[2536-09-07 06:30:43 .. 2536-09-07 06:30:43] boot=120
+[   279.333]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.2 faults=00[   279.334] 
+[   281.154] HB node(1,1) seq=298 clk=542422 ms
+[   283.154] HB node(1,1) seq=299 clk=544422 ms
+[   284.434] TELEMETRY_BATCH seq=300 DROPPED (bench knob)
+[   286.432] TELEMETRY_BATCH seq=300 DROPPED (bench knob)
+[   288.439] $ committed node(1,1) seq=300 span=[545690..545690] ms=1 count=12 utc=[2536-09-07 06:30:49 .. 2536-09-07 06:30:49] boot=120
+[   288.441]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.2 faults=00[   288.441] 
+[   288.472] HB node(1,1) seq=301 clk=549743 ms
+[   289.537] $ committed node(1,1) seq=302 span=[550790..550790] ms=1 count=12 utc=[2536-09-07 06:30:54 .. 2536-09-07 06:30:54] boot=120
+[   289.538]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.2 faults=00[   289.539] 
+[   290.473] HB node(1,1) seq=303 clk=551742 ms
+[   292.471] HB node(1,1) seq=304 clk=553742 ms
+[   294.471] HB node(1,1) seq=305 clk=555742 ms
+[   294.637] $ committed node(1,1) seq=306 span=[555890..555890] ms=1 count=12 utc=[2536-09-07 06:30:59 .. 2536-09-07 06:30:59] boot=120
+[   294.638]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   294.639] 
+[   296.476] HB node(1,1) seq=307 clk=557742 ms
+[   298.473] HB node(1,1) seq=308 clk=559742 ms
+[   299.734] $ committed node(1,1) seq=309 span=[560990..560990] ms=1 count=12 utc=[2536-09-07 06:31:04 .. 2536-09-07 06:31:04] boot=120
+[   299.735]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.2 faults=00[   299.735] 
+[   300.473] HB node(1,1) seq=310 clk=561742 ms
+[   302.471] HB node(1,1) seq=311 clk=563742 ms
+[   304.479] HB node(1,1) seq=312 clk=565742 ms
+[   304.832] $ committed node(1,1) seq=313 span=[566090..566090] ms=1 count=12 utc=[2536-09-07 06:31:09 .. 2536-09-07 06:31:09] boot=120
+[   304.833]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.2 faults=00[   304.834] 
+[   306.471] HB node(1,1) seq=314 clk=567742 ms
+[   308.474] HB node(1,1) seq=315 clk=569742 ms
+[   309.932] $ committed node(1,1) seq=316 span=[571190..571190] ms=1 count=12 utc=[2536-09-07 06:31:14 .. 2536-09-07 06:31:14] boot=120
+[   309.933]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   309.934] 
+[   310.475] HB node(1,1) seq=317 clk=571742 ms
+[   312.474] HB node(1,1) seq=318 clk=573742 ms
+[   314.475] HB node(1,1) seq=319 clk=575742 ms
+[   315.044] $ committed node(1,1) seq=320 span=[576290..576290] ms=1 count=12 utc=[2536-09-07 06:31:19 .. 2536-09-07 06:31:19] boot=120
+[   315.045]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   315.046] 
+[   316.484] HB node(1,1) seq=321 clk=577752 ms
+[   318.484] HB node(1,1) seq=322 clk=579752 ms
+[   320.125] $ committed node(1,1) seq=323 span=[581390..581390] ms=1 count=12 utc=[2536-09-07 06:31:24 .. 2536-09-07 06:31:24] boot=120
+[   320.127]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.6 tpu=28.5 amb=26.2 faults=00[   320.127] 
+[   320.483] HB node(1,1) seq=324 clk=581752 ms
+[   322.481] HB node(1,1) seq=325 clk=583752 ms
+[   324.482] HB node(1,1) seq=326 clk=585752 ms
+[   325.223] $ committed node(1,1) seq=327 span=[586490..586490] ms=1 count=12 utc=[2536-09-07 06:31:29 .. 2536-09-07 06:31:29] boot=120
+[   325.224]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   325.225] 
+[   326.484] HB node(1,1) seq=328 clk=587752 ms
+[   328.481] HB node(1,1) seq=329 clk=589752 ms
+[   330.321] $ committed node(1,1) seq=330 span=[591590..591590] ms=1 count=12 utc=[2536-09-07 06:31:34 .. 2536-09-07 06:31:34] boot=120
+[   330.323]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   330.323] 
+[   330.481] HB node(1,1) seq=331 clk=591752 ms
+[   332.485] HB node(1,1) seq=332 clk=593752 ms
+[   334.481] HB node(1,1) seq=333 clk=595752 ms
+[   335.423] $ committed node(1,1) seq=334 span=[596690..596690] ms=1 count=12 utc=[2536-09-07 06:31:40 .. 2536-09-07 06:31:40] boot=120
+[   335.424]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.2 faults=00[   335.425] 
+[   336.483] HB node(1,1) seq=335 clk=597752 ms
+[   338.483] HB node(1,1) seq=336 clk=599752 ms
+[   340.484] HB node(1,1) seq=337 clk=601752 ms
+[   340.525] $ committed node(1,1) seq=338 span=[601790..601790] ms=1 count=12 utc=[2536-09-07 06:31:45 .. 2536-09-07 06:31:45] boot=120
+[   340.527]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.2 faults=00[   340.527] 
+[   342.481] HB node(1,1) seq=339 clk=603752 ms
+[   344.483] HB node(1,1) seq=340 clk=605752 ms
+[   345.627] $ committed node(1,1) seq=341 span=[606890..606890] ms=1 count=12 utc=[2536-09-07 06:31:50 .. 2536-09-07 06:31:50] boot=120
+[   345.629]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   345.629] 
+[   346.484] HB node(1,1) seq=342 clk=607752 ms
+[   348.485] HB node(1,1) seq=343 clk=609752 ms
+[   350.485] HB node(1,1) seq=344 clk=611752 ms
+[   350.724] $ committed node(1,1) seq=345 span=[611990..611990] ms=1 count=12 utc=[2536-09-07 06:31:55 .. 2536-09-07 06:31:55] boot=120
+[   350.726]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   350.726] 
+[   352.480] HB node(1,1) seq=346 clk=613752 ms
+[   354.483] HB node(1,1) seq=347 clk=615752 ms
+[   355.821] $ committed node(1,1) seq=348 span=[617090..617090] ms=1 count=12 utc=[2536-09-07 06:32:00 .. 2536-09-07 06:32:00] boot=120
+[   355.822]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   355.823] 
+[   356.483] HB node(1,1) seq=349 clk=617752 ms
+[   358.483] HB node(1,1) seq=350 clk=619752 ms
+[   360.480] HB node(1,1) seq=351 clk=621752 ms
+[   360.921] $ committed node(1,1) seq=352 span=[622190..622190] ms=1 count=12 utc=[2536-09-07 06:32:05 .. 2536-09-07 06:32:05] boot=120
+[   360.922]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   360.923] 
+[   362.480] HB node(1,1) seq=353 clk=623752 ms
+[   364.491] HB node(1,1) seq=354 clk=625752 ms
+[   366.035] $ committed node(1,1) seq=355 span=[627290..627290] ms=1 count=12 utc=[2536-09-07 06:32:10 .. 2536-09-07 06:32:10] boot=120
+[   366.037]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   366.037] 
+[   366.493] HB node(1,1) seq=356 clk=627762 ms
+[   368.490] HB node(1,1) seq=357 clk=629762 ms
+[   370.496] HB node(1,1) seq=358 clk=631762 ms
+[   371.130] TELEMETRY_BATCH seq=359 DROPPED (bench knob)
+[   373.133] $ committed node(1,1) seq=359 span=[632390..632390] ms=1 count=12 utc=[2536-09-07 06:32:15 .. 2536-09-07 06:32:15] boot=120
+[   373.134]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   373.135] 
+[   373.150] HB node(1,1) seq=360 clk=634423 ms
+[   375.151] HB node(1,1) seq=361 clk=636422 ms
+[   376.230] $ committed node(1,1) seq=362 span=[637490..637490] ms=1 count=12 utc=[2536-09-07 06:32:20 .. 2536-09-07 06:32:20] boot=120
+[   376.232]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   376.232] 
+[   377.154] HB node(1,1) seq=363 clk=638422 ms
+[   379.156] HB node(1,1) seq=364 clk=640422 ms
+[   381.152] HB node(1,1) seq=365 clk=642422 ms
+[   381.337] $ committed node(1,1) seq=366 span=[642590..642590] ms=1 count=12 utc=[2536-09-07 06:32:25 .. 2536-09-07 06:32:25] boot=120
+[   381.339]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.5 amb=26.2 faults=00[   381.339] 
+[   383.156] HB node(1,1) seq=367 clk=644422 ms
+[   385.150] HB node(1,1) seq=368 clk=646422 ms
+[   386.434] $ committed node(1,1) seq=369 span=[647690..647690] ms=1 count=12 utc=[2536-09-07 06:32:31 .. 2536-09-07 06:32:31] boot=120
+[   386.435]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   386.435] 
+[   387.153] HB node(1,1) seq=370 clk=648422 ms
+[   389.155] HB node(1,1) seq=371 clk=650422 ms
+[   391.151] HB node(1,1) seq=372 clk=652422 ms
+[   391.538] $ committed node(1,1) seq=373 span=[652790..652790] ms=1 count=12 utc=[2536-09-07 06:32:36 .. 2536-09-07 06:32:36] boot=120
+[   391.539]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   391.540] 
+[   393.149] HB node(1,1) seq=374 clk=654422 ms
+[   395.149] HB node(1,1) seq=375 clk=656422 ms
+[   396.637] $ committed node(1,1) seq=376 span=[657890..657890] ms=1 count=12 utc=[2536-09-07 06:32:41 .. 2536-09-07 06:32:41] boot=120
+[   396.638]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   396.639] 
+[   397.153] HB node(1,1) seq=377 clk=658422 ms
+[   399.149] HB node(1,1) seq=378 clk=660422 ms
+[   401.159] HB node(1,1) seq=379 clk=662422 ms
+[   401.720] TELEMETRY_BATCH seq=380 DROPPED (bench knob)
+[   403.727] $ committed node(1,1) seq=380 span=[662990..662990] ms=1 count=12 utc=[2536-09-07 06:32:46 .. 2536-09-07 06:32:46] boot=120
+[   403.729]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   403.729] 
+[   403.761] HB node(1,1) seq=381 clk=665033 ms
+[   405.765] HB node(1,1) seq=382 clk=667032 ms
+[   406.821] TELEMETRY_BATCH seq=383 DROPPED (bench knob)
+[   408.820] TELEMETRY_BATCH seq=383 DROPPED (bench knob)
+[   410.828] TELEMETRY_BATCH seq=383 DROPPED (bench knob)
+[   416.922] !! node(1,1) silent for 6s — unreachable (expect ~2s cadence)
+[   439.101] node(1,1) frames resumed
+[   439.101] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=385 (driver ch 11)
+[   445.112] !! node(1,1) silent for 6s — unreachable (expect ~2s cadence)
+[   462.600] node(1,1) frames resumed
+[   462.601] HELLO node(1,1) mac 7c:4f:ad:d1:80:50 cfg_ver=1 seq=387 (driver ch 11)
+[   462.620] $ committed node(1,1) seq=388 span=[668090..719090] ms=11 count=132 utc=[2536-09-07 06:32:50 .. 2536-09-07 06:33:41] boot=120
+[   462.621]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   462.622] 
+[   462.631]   [ 1] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.631] 
+[   462.640]   [ 2] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.641] 
+[   462.650]   [ 3] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.650] 
+[   462.659]   [ 4] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.660] 
+[   462.669]   [ 5] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.670] 
+[   462.679]   [ 6] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.679] 
+[   462.688]   [ 7] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.689] 
+[   462.698]   [ 8] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.698] 
+[   462.707]   [ 9] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.708] 
+[   462.717]   [10] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.717] 
+[   462.919] $ committed node(1,1) seq=389 span=[724190..724190] ms=1 count=12 utc=[2536-09-07 06:33:47 .. 2536-09-07 06:33:47] boot=120
+[   462.920]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   462.921] 
+[   464.618] HB node(1,1) seq=390 clk=725892 ms
+[   466.619] HB node(1,1) seq=391 clk=727892 ms
+[   468.019] $ committed node(1,1) seq=392 span=[729290..729290] ms=1 count=12 utc=[2536-09-07 06:33:52 .. 2536-09-07 06:33:52] boot=120
+[   468.020]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   468.021] 
+[   468.621] HB node(1,1) seq=393 clk=729892 ms
+[   470.618] HB node(1,1) seq=394 clk=731892 ms
+[   472.619] HB node(1,1) seq=395 clk=733892 ms
+[   473.122] TELEMETRY_BATCH seq=396 DROPPED (bench knob)
+[   475.122] $ committed node(1,1) seq=396 span=[734390..734390] ms=1 count=12 utc=[2536-09-07 06:33:57 .. 2536-09-07 06:33:57] boot=120
+[   475.123]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   475.124] 
+[   475.142] HB node(1,1) seq=397 clk=736413 ms
+[   477.147] HB node(1,1) seq=398 clk=738412 ms
+[   478.233] $ committed node(1,1) seq=399 span=[739490..739490] ms=1 count=12 utc=[2536-09-07 06:34:02 .. 2536-09-07 06:34:02] boot=120
+[   478.234]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   478.235] 
+[   479.150] HB node(1,1) seq=400 clk=740422 ms
+[   481.148] HB node(1,1) seq=401 clk=742422 ms
+[   483.148] HB node(1,1) seq=402 clk=744422 ms
+[   483.340] $ committed node(1,1) seq=403 span=[744590..744590] ms=1 count=12 utc=[2536-09-07 06:34:07 .. 2536-09-07 06:34:07] boot=120
+[   483.341]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   483.342] 
+[   485.158] HB node(1,1) seq=404 clk=746432 ms
+[   487.158] HB node(1,1) seq=405 clk=748432 ms
+[   488.424] $ committed node(1,1) seq=406 span=[749690..749690] ms=1 count=12 utc=[2536-09-07 06:34:12 .. 2536-09-07 06:34:12] boot=120
+[   488.425]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   488.426] 
+[   489.160] HB node(1,1) seq=407 clk=750432 ms
+[   491.158] HB node(1,1) seq=408 clk=752432 ms
+[   493.157] HB node(1,1) seq=409 clk=754432 ms
+[   493.529] $ committed node(1,1) seq=410 span=[754790..754790] ms=1 count=12 utc=[2536-09-07 06:34:17 .. 2536-09-07 06:34:17] boot=120
+[   493.530]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   493.531] 
+[   495.171] HB node(1,1) seq=411 clk=756442 ms
+[   497.167] HB node(1,1) seq=412 clk=758442 ms
+[   498.631] $ committed node(1,1) seq=413 span=[759890..759890] ms=1 count=12 utc=[2536-09-07 06:34:22 .. 2536-09-07 06:34:22] boot=120
+[   498.632]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   498.633] 
+[   499.169] HB node(1,1) seq=414 clk=760442 ms
+[   501.169] HB node(1,1) seq=415 clk=762442 ms
+[   503.167] HB node(1,1) seq=416 clk=764442 ms
+[   503.730] $ committed node(1,1) seq=417 span=[764990..764990] ms=1 count=12 utc=[2536-09-07 06:34:27 .. 2536-09-07 06:34:27] boot=120
+[   503.731]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.3 faults=00[   503.731] 
+[   505.178] HB node(1,1) seq=418 clk=766442 ms
+[   507.185] HB node(1,1) seq=419 clk=768452 ms
+[   508.820] $ committed node(1,1) seq=420 span=[770090..770090] ms=1 count=12 utc=[2536-09-07 06:34:32 .. 2536-09-07 06:34:32] boot=120
+[   508.821]   [ 0] mode=AUTO   relay=1 ct=NOT_FITTED      tpo=28.5 tpu=28.4 amb=26.2 faults=00[   508.822] 
+[   509.181] HB node(1,1) seq=421 clk=770452 ms
+[   511.180] HB node(1,1) seq=422 clk=772452 ms
+[   513.185] HB node(1,1) seq=423 clk=774452 ms
+[   513.926] TELEMETRY_BATCH seq=424 DROPPED (bench knob)
+[   515.931] TELEMETRY_BATCH seq=424 DROPPED (bench knob)
+
+[17:39:42.260] Disconnected
+[17:39:42.262] Saved log to file tio_ttyUSB0_2026-09-01T17:26:59.log
