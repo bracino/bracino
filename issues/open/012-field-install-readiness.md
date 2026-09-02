@@ -21,6 +21,12 @@ CT dropped from the circuit (`CT_FITTED 0`, telemetry `NOT_FITTED`). Install
 unblocks here, pending the field-image pass below. 009 closed 2026-09-01:
 Auto-start on real wells observed; charge-stop not waited (desk-proven).
 
+**HW note 2026-09-02 (human):** PPTCs still out of stock — deploy the
+protoboard **without F1**. Accepted risk: node mounted on concrete, no
+flammables nearby, only 220 V connection is the contactor coil line (second
+relay), 12 V supply mounted elsewhere, breaker box covers severe
+over-current. Schematic bump will reflect the absent PPTC.
+
 ## Expected
 
 - [x] 009 closed: Auto-start on real wells + pump ON when TPO cold (human). Charge-stop not waited — watch a full cycle when convenient, not a blocker
