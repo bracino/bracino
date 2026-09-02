@@ -32,7 +32,7 @@ Auto-start on real wells observed; charge-stop not waited (desk-proven).
       labels, sensor runs to tank, enclosure serviceable (USB reachable —
       no OTA transport yet, so a node bug means physical reflash);
       **schematic bump (v0.09+) reflects snubber + CT removal** (014)
-- [ ] TFT field-image menus:
+- [x] TFT field-image menus (2026-09-02, build clean, **not yet bench-walked**):
       - Main: comms status line (disabled/enabled + OK or SCANNING when
         enabled)
       - Temperatures: add AMB; drop Hyst and dT (programmables, not
