@@ -15,3 +15,4 @@ int enc_net(void);            /* running detent total, not cleared */
 void enc_levels(int *a, int *b, int *sw);
 bool enc_take_click(void);
 bool enc_take_hold(void);     /* ~0.8 s stable press; goes home */
+uint32_t enc_isr_suppressed(void); /* noise edges dropped by ISR rate cap */

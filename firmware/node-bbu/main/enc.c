@@ -33,6 +33,14 @@ static volatile int32_t s_raw;
 static int32_t s_raw_taken;
 static int s_net;
 static volatile uint8_t s_ab;
+static volatile uint32_t s_isr_supp; /* edges dropped by the storm limiter */
+
+/* ISR rate cap: mechanical rotation is ≤40 edges/s per pin (4 edges/detent);
+ * a bouncing/floating wire is kHz+. Without this cap an ISR storm starves
+ * IDLE (TWDT fires, everything frozen) — seen on the bench 2026-09-02.
+ * 1 ms min edge spacing absorbs contact bounce and costs nothing. */
+#define ENC_MIN_EDGE_US 1000LL
+static volatile int64_t s_last_edge_us;
 
 static portMUX_TYPE s_mux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -50,11 +58,17 @@ static esp_timer_handle_t s_timer;
 static void IRAM_ATTR enc_isr(void *arg)
 {
     (void)arg;
+    int64_t now = esp_timer_get_time();
+    if (now - s_last_edge_us < ENC_MIN_EDGE_US) {
+        s_isr_supp++;
+        return; /* bounce/noise storm: drop the edge */
+    }
+    s_last_edge_us = now;
     int a = gpio_get_level(ENC_PIN_A) ? 1 : 0;
     int b = gpio_get_level(ENC_PIN_B) ? 1 : 0;
-    uint8_t now = (uint8_t)((a << 1) | b);
-    uint8_t idx = (uint8_t)((s_ab << 2) | now);
-    s_ab = now;
+    uint8_t level = (uint8_t)((a << 1) | b);
+    uint8_t idx = (uint8_t)((s_ab << 2) | level);
+    s_ab = level;
     int8_t d = k_quad[idx & 15];
     if (d) {
         s_raw += d;
@@ -219,4 +233,9 @@ bool enc_take_hold(void)
     s_hold = false;
     portEXIT_CRITICAL(&s_mux);
     return v;
+}
+
+uint32_t enc_isr_suppressed(void)
+{
+    return s_isr_supp;
 }
