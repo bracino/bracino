@@ -10,6 +10,7 @@
 typedef struct {
     ntc_sample_t tpo;
     ntc_sample_t tpu;
+    ntc_sample_t amb;   /* 012: shown in Temperatures */
     bool ct_fitted;
     bool ct_present;
 } ui_live_t;

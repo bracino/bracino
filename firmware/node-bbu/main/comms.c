@@ -1276,6 +1276,31 @@ bool comms_ring_resize(uint16_t samples)
     return true;
 }
 
+void comms_ui_snapshot(comms_ui_t *out)
+{
+    if (out == NULL) {
+        return;
+    }
+    *out = (comms_ui_t){
+        .enabled = s_enabled,
+        .link_ok = s_enabled && anchored(),
+        .channel = s_channel,
+        .bound = s_bound,
+        .anchored = anchored(),
+        .epoch_s = s_anchor_epoch_s,
+        .fifo = fifo_count(),
+        .fifo_cap = s_ring_cap,
+        .fails = s_consec_fail,
+        .rx = s_ct.rx,
+        .tx_ok = s_ct.tx_ok,
+        .tx_fail = s_ct.tx_fail,
+        .retrans = s_ct.retrans,
+        .decim = s_ct.decim_passes,
+        .ev_sent = s_ct.ev_sent,
+    };
+    memcpy(out->gw, s_gw_mac, sizeof(out->gw));
+}
+
 uint8_t comms_node_type(void)
 {
     return s_node_type;

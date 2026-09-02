@@ -850,7 +850,7 @@ static void monitor_task(void *arg)
         };
         uint32_t ev = bbu_ctrl_tick(&s_ctrl, &sense, params_get());
         apply_ctrl();
-        ui_live_t live = { .tpo = tpo, .tpu = tpu,
+        ui_live_t live = { .tpo = tpo, .tpu = tpu, .amb = amb,
                            .ct_fitted = CT_FITTED, .ct_present = ct_on };
         ui_set_live(&live);
 

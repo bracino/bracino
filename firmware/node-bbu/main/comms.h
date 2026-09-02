@@ -56,6 +56,22 @@ size_t comms_encode_param_value(uint8_t param_id, int32_t raw, uint8_t *out);
 
 /* Bench/status (serial). */
 void comms_status_print(void);
+
+/* UI snapshot (012): small POD read for TFT menus; benign racy.
+ * 'link' summarizes the Home status line: OFF = disabled, SCAN = enabled
+ * but not bound/anchored, OK = enabled and anchored. */
+typedef struct {
+    bool enabled;
+    bool link_ok;      /* enabled && anchored */
+    uint8_t channel;
+    bool bound;
+    bool anchored;
+    uint32_t epoch_s;  /* last anchor, 0 = never */
+    uint16_t fifo, fifo_cap;
+    uint32_t fails, rx, tx_ok, tx_fail, retrans, decim, ev_sent;
+    uint8_t gw[6];
+} comms_ui_t;
+void comms_ui_snapshot(comms_ui_t *out);
 void comms_bench_hello_burst(uint8_t ch, int count); /* bench: fixed-ch HELLO burst */
 bool comms_set_ident(uint8_t node_type, uint8_t node_id); /* NVS-persisted */
 void comms_set_sample_period_s(uint32_t s);               /* default 15  */
