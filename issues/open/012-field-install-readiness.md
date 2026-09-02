@@ -31,14 +31,14 @@ over-current. Schematic bump will reflect the absent PPTC.
 
 - [x] 009 closed: Auto-start on real wells + pump ON when TPO cold (human). Charge-stop not waited — watch a full cycle when convenient, not a blocker
 - [x] CT dispensed with (2026-09-01, 014): firmware `CT_FITTED 0` — A0 ignored, telemetry `ct_state = NOT_FITTED`, no-CT warning gated off (`ct_fitted`); TFT shows `n/f` instead of the amber no-CT WARN; A0 reserved for a later rev. DN001 rev 2 / DN002 updated
-- [x] Boot-mode persistence (DN002 boot behavior) implemented — `bbu/boot` NVS blob (mode + Manual coil state), written by a control-module persist callback that only fires on human/commanded paths (serial / UI / PARAM_SET); Auto loop transitions never write; TESTING never persisted; params auto-save on change. Host tests + IDF build pass (2026-09-02, not yet bench-flashed)
+- [x] Boot-mode persistence (DN002 boot behavior) implemented — `bbu/boot` NVS blob (mode + Manual coil state), written by a control-module persist callback that only fires on human/commanded paths (serial / UI / PARAM_SET); Auto loop transitions never write; TESTING never persisted; params auto-save on change. Host tests + IDF build pass; **bench-verified 2026-09-02** (incl. erase_region factory-fresh test → Manual/OFF)
 - [ ] Identity provisioned in NVS (node_type=1, node_id=1) at flash time
 - [x] ESP-NOW client compiled in (011 closed); `comms_enabled` NVS default **off**. Enable from UI/serial only when the field logger is present
 - [ ] Hardware loose ends: PPTC (F1) if stock arrived, connector/jumper
       labels, sensor runs to tank, enclosure serviceable (USB reachable —
       no OTA transport yet, so a node bug means physical reflash);
       **schematic bump (v0.09+) reflects snubber + CT removal** (014)
-- [x] TFT field-image menus (2026-09-02, build clean, **not yet bench-walked**):
+- [x] TFT field-image menus (2026-09-02, build clean, **bench-walked: usable**):
       - Main: comms status line (disabled/enabled + OK or SCANNING when
         enabled)
       - Temperatures: add AMB; drop Hyst and dT (programmables, not
@@ -56,6 +56,21 @@ over-current. Schematic bump will reflect the absent PPTC.
       - Note: with `CT_FITTED 0` the no-CT warning never fires; `ct_confirm_s`
         stays listed (registry stability) but is inert
 - [ ] Serial `halt` + UI confirmed before leaving the pump unattended
+
+## 2026-09-02 bench session (agent fixes, human walk)
+
+Walked and working: Counters (uptime/pump/starts/FIFO), Diagnostics incl.
+soft-reboot two-click confirm, Control Prog (abbrev names, `>val<` edit
+preview), serial `reboot`, build alias + UTC stamp. Fixed same day: DIAG
+stack overflow (items[16]→[17] — crashed on entry), TWDT mis-subscription
+(main task was subscribed via `esp_task_wdt_add(NULL)` in app_main → 5 s
+dump spam wrecked scan dwells; mon+ui now subscribe themselves), scan now
+two HELLO shots/dwell (300 ms) + 9 s budget, `link_ok` requires bound
+(was anchored-only → showed OK while scanning). Persistent counters in
+NVS (bbu/stats; save on pump stop/clear/soft-reboot; power blip mid-run
+loses current run). GW default channel 6→1 — house AP on ch 6 occludes
+HELLO/ACK (bench: ch 1/3/11 bind reliably, 6 unusable; DN004 addenda +
+gotchas). Bench-master reflash pending; deploy-channel survey at install.
 
 ## Low-priority bench hardening (2026-08-31, from bare-module flash test)
 
