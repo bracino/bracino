@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <export version="E">
   <design>
-    <source>/home/elliot/Projects/bracino/hardware/bbu-controller/bbu_controller_prototype_kicad/bbu_controller_prototype_kicad.kicad_sch</source>
-    <date>2026-08-22T15:57:45</date>
+    <source>/home/elliot/projects/bracino/hardware/bbu-controller/bbu_controller_prototype_kicad/bbu_controller_prototype_kicad.kicad_sch</source>
+    <date>2026-09-02T21:45:30</date>
     <tool>Eeschema 10.0.3</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
         <title>Bracino BBU controller prototype</title>
         <company/>
-        <rev>v0.08</rev>
+        <rev>v0.09</rev>
         <date>2026-08-15</date>
         <source>bbu_controller_prototype_kicad.kicad_sch</source>
         <comment number="1" value=""/>
@@ -159,6 +159,54 @@
       <property name="ki_fp_filters" value="CP_*"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>59eb1b31-60e6-4e62-98d1-b28f54c628a5</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C7">
+      <value>100 nF</value>
+      <description>capacitor, small US symbol</description>
+      <fields>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">capacitor, small US symbol</field>
+      </fields>
+      <libsource lib="Device" part="C_Small_US" description="capacitor, small US symbol"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>39383161-d150-4221-9cfc-7fe0966f93a1</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
+    <comp ref="C8">
+      <value>100 nF</value>
+      <description>capacitor, small US symbol</description>
+      <fields>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">capacitor, small US symbol</field>
+      </fields>
+      <libsource lib="Device" part="C_Small_US" description="capacitor, small US symbol"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>80037626-489e-48d4-899f-ba1213bdae6c</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -474,6 +522,30 @@
         </unit>
       </units>
     </comp>
+    <comp ref="J9">
+      <value>Conn_01x02_Socket</value>
+      <description>Generic connector, single row, 01x02, script generated</description>
+      <fields>
+        <field name="Footprint"/>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, single row, 01x02, script generated</field>
+      </fields>
+      <libsource lib="Connector" part="Conn_01x02_Socket" description="Generic connector, single row, 01x02, script generated"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>b763527e-43c5-4511-b8b4-ab5ef4f3b8f8</tstamps>
+      <units>
+        <unit name="A">
+          <pins>
+            <pin num="1"/>
+            <pin num="2"/>
+          </pins>
+        </unit>
+      </units>
+    </comp>
     <comp ref="M1">
       <value>Snubber_module_220VAC</value>
       <fields>
@@ -481,11 +553,11 @@
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
-      <libsource lib="0_my_custom_library" part="SNUBBER_MODULE" description=""/>
+      <libsource lib="01_my_custom_library" part="SNUBBER_MODULE" description=""/>
       <property name="Sheetname" value=""/>
       <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamps>8ddb0b27-b13d-47f4-8976-bb766c292612</tstamps>
+      <tstamps>0326d91a-ec12-47b3-bf6b-0aced004a83d</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -496,18 +568,17 @@
       </units>
     </comp>
     <comp ref="M2">
-      <value>JQC-3FE-S-Z_MODULE</value>
-      <description>Low level switched opto-isolated, 10A @ 240V</description>
+      <value>~</value>
       <fields>
         <field name="Footprint"/>
         <field name="Datasheet"/>
-        <field name="Description">Low level switched opto-isolated, 10A @ 240V</field>
+        <field name="Description"/>
       </fields>
-      <libsource lib="0_my_custom_library" part="RELAY_MODULE" description=""/>
+      <libsource lib="01_my_custom_library" part="RELAY_MODULE" description=""/>
       <property name="Sheetname" value=""/>
       <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamps>dd6bb865-0a79-42a2-a0e5-692bd082c176</tstamps>
+      <tstamps>896469cc-ee06-4b8a-b278-44e418a064e7</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -522,17 +593,17 @@
       </units>
     </comp>
     <comp ref="M3">
-      <value>TFT 1.8"</value>
+      <value>~</value>
       <fields>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
-      <libsource lib="0_my_custom_library" part="1.8{dblquote}_TFT_MODULE" description=""/>
+      <libsource lib="01_my_custom_library" part="1.8{dblquote}_TFT_MODULE" description=""/>
       <property name="Sheetname" value=""/>
       <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamps>4bd192c0-2463-4725-a4db-43791518cac6</tstamps>
+      <tstamps>341cde8e-7546-429f-a2da-463f0b55d00f</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -549,17 +620,17 @@
       </units>
     </comp>
     <comp ref="M4">
-      <value>ZMCT103C</value>
+      <value>~</value>
       <fields>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
-      <libsource lib="0_my_custom_library" part="ZMCT_COIL_MODULE" description=""/>
+      <libsource lib="01_my_custom_library" part="ZMCT_COIL_MODULE" description=""/>
       <property name="Sheetname" value=""/>
       <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamps>09d1995c-ca0b-43f5-a02f-c640de791bff</tstamps>
+      <tstamps>43972617-77f0-4c7e-b78b-1f4c4d3fa9a5</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -578,11 +649,11 @@
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
-      <libsource lib="0_my_custom_library" part="ROTARY_ENC_W/SW_MODULE" description=""/>
+      <libsource lib="01_my_custom_library" part="ROTARY_ENC_W/SW_MODULE" description=""/>
       <property name="Sheetname" value=""/>
       <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamps>03ecca6c-984d-4a00-8922-57107c5040ea</tstamps>
+      <tstamps>0c263772-6061-4924-96c1-68f58c99c96a</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -597,17 +668,17 @@
       </units>
     </comp>
     <comp ref="M6">
-      <value>ADS1115</value>
+      <value>~</value>
       <fields>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
-      <libsource lib="0_my_custom_library" part="ADC_4CH_MODULE" description=""/>
+      <libsource lib="01_my_custom_library" part="ADC_4CH_MODULE" description=""/>
       <property name="Sheetname" value=""/>
       <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamps>ed3808c8-e690-4291-82d0-de63ecb4616d</tstamps>
+      <tstamps>5b8cf630-3e1c-4733-91c4-2db8528b7239</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -626,17 +697,17 @@
       </units>
     </comp>
     <comp ref="M7">
-      <value>ESP32-C3-ZERO</value>
+      <value>~</value>
       <fields>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
-      <libsource lib="0_my_custom_library" part="ESP32-C3_ZERO_MODULE" description=""/>
+      <libsource lib="01_my_custom_library" part="ESP32-C3_ZERO_MODULE" description=""/>
       <property name="Sheetname" value=""/>
       <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamps>3f82204a-b764-4475-b8bd-190865564b9f</tstamps>
+      <tstamps>7e50b24f-83b3-4949-a747-3e59d6fa5f72</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -663,17 +734,17 @@
       </units>
     </comp>
     <comp ref="M8">
-      <value>4-24V to 5V buck</value>
+      <value>~</value>
       <fields>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
-      <libsource lib="0_my_custom_library" part="BUCK_6-24V_to_5V_MODULE" description=""/>
+      <libsource lib="01_my_custom_library" part="BUCK_6-24V_to_5V_MODULE" description=""/>
       <property name="Sheetname" value=""/>
       <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
-      <tstamps>3df05ba6-969f-43d8-9f59-ca6116263cb1</tstamps>
+      <tstamps>8e1949a7-d3ab-486b-92eb-a8ab7e02aad9</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -755,30 +826,6 @@
       <property name="ki_fp_filters" value="R_*"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>972d9f3e-6720-46d0-a476-dd6ae6a688b4</tstamps>
-      <units>
-        <unit name="A">
-          <pins>
-            <pin num="1"/>
-            <pin num="2"/>
-          </pins>
-        </unit>
-      </units>
-    </comp>
-    <comp ref="R3">
-      <value>220</value>
-      <description>Resistor</description>
-      <fields>
-        <field name="Footprint"/>
-        <field name="Datasheet"/>
-        <field name="Description">Resistor</field>
-      </fields>
-      <libsource lib="Device" part="R" description="Resistor"/>
-      <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
-      <property name="ki_keywords" value="R res resistor"/>
-      <property name="ki_fp_filters" value="R_*"/>
-      <sheetpath names="/" tstamps="/"/>
-      <tstamps>9e497d86-852c-42c7-a88f-7ceddfeba4a5</tstamps>
       <units>
         <unit name="A">
           <pins>
@@ -1010,7 +1057,7 @@
     </comp>
   </components>
   <libparts>
-    <libpart lib="0_my_custom_library" part="1.8{dblquote}_TFT_MODULE">
+    <libpart lib="01_my_custom_library" part="1.8{dblquote}_TFT_MODULE">
       <fields>
         <field name="Reference">M</field>
         <field name="Value"/>
@@ -1029,7 +1076,7 @@
         <pin num="8" name="LED" type="input"/>
       </pins>
     </libpart>
-    <libpart lib="0_my_custom_library" part="ADC_4CH_MODULE">
+    <libpart lib="01_my_custom_library" part="ADC_4CH_MODULE">
       <fields>
         <field name="Reference">M</field>
         <field name="Value"/>
@@ -1050,7 +1097,7 @@
         <pin num="10" name="A3" type="input"/>
       </pins>
     </libpart>
-    <libpart lib="0_my_custom_library" part="BUCK_6-24V_to_5V_MODULE">
+    <libpart lib="01_my_custom_library" part="BUCK_6-24V_to_5V_MODULE">
       <fields>
         <field name="Reference">M</field>
         <field name="Value"/>
@@ -1065,7 +1112,7 @@
         <pin num="4" name="EN" type="input"/>
       </pins>
     </libpart>
-    <libpart lib="0_my_custom_library" part="ESP32-C3_ZERO_MODULE">
+    <libpart lib="01_my_custom_library" part="ESP32-C3_ZERO_MODULE">
       <fields>
         <field name="Reference">M</field>
         <field name="Value"/>
@@ -1094,7 +1141,7 @@
         <pin num="18" name="GPIO_21" type="bidirectional"/>
       </pins>
     </libpart>
-    <libpart lib="0_my_custom_library" part="RELAY_MODULE">
+    <libpart lib="01_my_custom_library" part="RELAY_MODULE">
       <fields>
         <field name="Reference">M1</field>
         <field name="Value"/>
@@ -1111,7 +1158,7 @@
         <pin num="6" name="IN" type="input"/>
       </pins>
     </libpart>
-    <libpart lib="0_my_custom_library" part="ROTARY_ENC_W/SW_MODULE">
+    <libpart lib="01_my_custom_library" part="ROTARY_ENC_W/SW_MODULE">
       <fields>
         <field name="Reference">M</field>
         <field name="Value">ROTARY_ENC_W/SW_MODULE</field>
@@ -1128,7 +1175,7 @@
         <pin num="6" name="SW" type="output"/>
       </pins>
     </libpart>
-    <libpart lib="0_my_custom_library" part="SNUBBER_MODULE">
+    <libpart lib="01_my_custom_library" part="SNUBBER_MODULE">
       <fields>
         <field name="Reference">M</field>
         <field name="Value">Snubber_module_220VAC</field>
@@ -1141,7 +1188,7 @@
         <pin num="2" name="snub2" type="passive"/>
       </pins>
     </libpart>
-    <libpart lib="0_my_custom_library" part="ZMCT_COIL_MODULE">
+    <libpart lib="01_my_custom_library" part="ZMCT_COIL_MODULE">
       <fields>
         <field name="Reference">M</field>
         <field name="Value"/>
@@ -1398,8 +1445,8 @@
     </libpart>
   </libparts>
   <libraries>
-    <library logical="0_my_custom_library">
-      <uri>/home/elliot/Projects/share/kicad_common/0_my_custom_library.kicad_sym</uri>
+    <library logical="01_my_custom_library">
+      <uri>/home/elliot/projects/share/kicad_common/01_my_custom_library.kicad_sym</uri>
     </library>
     <library logical="Connector">
       <uri>${KICAD10_SYMBOL_DIR}/Connector.kicad_symdir</uri>
@@ -1424,12 +1471,12 @@
       <node ref="J5" pin="2" pinfunction="Pin_2_2" pintype="passive"/>
       <node ref="J6" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
       <node ref="M3" pin="1" pinfunction="VCC_1" pintype="power_in"/>
+      <node ref="M3" pin="8" pinfunction="LED_8" pintype="input"/>
       <node ref="M4" pin="1" pinfunction="VCC_1" pintype="power_in"/>
       <node ref="M5" pin="4" pinfunction="VCC_4" pintype="power_in"/>
       <node ref="M6" pin="1" pinfunction="VDD_1" pintype="power_in"/>
       <node ref="M7" pin="3" pinfunction="3v3_3" pintype="power_out"/>
       <node ref="R2" pin="2" pintype="passive"/>
-      <node ref="R3" pin="2" pintype="passive"/>
       <node ref="TH1" pin="1" pintype="passive"/>
       <node ref="TH2" pin="1" pintype="passive"/>
       <node ref="TH3" pin="1" pintype="passive"/>
@@ -1456,12 +1503,14 @@
       <node ref="M7" pin="11" pinfunction="GPIO_7_11" pintype="bidirectional"/>
     </net>
     <net code="6" name="ENC_A" class="Default">
+      <node ref="C7" pin="2" pintype="passive"/>
       <node ref="J2" pin="3" pinfunction="Pin_3_3" pintype="passive"/>
       <node ref="J5" pin="3" pinfunction="Pin_3_3" pintype="passive"/>
       <node ref="M5" pin="1" pinfunction="A_1" pintype="output"/>
       <node ref="M7" pin="4" pinfunction="GPIO_0_4" pintype="bidirectional"/>
     </net>
     <net code="7" name="ENC_B" class="Default">
+      <node ref="C8" pin="1" pintype="passive"/>
       <node ref="J2" pin="4" pinfunction="Pin_4_4" pintype="passive"/>
       <node ref="J5" pin="4" pinfunction="Pin_4_4" pintype="passive"/>
       <node ref="M5" pin="3" pinfunction="B_3" pintype="output"/>
@@ -1480,6 +1529,8 @@
       <node ref="C4" pin="1" pintype="passive"/>
       <node ref="C5" pin="2" pintype="passive"/>
       <node ref="C6" pin="2" pintype="passive"/>
+      <node ref="C7" pin="1" pintype="passive"/>
+      <node ref="C8" pin="2" pintype="passive"/>
       <node ref="D2" pin="1" pinfunction="K_1" pintype="passive"/>
       <node ref="J2" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
       <node ref="J5" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
@@ -1513,7 +1564,7 @@
     </net>
     <net code="13" name="Net-(D3-A)" class="Default">
       <node ref="D3" pin="2" pinfunction="A_2" pintype="passive"/>
-      <node ref="F1" pin="2" pintype="passive"/>
+      <node ref="J8" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
     </net>
     <net code="14" name="Net-(D3-K)" class="Default">
       <node ref="C5" pin="1" pintype="passive"/>
@@ -1523,12 +1574,10 @@
     </net>
     <net code="15" name="Net-(J1-Pin_1)" class="Default">
       <node ref="J1" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
-      <node ref="M1" pin="1" pinfunction="snub1_1" pintype="passive"/>
       <node ref="M2" pin="1" pinfunction="NO_1" pintype="output"/>
     </net>
     <net code="16" name="Net-(J1-Pin_2)" class="Default">
       <node ref="J1" pin="2" pinfunction="Pin_2_2" pintype="passive"/>
-      <node ref="M1" pin="2" pinfunction="snub2_2" pintype="passive"/>
       <node ref="M2" pin="2" pinfunction="COM_2" pintype="input"/>
     </net>
     <net code="17" name="Net-(J3-Pin_2)" class="Default">
@@ -1549,80 +1598,90 @@
       <node ref="R6" pin="1" pintype="passive"/>
       <node ref="TH3" pin="2" pintype="passive"/>
     </net>
-    <net code="20" name="Net-(J8-Pin_1)" class="Default">
-      <node ref="F1" pin="1" pintype="passive"/>
-      <node ref="J8" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+    <net code="20" name="Net-(J9-Pin_1)" class="Default">
+      <node ref="J9" pin="1" pinfunction="Pin_1_1" pintype="passive"/>
+      <node ref="J9" pin="2" pinfunction="Pin_2_2" pintype="passive"/>
     </net>
     <net code="21" name="Net-(M2-IN)" class="Default">
       <node ref="M2" pin="6" pinfunction="IN_6" pintype="input"/>
       <node ref="Q1" pin="3" pinfunction="C_3" pintype="passive"/>
     </net>
-    <net code="22" name="Net-(M3-LED)" class="Default">
-      <node ref="M3" pin="8" pinfunction="LED_8" pintype="input"/>
-      <node ref="R3" pin="1" pintype="passive"/>
-    </net>
-    <net code="23" name="Net-(M4-OUT)" class="Default">
-      <node ref="M4" pin="2" pinfunction="OUT_2" pintype="output"/>
-      <node ref="M6" pin="7" pinfunction="A0_7" pintype="input"/>
-    </net>
-    <net code="24" name="Net-(Q1-B)" class="Default">
+    <net code="22" name="Net-(Q1-B)" class="Default">
       <node ref="Q1" pin="2" pinfunction="B_2" pintype="input"/>
       <node ref="R1" pin="1" pintype="passive"/>
     </net>
-    <net code="25" name="RELAY" class="Default">
+    <net code="23" name="RELAY" class="Default">
       <node ref="M7" pin="14" pinfunction="GPIO_10_14" pintype="bidirectional"/>
       <node ref="R1" pin="2" pintype="passive"/>
     </net>
-    <net code="26" name="TFT_AO" class="Default">
+    <net code="24" name="TFT_AO" class="Default">
       <node ref="J2" pin="6" pinfunction="Pin_6_6" pintype="passive"/>
       <node ref="J5" pin="6" pinfunction="Pin_6_6" pintype="passive"/>
       <node ref="M3" pin="5" pinfunction="AO_5" pintype="input"/>
       <node ref="M7" pin="7" pinfunction="GPIO_3_7" pintype="bidirectional"/>
     </net>
-    <net code="27" name="TFT_RESET" class="Default">
+    <net code="25" name="TFT_RESET" class="Default">
       <node ref="J2" pin="5" pinfunction="Pin_5_5" pintype="passive"/>
       <node ref="J5" pin="5" pinfunction="Pin_5_5" pintype="passive"/>
       <node ref="M3" pin="4" pinfunction="RESET_4" pintype="input"/>
       <node ref="M7" pin="6" pinfunction="GPIO_2_6" pintype="bidirectional"/>
       <node ref="R2" pin="1" pintype="passive"/>
     </net>
-    <net code="28" name="TFT_SCK" class="Default">
+    <net code="26" name="TFT_SCK" class="Default">
       <node ref="J2" pin="9" pinfunction="Pin_9_9" pintype="passive"/>
       <node ref="J5" pin="9" pinfunction="Pin_9_9" pintype="passive"/>
       <node ref="M3" pin="7" pinfunction="SCK_7" pintype="input"/>
       <node ref="M7" pin="13" pinfunction="GPIO_9_13" pintype="bidirectional"/>
     </net>
-    <net code="29" name="TFT_SDA" class="Default">
+    <net code="27" name="TFT_SDA" class="Default">
       <node ref="J2" pin="7" pinfunction="Pin_7_7" pintype="passive"/>
       <node ref="J5" pin="7" pinfunction="Pin_7_7" pintype="passive"/>
       <node ref="M3" pin="6" pinfunction="SDA_6" pintype="bidirectional"/>
       <node ref="M7" pin="8" pinfunction="GPIO_4_8" pintype="bidirectional"/>
     </net>
-    <net code="30" name="unconnected-(M2-NC-Pad3)" class="Default">
+    <net code="28" name="unconnected-(F1-Pad1)" class="Default">
+      <node ref="F1" pin="1" pintype="passive+no_connect"/>
+    </net>
+    <net code="29" name="unconnected-(F1-Pad2)" class="Default">
+      <node ref="F1" pin="2" pintype="passive+no_connect"/>
+    </net>
+    <net code="30" name="unconnected-(M1-snub1-Pad1)" class="Default">
+      <node ref="M1" pin="1" pinfunction="snub1_1" pintype="passive+no_connect"/>
+    </net>
+    <net code="31" name="unconnected-(M1-snub2-Pad2)" class="Default">
+      <node ref="M1" pin="2" pinfunction="snub2_2" pintype="passive+no_connect"/>
+    </net>
+    <net code="32" name="unconnected-(M2-NC-Pad3)" class="Default">
       <node ref="M2" pin="3" pinfunction="NC_3" pintype="output+no_connect"/>
     </net>
-    <net code="31" name="unconnected-(M5-COM-Pad2)" class="Default">
+    <net code="33" name="unconnected-(M4-OUT-Pad2)" class="Default">
+      <node ref="M4" pin="2" pinfunction="OUT_2" pintype="output+no_connect"/>
+    </net>
+    <net code="34" name="unconnected-(M5-COM-Pad2)" class="Default">
       <node ref="M5" pin="2" pinfunction="COM_2" pintype="no_connect"/>
     </net>
-    <net code="32" name="unconnected-(M6-ADDR-Pad5)" class="Default">
+    <net code="35" name="unconnected-(M6-A0-Pad7)" class="Default">
+      <node ref="M6" pin="7" pinfunction="A0_7" pintype="input+no_connect"/>
+    </net>
+    <net code="36" name="unconnected-(M6-ADDR-Pad5)" class="Default">
       <node ref="M6" pin="5" pinfunction="ADDR_5" pintype="input+no_connect"/>
     </net>
-    <net code="33" name="unconnected-(M6-ALRT-Pad6)" class="Default">
+    <net code="37" name="unconnected-(M6-ALRT-Pad6)" class="Default">
       <node ref="M6" pin="6" pinfunction="ALRT_6" pintype="input+no_connect"/>
     </net>
-    <net code="34" name="unconnected-(M7-GPIO_18-Pad15)" class="Default">
+    <net code="38" name="unconnected-(M7-GPIO_18-Pad15)" class="Default">
       <node ref="M7" pin="15" pinfunction="GPIO_18_15" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="35" name="unconnected-(M7-GPIO_19-Pad16)" class="Default">
+    <net code="39" name="unconnected-(M7-GPIO_19-Pad16)" class="Default">
       <node ref="M7" pin="16" pinfunction="GPIO_19_16" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="36" name="unconnected-(M7-GPIO_20-Pad17)" class="Default">
+    <net code="40" name="unconnected-(M7-GPIO_20-Pad17)" class="Default">
       <node ref="M7" pin="17" pinfunction="GPIO_20_17" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="37" name="unconnected-(M7-GPIO_21-Pad18)" class="Default">
+    <net code="41" name="unconnected-(M7-GPIO_21-Pad18)" class="Default">
       <node ref="M7" pin="18" pinfunction="GPIO_21_18" pintype="bidirectional+no_connect"/>
     </net>
-    <net code="38" name="unconnected-(M8-EN-Pad4)" class="Default">
+    <net code="42" name="unconnected-(M8-EN-Pad4)" class="Default">
       <node ref="M8" pin="4" pinfunction="EN_4" pintype="input+no_connect"/>
     </net>
   </nets>
