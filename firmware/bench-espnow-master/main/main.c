@@ -49,7 +49,11 @@
 #include "bracino_log.h"
 
 #define PIN_BUTTON     GPIO_NUM_27
-#define DEFAULT_CH     6
+/* Default bench channel. Was 6 — but the local house AP sits on ch 6 and
+ * its traffic occludes HELLO/ACK exchanges at desk range (bench 2026-09-02:
+ * binds on 1/11 were quick, 6 failed in many cases). Target install WiFi
+ * is on ch 1, so default to 1. Override per bench with `c <ch>`. */
+#define DEFAULT_CH     1
 #define MAX_NODES      4
 #define RX_QUEUE_LEN   8
 #define FRAG_TIMEOUT_MS 2000
