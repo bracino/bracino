@@ -20,7 +20,6 @@
 #include "esp_err.h"
 #include "esp_system.h"
 #include "esp_task_wdt.h"
-#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
@@ -875,8 +874,14 @@ static void cmd_comms(char *line)
 static void monitor_task(void *arg)
 {
     (void)arg;
+    /* TWDT: subscribe THIS task, not app_main (bench 2026-09-02: a
+     * _add(NULL) in app_main subscribed the blocked main task and the
+     * resulting 5 s dump spam wrecked scan timing). Feeding here keeps the
+     * IDLE-starvation noise down without masking a dead loop: mon is prio
+     * 2, and a truly wedged system still trips this reset path. */
+    esp_task_wdt_add(NULL);
     for (;;) {
-        esp_task_wdt_reset(); /* keep IDLE fed even if printf stalls */
+        esp_task_wdt_reset();
 #if CT_FITTED
         int mid0 = 0, rms0 = 0, pp0 = 0, sat0 = 0;
         bool ct_ok = burst_ch(0, &mid0, &rms0, &pp0, &sat0, true);
@@ -1011,8 +1016,6 @@ void app_main(void)
     apply_ctrl();
     comms_init();
     xTaskCreate(heartbeat_task, "heart", 2048, NULL, 1, NULL);
-    esp_task_wdt_init(NULL);
-    esp_task_wdt_add(NULL); /* monitor task subscribes to the TWDT */
 
     i2c_master_bus_config_t bus_cfg = {
         .i2c_port = I2C_NUM_0,

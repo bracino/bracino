@@ -20,6 +20,7 @@
 #include "comms.h"
 #include "enc.h"
 #include "esp_system.h"
+#include "esp_task_wdt.h"
 #include "esp_timer.h"
 #include "tft.h"
 
@@ -752,10 +753,12 @@ static bool scr_needs_live(int scr)
 void ui_task(void *arg)
 {
     (void)arg;
+    esp_task_wdt_add(NULL); /* name us if we ever wedge a redraw */
     vTaskDelay(pdMS_TO_TICKS(800));
     s_dirty = true;
     int live_div = 0;
     for (;;) {
+        esp_task_wdt_reset();
         /* Switch is polled by enc's 5 ms timer; just consume events here. */
         int steps = enc_take_steps();
         bool click = enc_take_click();
