@@ -18,6 +18,7 @@
 #include "driver/gpio.h"
 #include "driver/i2c_master.h"
 #include "esp_err.h"
+#include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
@@ -295,7 +296,8 @@ static void print_help(void)
         "  hel <ch> [n]     bench: HELLO burst on fixed channel\n"
         "  prog / st / scan / enc / h\n"
         "GPIO8: idle 100/900, RUNNING steady, alert 300/300.\n"
-        "Boots last saved mode (factory: Manual). CT is loaded/not.\n");
+        "Boots last saved mode (factory: Manual). CT is loaded/not.\n"
+        "reboot: soft restart (NVS state restores).\n");
 }
 
 static void cmd_scan(i2c_master_bus_handle_t bus)
@@ -634,6 +636,10 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
         } else {
             TLOG("hel <ch 1-13> [count=20]  (run `comms off` first)\n");
         }
+    } else if (strcmp(line, "reboot") == 0) {
+        TLOG("rebooting\n");
+        vTaskDelay(pdMS_TO_TICKS(50));
+        esp_restart();
     } else if (strcmp(line, "prog") == 0) {
         s_prog = true;
         TLOG("programming on  (list | NAME VALUE | save | default | exit)\n");

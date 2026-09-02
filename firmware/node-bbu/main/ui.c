@@ -19,6 +19,7 @@
 
 #include "comms.h"
 #include "enc.h"
+#include "esp_system.h"
 #include "tft.h"
 
 #ifndef BRACINO_BUILD
@@ -49,6 +50,7 @@ static int s_cur;
 static int s_top;
 static int s_edit = -1;   /* SCR_PROG: param-table index being edited */
 static int32_t s_edit_raw; /* shadow value while editing (commit on click) */
+static bool s_rbt_arm;     /* SCR_DIAG: reboot row armed (click twice) */
 
 /* Quick rows above the DN003 table (pre-012 behavior kept for habit): */
 #define PROG_QUICK_ROWS 2
@@ -64,6 +66,7 @@ static void go_home(void)
     s_cur = 0;
     s_top = 0;
     s_edit = -1;
+    s_rbt_arm = false;
     s_dirty = true;
 }
 
@@ -528,15 +531,16 @@ static void draw_diag(const bbu_ctrl_t *c, const ui_live_t *lv)
         cell(items[i++], sizeof(items[0]), "Ev   %6lu",
                (unsigned long)cm.ev_sent);
     }
-    int n_back = i;
+    cell(items[i++], sizeof(items[0]), s_rbt_arm ? "Reboot? click" : "Reboot");
     cell(items[i++], sizeof(items[0]), "Back");
     for (int j = 0; j < i; j++) {
         pitems[j] = items[j];
     }
     line(0, "Diagnostics", COL_HEADER);
     draw_items(pitems, i, COL_FOCUS);
-    line(7, "click=ok", COL_FOOTER);
-    (void)n_back;
+    line(7, s_rbt_arm ? "click=REBOOT" : "click=ok",
+         s_rbt_arm ? COL_BAD : COL_FOOTER);
+    (void)c;
 }
 
 static int nitems(int scr)
@@ -551,9 +555,9 @@ static int nitems(int scr)
     case SCR_DIAG: {
         comms_ui_t cm;
         comms_ui_snapshot(&cm);
-        /* 3 sensor rows + comms status + Back; enabled adds 11 comms
-         * rows (ch, gw, epoch, fifo, fails, rx, txok, txfl, rtx, dec, ev) */
-        return cm.enabled ? 16 : 5;
+        /* 3 sensor rows + comms status + Reboot + Back; enabled adds 11
+         * comms rows (ch, gw, epoch, fifo, fails, rx, txok, txfl, rtx, dec, ev) */
+        return cm.enabled ? 17 : 6;
     }
     default:       return 1;
     }
@@ -595,6 +599,8 @@ static void on_click_prog(bbu_ctrl_t *c)
 
 static void on_click(bbu_ctrl_t *c)
 {
+    bool was_rbt = s_rbt_arm;
+    s_rbt_arm = false;             /* any other click disarms reboot */
     switch (s_scr) {
     case SCR_HOME:
         s_scr = SCR_SEL;
@@ -626,6 +632,16 @@ static void on_click(bbu_ctrl_t *c)
         }
         break;
     case SCR_DIAG:
+        if (s_cur == nitems(SCR_DIAG) - 2) {
+            if (was_rbt) {
+                /* Two-click confirm done: full restart through the
+                 * normal boot path (NVS mode/params/identity restore).
+                 * Relay GPIO is driven low before restore logic runs. */
+                esp_restart();
+            }
+            s_rbt_arm = true;      /* first click: arm */
+            break;
+        }
         if (s_cur == nitems(SCR_DIAG) - 1) {
             s_scr = SCR_SEL;
             s_cur = 4;
