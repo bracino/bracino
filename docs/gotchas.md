@@ -39,6 +39,31 @@ target WiFi is on ch 1 and unlikely to change). Keep ch 6 out of bench
 drills unless testing occlusion deliberately; field DN004 channel choice
 must stay off the house AP's channel (re-survey at install).
 
+## Encoder A/B lines: ISR storm on bounce (2026-09-02)
+
+Symptom: intermittent task-WDT fire — IDLE starved, `ui` listed as the
+running task, garbage register dumps. Root cause: the A/B ISR had no rate
+limit; a bouncing/floating encoder wire generates kHz edge storms that
+run at interrupt priority and freeze everything. Screen-correlated on the
+bench because the trigger was physical contact with the board during
+handling, not the screen itself. Firmware fix: the A/B ISR now drops
+edges within 1 ms of the previous accepted edge (legit rotation ≤40
+edges/s), and serial `enc` reports `supp=<n>` dropped edges.
+
+Hardware answer for v0.09: small caps A/B (and SW) to ground — 10–100 nF
+against the GPIO pull-ups (τ ≈ 0.1–1 ms) kills bounce before the ISR
+sees it. Don't go much above 100 nF or legitimate fast rotation starts
+to round off.
+
+## Build alias auto-default (2026-09-02)
+
+`BRACINO_BUILD_NAME` now defaults to the **git short hash of the tree
+being built** (e.g. `g82415e8`; `-m` suffix marks a dirty tree), so a
+flashed binary is uniquely identified on the System Data screen without
+any build-time ceremony. Fallback `dev` outside git. Named per-deploy
+aliases still work: `idf.py -D'BRACINO_BUILD_NAME="b2"' ...`. Pair it
+with the UTC stamp on the next System Data row.
+
 ## Field reflash without ESP-IDF — standalone esptool (2026-09-02)
 
 `idf.py flash` needs the whole toolchain; a laptop only needs **esptool**
