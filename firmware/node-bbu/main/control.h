@@ -73,6 +73,11 @@ typedef struct {
 typedef void (*bbu_persist_fn_t)(bbu_mode_t user_mode, bool relay_on);
 void bbu_ctrl_register_persist_cb(bbu_persist_fn_t fn);
 
+/* Fired when stats are reset (bbu_ctrl_clear_stats) so the caller can
+ * persist the cleared values. */
+typedef void (*bbu_stats_fn_t)(uint32_t total_run_s, uint32_t starts);
+void bbu_ctrl_register_stats_cb(bbu_stats_fn_t fn);
+
 void bbu_ctrl_init(bbu_ctrl_t *c);
 const char *bbu_mode_name(bbu_mode_t m);
 const char *bbu_cycle_name(bbu_cycle_t cy);

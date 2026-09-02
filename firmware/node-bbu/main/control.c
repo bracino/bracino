@@ -3,6 +3,7 @@
 #include <string.h>
 
 static bbu_persist_fn_t s_persist_cb;
+static bbu_stats_fn_t s_stats_cb;
 
 static bool is_user_mode(bbu_mode_t m)
 {
@@ -32,6 +33,11 @@ static void go_running(bbu_ctrl_t *c)
 void bbu_ctrl_register_persist_cb(bbu_persist_fn_t fn)
 {
     s_persist_cb = fn;
+}
+
+void bbu_ctrl_register_stats_cb(bbu_stats_fn_t fn)
+{
+    s_stats_cb = fn;
 }
 
 /* Persist last-known user mode + Manual coil state. Never called for
@@ -132,6 +138,9 @@ void bbu_ctrl_clear_stats(bbu_ctrl_t *c)
 {
     c->starts = 0;
     c->total_run_s = 0;
+    if (s_stats_cb) {
+        s_stats_cb(c->total_run_s, c->starts);
+    }
 }
 
 static float on_c(const bbu_params_t *p)

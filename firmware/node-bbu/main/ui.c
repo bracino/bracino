@@ -20,10 +20,14 @@
 #include "comms.h"
 #include "enc.h"
 #include "esp_system.h"
+#include "esp_timer.h"
 #include "tft.h"
 
 #ifndef BRACINO_BUILD
 #define BRACINO_BUILD "dev"
+#endif
+#ifndef BRACINO_BUILD_NAME
+#define BRACINO_BUILD_NAME "dev"
 #endif
 
 enum {
@@ -300,30 +304,38 @@ static void draw_temp(const ui_live_t *lv, const bbu_params_t *p)
 
 static void draw_cnt(const bbu_ctrl_t *c)
 {
-    char items[5][32];
-    const char *pitems[5];
+    char items[6][32];
+    const char *pitems[6];
     comms_ui_t cm;
     comms_ui_snapshot(&cm);
-    cell(items[0], sizeof(items[0]), "Runtime %4luh",
-         (unsigned long)(c->total_run_s / 3600u));
-    cell(items[1], sizeof(items[1]), "Starts   %5lu",
+
+    /* uptime since boot: DD:HH:MM */
+    int64_t up_s = esp_timer_get_time() / 1000000;
+    cell(items[0], sizeof(items[0]), "Up    %02ld:%02lu:%02lu",
+         (long)(up_s / 86400), (unsigned long)((up_s / 3600) % 24),
+         (unsigned long)((up_s / 60) % 60));
+    /* persistent across reboots (NVS, saved on pump stop / clear) */
+    cell(items[1], sizeof(items[1]), "Pump  %02lu:%02lu",
+         (unsigned long)(c->total_run_s / 3600u),
+         (unsigned long)((c->total_run_s / 60u) % 60u));
+    cell(items[2], sizeof(items[2]), "Starts   %5lu",
          (unsigned long)c->starts);
     /* >1 means buffering (no comms / gateway down) — normal is 0 or 1 */
-    cell(items[2], sizeof(items[2]), "FIFO  %4u/%u", cm.fifo, cm.fifo_cap);
-    cell(items[3], sizeof(items[3]), "Clear counts");
-    cell(items[4], sizeof(items[4]), "Back");
-    for (int i = 0; i < 5; i++) {
+    cell(items[3], sizeof(items[3]), "FIFO  %4u/%u", cm.fifo, cm.fifo_cap);
+    cell(items[4], sizeof(items[4]), "Clear counts");
+    cell(items[5], sizeof(items[5]), "Back");
+    for (int i = 0; i < 6; i++) {
         pitems[i] = items[i];
     }
     line(0, "Counters", COL_HEADER);
-    draw_items(pitems, 5, COL_FOCUS);
+    draw_items(pitems, 6, COL_FOCUS);
     line(7, "click=ok", COL_FOOTER);
 }
 
 static void draw_sys(const bbu_params_t *p)
 {
-    char items[9][32];
-    const char *pitems[9];
+    char items[10][32];
+    const char *pitems[10];
     cell(items[0], sizeof(items[0]), "Setpt  %5.1fC",
          (double)p->tpo_setpoint_c);
     cell(items[1], sizeof(items[1]), "Hyst    %4.1fK",
@@ -338,17 +350,34 @@ static void draw_sys(const bbu_params_t *p)
          (unsigned long)p->ct_confirm_s);
     cell(items[6], sizeof(items[6]), "Max run  %4lum",
          (unsigned long)p->max_run_time_min);
-    cell(items[7], sizeof(items[7]), "FW  " BRACINO_BUILD);
-    cell(items[8], sizeof(items[8]), "Back");
-    for (int i = 0; i < 9; i++) {
+    cell(items[7], sizeof(items[0]), "FW    " BRACINO_BUILD_NAME);
+    cell(items[8], sizeof(items[0]), "UTC " BRACINO_BUILD);
+    cell(items[9], sizeof(items[0]), "Back");
+    for (int i = 0; i < 10; i++) {
         pitems[i] = items[i];
     }
     line(0, "System Data", COL_HEADER);
-    draw_items(pitems, 9, COL_FOCUS);
+    draw_items(pitems, 10, COL_FOCUS);
     line(7, "click=ok", COL_FOOTER);
 }
 
 /* ---- Control Programming: the DN003 param table (012) ---- */
+
+/* Abbreviated display names, parallel to params_table() order. The TFT is
+ * 20 cols; full DN003 names (min_tpo_tpu_delta_c = 19 chars) leave no room
+ * for the value. Keep each ≤ 7 chars; order MUST match params_table(). */
+static const char *const k_short[] = {
+    "setpt", "hyst", "min on", "min off", "ct wt",
+    "dT min", "maxrun", "mode", "pump", "comms",
+};
+
+static const char *prog_short(int idx, int n)
+{
+    if (idx >= 0 && idx < n && idx < (int)(sizeof(k_short) / sizeof(k_short[0]))) {
+        return k_short[idx];
+    }
+    return "?";
+}
 
 static const char *enum_name(uint8_t id, int32_t v)
 {
@@ -365,17 +394,18 @@ static const char *enum_name(uint8_t id, int32_t v)
 }
 
 static void param_value_txt(char *dst, size_t n, const bbu_param_desc_t *d,
-                            int32_t raw)
+                            int32_t raw, bool editing)
 {
+    const char *mark = editing ? ">" : " ";
     switch (d->type) {
     case PTYPE_I16_X10:
-        cell(dst, n, "%5.1f", raw / 10.0);
+        cell(dst, n, "%s%5.1f%s", mark, raw / 10.0, editing ? "<" : " ");
         break;
     case PTYPE_ENUM:
-        cell(dst, n, "%6s", enum_name(d->id, raw));
+        cell(dst, n, "%s%5s%s", mark, enum_name(d->id, raw), editing ? "<" : " ");
         break;
     default: /* PTYPE_U32 */
-        cell(dst, n, "%6lu", (unsigned long)raw);
+        cell(dst, n, "%s%5lu%s", mark, (unsigned long)raw, editing ? "<" : " ");
         break;
     }
 }
@@ -407,9 +437,10 @@ static void draw_prog(const bbu_ctrl_t *c)
         } else {
             params_get_raw_by_id(d->id, &raw);
         }
-        param_value_txt(val, sizeof(val), d, raw);
-        cell(items[i + PROG_QUICK_ROWS], sizeof(items[0]), "%-13s %6s",
-             d->name, val);
+        /* short name (≤7) + value with >…< edit hint: fits 20 cols */
+        param_value_txt(val, sizeof(val), d, raw, i == s_edit);
+        cell(items[i + PROG_QUICK_ROWS], sizeof(items[0]), "%-9s %8s",
+             prog_short(i, n), val);
     }
     cell(items[n + PROG_QUICK_ROWS], sizeof(items[0]), "Back");
     int total = n + 1 + PROG_QUICK_ROWS;
@@ -488,8 +519,11 @@ static void next_user_mode(bbu_ctrl_t *c)
 
 static void draw_diag(const bbu_ctrl_t *c, const ui_live_t *lv)
 {
-    char items[16][32];
-    const char *pitems[16];
+    /* 17 rows max (3 sensor + comms status + 11 comms + Reboot + Back).
+     * The [17] is load-bearing: 16 overflowed the stack and rebooted the
+     * node on screen entry (bench 2026-09-02). */
+    char items[17][32];
+    const char *pitems[17];
     comms_ui_t cm;
     comms_ui_snapshot(&cm);
     int i = 0;
@@ -549,8 +583,8 @@ static int nitems(int scr)
     case SCR_HOME: return 1;
     case SCR_SEL:  return 6;
     case SCR_TEMP: return 5;
-    case SCR_CNT:  return 5;
-    case SCR_SYS:  return 9;
+    case SCR_CNT:  return 6;
+    case SCR_SYS:  return 10;
     case SCR_PROG: return prog_count();
     case SCR_DIAG: {
         comms_ui_t cm;
@@ -625,7 +659,7 @@ static void on_click(bbu_ctrl_t *c)
         }
         break;
     case SCR_SYS:
-        if (s_cur == 8) {
+        if (s_cur == 9) {
             s_scr = SCR_SEL;
             s_cur = 2;
             s_top = 0;
@@ -649,9 +683,9 @@ static void on_click(bbu_ctrl_t *c)
         }
         break;
     case SCR_CNT:
-        if (s_cur == 3) {
+        if (s_cur == 4) {
             bbu_ctrl_clear_stats(c);
-        } else if (s_cur == 4) {
+        } else if (s_cur == 5) {
             s_scr = SCR_SEL;
             s_cur = 1;
             s_top = 0;

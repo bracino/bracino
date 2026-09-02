@@ -19,6 +19,8 @@
 #include "driver/i2c_master.h"
 #include "esp_err.h"
 #include "esp_system.h"
+#include "esp_task_wdt.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
@@ -75,6 +77,61 @@ static bool s_hw_relay;
 #define BOOT_KEY      "boot"
 #define BOOT_MAGIC    0x32425442u /* 'BTB2' */
 #define BOOT_VER      1u
+#define STATS_KEY     "stats"
+#define STATS_MAGIC   0x32535442u /* 'BTS2' */
+#define STATS_VER     1u
+
+typedef struct {
+    uint32_t magic;
+    uint32_t ver;
+    uint32_t total_run_s;
+    uint32_t starts;
+} stats_blob_t;
+
+/* Pump lifetime counters: saved on each pump stop, on clear, and before a
+ * soft reboot. Human-rate NVS wear. A power blip mid-run loses the current
+ * run's seconds + one start — accepted (documented in issue 012). */
+static void stats_save(void)
+{
+    nvs_handle_t h;
+    if (nvs_open(PARAMS_NS, NVS_READWRITE, &h) != ESP_OK) {
+        return;
+    }
+    stats_blob_t blob = {
+        .magic = STATS_MAGIC,
+        .ver = STATS_VER,
+        .total_run_s = s_ctrl.total_run_s,
+        .starts = s_ctrl.starts,
+    };
+    if (nvs_set_blob(h, STATS_KEY, &blob, sizeof(blob)) == ESP_OK) {
+        nvs_commit(h);
+    }
+    nvs_close(h);
+}
+
+static void stats_clear_cb(uint32_t total_run_s, uint32_t starts)
+{
+    (void)total_run_s;
+    (void)starts;
+    stats_save();
+}
+
+static void stats_restore(void)
+{
+    nvs_handle_t h;
+    if (nvs_open(PARAMS_NS, NVS_READONLY, &h) != ESP_OK) {
+        return;
+    }
+    stats_blob_t blob;
+    size_t len = sizeof(blob);
+    esp_err_t err = nvs_get_blob(h, STATS_KEY, &blob, &len);
+    nvs_close(h);
+    if (err == ESP_OK && len == sizeof(blob) &&
+        blob.magic == STATS_MAGIC && blob.ver == STATS_VER) {
+        s_ctrl.total_run_s = blob.total_run_s;
+        s_ctrl.starts = blob.starts;
+    }
+}
 
 typedef struct {
     uint32_t magic;
@@ -637,6 +694,7 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
             TLOG("hel <ch 1-13> [count=20]  (run `comms off` first)\n");
         }
     } else if (strcmp(line, "reboot") == 0) {
+        stats_save(); /* flush lifetime counters before restart */
         TLOG("rebooting\n");
         vTaskDelay(pdMS_TO_TICKS(50));
         esp_restart();
@@ -818,6 +876,7 @@ static void monitor_task(void *arg)
 {
     (void)arg;
     for (;;) {
+        esp_task_wdt_reset(); /* keep IDLE fed even if printf stalls */
 #if CT_FITTED
         int mid0 = 0, rms0 = 0, pp0 = 0, sat0 = 0;
         bool ct_ok = burst_ch(0, &mid0, &rms0, &pp0, &sat0, true);
@@ -914,6 +973,10 @@ static void monitor_task(void *arg)
         log_events(ev);
         xSemaphoreGive(s_mu);
 
+        if (ev & BBU_EVT_CYCLE) {
+            stats_save(); /* pump start/stop: human-rate NVS wear */
+        }
+
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -942,10 +1005,14 @@ void app_main(void)
     params_register_ext_setters(hook_param_set, hook_param_get);
     params_register_changed_cb(param_changed_cb);
     bbu_ctrl_register_persist_cb(persist_boot_cb);
+    bbu_ctrl_register_stats_cb(stats_clear_cb);
     boot_state_restore();
+    stats_restore();
     apply_ctrl();
     comms_init();
     xTaskCreate(heartbeat_task, "heart", 2048, NULL, 1, NULL);
+    esp_task_wdt_init(NULL);
+    esp_task_wdt_add(NULL); /* monitor task subscribes to the TWDT */
 
     i2c_master_bus_config_t bus_cfg = {
         .i2c_port = I2C_NUM_0,
@@ -975,7 +1042,7 @@ void app_main(void)
     params_print();
     print_help();
     ui_init(s_mu, &s_ctrl, params_get, apply_ctrl);
-    xTaskCreate(ui_task, "ui", 8192, NULL, 1, NULL);
+    xTaskCreate(ui_task, "ui", 12288, NULL, 1, NULL);
     xTaskCreate(monitor_task, "mon", 4096, NULL, 2, NULL);
     printf("> "); fflush(stdout); fsync(fileno(stdout));
 

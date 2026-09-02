@@ -6,10 +6,14 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # canonical registry included by node AND bench-master firmware.
 list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../shared")
 
-# 012 System Data screen: UTC build stamp shown as firmware revision.
+# 012 System Data screen: UTC build stamp + short alias shown as firmware
+# revision. Override the alias per bench/field build:
+#   idf.py -D'BRACINO_BUILD_NAME="b2"' ...   (or edit the default below)
 execute_process(COMMAND date -u +%Y%m%d.%H%M
                 OUTPUT_VARIABLE BRACINO_BUILD_STAMP
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
-add_compile_definitions(BRACINO_BUILD="${BRACINO_BUILD_STAMP}")
+set(BRACINO_BUILD_NAME "dev" CACHE STRING "short build alias for the System Data screen")
+add_compile_definitions(BRACINO_BUILD="${BRACINO_BUILD_STAMP}"
+                        BRACINO_BUILD_NAME="${BRACINO_BUILD_NAME}")
 
 project(node-bbu)
