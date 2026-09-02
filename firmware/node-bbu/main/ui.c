@@ -17,19 +17,14 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "bracino_build_id.h"
+
 #include "comms.h"
 #include "enc.h"
 #include "esp_system.h"
 #include "esp_task_wdt.h"
 #include "esp_timer.h"
 #include "tft.h"
-
-#ifndef BRACINO_BUILD
-#define BRACINO_BUILD "dev"
-#endif
-#ifndef BRACINO_BUILD_NAME
-#define BRACINO_BUILD_NAME "dev"
-#endif
 
 enum {
     SCR_HOME = 0,
