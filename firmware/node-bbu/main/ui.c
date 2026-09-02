@@ -245,10 +245,10 @@ static void draw_home(const bbu_ctrl_t *c, const ui_live_t *lv, const bbu_params
     cell(l, sizeof(l), "TPU   %s", t);
     line(2, l, lv->tpu.ok ? COL_FG : COL_BAD);
 
-    cell(l, sizeof(l), "Pump %s/%s",
-         c->relay_on ? "ON" : "OFF",
-         lv->ct_fitted ? (lv->ct_present ? "CT" : "none") : "n/f");
-    line(3, l, COL_FG);
+    cell(l, sizeof(l), "Pump %s",
+         c->user_mode == BBU_MODE_OFF ? "HALTED"
+                                      : (c->relay_on ? "ON" : "OFF"));
+    line(3, l, c->relay_on ? COL_OK : COL_FG);
 
     cell(l, sizeof(l), "Set    %4.0f C", (double)p->tpo_setpoint_c);
     line(4, l, COL_FG);

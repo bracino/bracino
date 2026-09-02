@@ -7,6 +7,8 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
+#include "soc/gpio_struct.h"
+#include "soc/io_mux_reg.h"
 
 #define TAG "enc"
 
@@ -55,17 +57,32 @@ static int s_sw = 1;
 
 static esp_timer_handle_t s_timer;
 
+/* Raw ISR registered via gpio_isr_register (NOT the per-pin framework).
+ * Rationale: during edge chatter every edge costs a framework dispatch
+ * (context save/restore) BEFORE any rate limiter could run — that
+ * interrupt-level load starved IDLE for >5 s and tripped the TWDT
+ * (bench 2026-09-02, panic backtrace: ui asleep in vTaskDelay while IDLE
+ * starved = the load was interrupt-level, not task-level). One raw ISR
+ * services both pins: entry cost only, then the 1 ms rate cap rejects
+ * chatter. Nothing else in node-bbu uses GPIO interrupts; revisit if
+ * that ever changes. */
 static void IRAM_ATTR enc_isr(void *arg)
 {
     (void)arg;
+    /* only our two edges should be pending; clear just those */
+    if ((GPIO.status.val & ENC_EDGE_MASK) == 0) {
+        return;
+    }
+    GPIO.status_w1tc.val = ENC_EDGE_MASK;
+
     int64_t now = esp_timer_get_time();
     if (now - s_last_edge_us < ENC_MIN_EDGE_US) {
         s_isr_supp++;
         return; /* bounce/noise storm: drop the edge */
     }
     s_last_edge_us = now;
-    int a = gpio_get_level(ENC_PIN_A) ? 1 : 0;
-    int b = gpio_get_level(ENC_PIN_B) ? 1 : 0;
+    int a = (GPIO.in.val >> ENC_PIN_A) & 1;
+    int b = (GPIO.in.val >> ENC_PIN_B) & 1;
     uint8_t level = (uint8_t)((a << 1) | b);
     uint8_t idx = (uint8_t)((s_ab << 2) | level);
     s_ab = level;
@@ -151,15 +168,20 @@ void enc_init(void)
     s_click = false;
     s_hold = false;
 
-    esp_err_t err = gpio_install_isr_service(0);
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TAG, "isr service %s", esp_err_to_name(err));
-        return;
-    }
+    /* IO-MUX glitch filter: pulses shorter than 2 IO-MUX clock cycles
+     * (~50–125 ns) never become interrupts. Handles the sub-µs spikes;
+     * the 1 ms rate cap below handles RC-threshold chatter. */
+    PIN_FILTER_EN(IO_MUX_GPIO0_REG);
+    PIN_FILTER_EN(IO_MUX_GPIO1_REG);
+    PIN_FILTER_EN(IO_MUX_GPIO5_REG);
+
+    /* Raw registration — no framework per-pin dispatch (see enc_isr). */
     gpio_set_intr_type(ENC_PIN_A, GPIO_INTR_ANYEDGE);
     gpio_set_intr_type(ENC_PIN_B, GPIO_INTR_ANYEDGE);
-    gpio_isr_handler_add(ENC_PIN_A, enc_isr, NULL);
-    gpio_isr_handler_add(ENC_PIN_B, enc_isr, NULL);
+    ESP_ERROR_CHECK(gpio_isr_register(enc_isr, NULL,
+                                      ESP_INTR_FLAG_IRAM, NULL));
+    gpio_intr_enable(ENC_PIN_A);
+    gpio_intr_enable(ENC_PIN_B);
 
     /* Independent of UI/TFT: never miss press/release during a redraw. */
     const esp_timer_create_args_t targs = {
@@ -169,7 +191,7 @@ void enc_init(void)
         .name = "enc_sw",
         .skip_unhandled_events = true,
     };
-    err = esp_timer_create(&targs, &s_timer);
+    esp_err_t err = esp_timer_create(&targs, &s_timer);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "timer %s", esp_err_to_name(err));
         return;

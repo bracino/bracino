@@ -3,10 +3,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/* v0.08: ENC_A GPIO0, ENC_B GPIO1, ENC_SW GPIO5. Internal pull-ups. */
+/* v0.08/v0.09: ENC_A GPIO0, ENC_B GPIO1, ENC_SW GPIO5. Internal pull-ups.
+ * v0.09 adds 10–100 nF A/B caps to ground (bounce); firmware adds the
+ * C3 IO-MUX per-pad glitch filter + a raw (framework-free) ISR — see
+ * bench WDT postmortem in docs/gotchas.md. */
 #define ENC_PIN_A   0
 #define ENC_PIN_B   1
 #define ENC_PIN_SW  5
+#define ENC_EDGE_MASK ((1u << ENC_PIN_A) | (1u << ENC_PIN_B))
 
 void enc_init(void);          /* A/B ISR + 5 ms switch timer */
 void enc_poll(void);          /* also driven by timer; safe to call */
