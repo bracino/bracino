@@ -7,7 +7,7 @@
  *    watermark trims entries <= watermark; 2 s timeout retransmits
  *  - no telemetry TX before first non-zero TIME_SYNC this boot session
  *  - HELLO broadcast on channel scan (cached → 1/6/11 → 1..13), bounded:
- *    ~250 ms dwell/channel, ~5 s/attempt, >=10 s rest between attempts
+ *    ~300 ms dwell/channel (2 HELLO shots), ~7 s/attempt, >=10 s rest
  *  - 3 consecutive failed unicast exchanges => unreachable => scan
  *  - control loop only ever calls comms_offer_sample (enqueue, no I/O)
  *
@@ -55,8 +55,9 @@
 #define ACK_TIMEOUT_MS     2000 /* BATCH_ACK wait (DN003 start value) */
 #define MAX_CONSEC_FAIL    3    /* failed unicast exchanges => unreachable */
 
-#define SCAN_DWELL_MS      250
-#define SCAN_BUDGET_MS     5000
+#define SCAN_DWELL_MS      300
+#define SCAN_SHOT2_MS      180 /* second HELLO inside the dwell */
+#define SCAN_BUDGET_MS     9000
 #define SCAN_REST_MS       10000
 #define SCAN_PRIOR_CH      { 1, 6, 11 }
 
@@ -670,21 +671,45 @@ static void scan_attempt(void)
         if (!send_wait(BCAST_MAC, buf, len)) {
             TLOG("comms: !! HELLO send on ch %u failed\n", chans[i]);
         }
-        rx_msg_t m;
-        while (xQueueReceive(s_rx_q, &m, pdMS_TO_TICKS(SCAN_DWELL_MS)) == pdTRUE) {
-            if (parse_hello_ack(&m, chans[i])) {
-                s_channel = chans[i];
-                memcpy(s_gw_mac, m.mac, 6);
-                add_gw_peer(s_gw_mac);
-                s_bound = true;
-                s_state = CS_ONLINE;
-                s_consec_fail = 0;
-                s_batch_out = false;
-                s_next_heartbeat_ms = now_ms() + HEARTBEAT_S * 1000;
-                nvs_save(); /* remember last-known-good channel */
-                TLOG("comms: bound gw " MACSTR " ch=%u\n",
-                       MAC2STR(s_gw_mac), s_channel);
-                return;
+        /* Two shots per dwell: a single HELLO per channel per pass lost
+         * to a gateway mid-TX window (HB cadence) turned one bad frame
+         * into a full 13.5 s wait for the next pass — bench showed 3–5
+         * passes to bind while hopping 1/6/11 (2026-09-02). Shot 2 fires
+         * shot fires ~180 ms into the same dwell; HELLO is idempotent
+         * (the GW just re-ACKs). */
+        {
+            uint32_t shot2_at = now_ms() + SCAN_SHOT2_MS;
+            uint32_t dwell_end = now_ms() + SCAN_DWELL_MS;
+            bool shot2_done = false;
+            rx_msg_t m;
+            for (;;) {
+                uint32_t now = now_ms();
+                uint32_t deadline = shot2_done ? dwell_end : shot2_at;
+                if (now >= deadline) {
+                    if (!shot2_done) {
+                        (void)send_wait(BCAST_MAC, buf, len);
+                        shot2_done = true;
+                        continue;
+                    }
+                    break;
+                }
+                if (xQueueReceive(s_rx_q, &m, pdMS_TO_TICKS(deadline - now)) != pdTRUE) {
+                    continue; /* deadline reached: loop fires shot2 or exits */
+                }
+                if (parse_hello_ack(&m, chans[i])) {
+                    s_channel = chans[i];
+                    memcpy(s_gw_mac, m.mac, 6);
+                    add_gw_peer(s_gw_mac);
+                    s_bound = true;
+                    s_state = CS_ONLINE;
+                    s_consec_fail = 0;
+                    s_batch_out = false;
+                    s_next_heartbeat_ms = now_ms() + HEARTBEAT_S * 1000;
+                    nvs_save(); /* remember last-known-good channel */
+                    TLOG("comms: bound gw " MACSTR " ch=%u\n",
+                           MAC2STR(s_gw_mac), s_channel);
+                    return;
+                }
             }
         }
     }
@@ -1283,7 +1308,9 @@ void comms_ui_snapshot(comms_ui_t *out)
     }
     *out = (comms_ui_t){
         .enabled = s_enabled,
-        .link_ok = s_enabled && anchored(),
+        /* bound AND anchored: an epoch from a previous anchor must not
+         * read as OK while we're rescanning (bench 2026-09-02). */
+        .link_ok = s_enabled && s_bound && anchored(),
         .channel = s_channel,
         .bound = s_bound,
         .anchored = anchored(),
