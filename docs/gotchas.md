@@ -31,9 +31,10 @@ erase.
 
 The local house AP sits on **channel 6** (heavy ambient traffic — the
 2026-08-31 sniff counted 452 frames/10 s). At desk range its traffic
-occludes ESP-NOW HELLO/ACK exchanges: binds on ch 1/11 were quick, binds
-on ch 6 failed in many cases even with two HELLO shots per scan dwell.
-GW default is now `DEFAULT_CH 1` (bench master; the install's target WiFi
-is on ch 1 and unlikely to change). Keep ch 6 out of bench drills unless
-testing occlusion deliberately; field DN004 channel choice should stay
-off the house AP's channel.
+occludes ESP-NOW HELLO/ACK exchanges. Hopping survey (2026-09-02,
+~8 SSIDs visible, clustered around 4–7): **ch 6 effectively unusable**;
+ch 1, 3, 11 bind quick and reliably even with two HELLO shots per scan
+dwell. GW default is now `DEFAULT_CH 1` (bench master; the install's
+target WiFi is on ch 1 and unlikely to change). Keep ch 6 out of bench
+drills unless testing occlusion deliberately; field DN004 channel choice
+must stay off the house AP's channel (re-survey at install).

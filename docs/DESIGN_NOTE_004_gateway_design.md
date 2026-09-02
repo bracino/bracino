@@ -64,6 +64,23 @@ Related: issues `004` (MQTT schema — this note closes it), `005`
     survive broker restarts. Broker config detail lives in `server/`, the
     requirement lives here and in the DN005 stub.
 
+## Addenda — field/bench notes 2026-09-02 (human, recorded by agent)
+
+- **Interim data-logger GW should include the maintenance SoftAP** from
+  day one, not only the real gateway: credentials need entering, and the
+  AP doubles as a live troubleshooting surface. DN004 requires building
+  it anyway (rule 7/9 above); carrying it into the logger build avoids a
+  second bring-up later. To be carried into the logger issue when filed.
+- **Status LED: GPIO2** — the chosen GW module's built-in LED sits on
+  GPIO2; gateway builds should use it for status indication (fills the
+  button/hardware TBD in rule 8 with a concrete pin for the LED side).
+- **RF channel guidance (bench 2026-09-02):** local spectrum shows ~8
+  SSIDs across 13 channels, clustered around 4–7. Bench binds: ch 1/3/11
+  quick and reliable; **ch 6 effectively unusable** (house AP channel;
+  occludes HELLO/ACK even with two-shot dwell). Field gateway channel
+  must avoid the house AP's channel (currently 1's neighbor noise is
+  benign; re-survey at install). See `docs/gotchas.md`.
+
 ---
 
 ## Architectural responsibilities
