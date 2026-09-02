@@ -22,7 +22,9 @@ if(NOT BRACINO_GIT_HASH)
     set(BRACINO_GIT_HASH "dev")
 endif()
 # mark dirty trees so a flashed bin is never confused with a pushed commit
-execute_process(COMMAND git -C ${CMAKE_CURRENT_LIST_DIR} diff --quiet
+# (scoped to firmware/ — unrelated in-flight hardware/doc churn must not
+# change the flashed binary's identity)
+execute_process(COMMAND git -C ${CMAKE_CURRENT_LIST_DIR} diff --quiet -- ${CMAKE_CURRENT_LIST_DIR}
                 RESULT_VARIABLE BRACINO_DIRTY
                 OUTPUT_QUIET ERROR_QUIET)
 if(NOT BRACINO_DIRTY EQUAL 0)
