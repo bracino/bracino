@@ -47,8 +47,13 @@ static int s_scr = SCR_HOME;
 static int s_shown_scr = -1;
 static int s_cur;
 static int s_top;
-static int s_edit = -1;   /* SCR_PROG: index of param being edited */
+static int s_edit = -1;   /* SCR_PROG: param-table index being edited */
 static int32_t s_edit_raw; /* shadow value while editing (commit on click) */
+
+/* Quick rows above the DN003 table (pre-012 behavior kept for habit): */
+#define PROG_QUICK_ROWS 2
+#define PROG_ROW_MODE   0
+#define PROG_ROW_PUMP   1
 static bool s_dirty = true;
 static char s_cache[TFT_ROWS][TFT_COLS + 1];
 static uint16_t s_cache_fg[TFT_ROWS];
@@ -376,16 +381,20 @@ static int prog_count(void)
 {
     int n = 0;
     params_table(&n);
-    return n + 1; /* + Back row */
+    return n + 1 + PROG_QUICK_ROWS; /* params + Back + quick rows */
 }
 
 static void draw_prog(const bbu_ctrl_t *c)
 {
     int n;
     const bbu_param_desc_t *tab = params_table(&n);
-    char items[11][32];
-    const char *pitems[11];
+    char items[13][32];
+    const char *pitems[13];
 
+    cell(items[0], sizeof(items[0]), "Mode %8s",
+         bbu_mode_name(c->user_mode));
+    cell(items[1], sizeof(items[1]), "Pump %8s",
+         c->relay_on ? "On" : "Off");
     for (int i = 0; i < n; i++) {
         char val[10];
         const bbu_param_desc_t *d = &tab[i];
@@ -396,19 +405,19 @@ static void draw_prog(const bbu_ctrl_t *c)
             params_get_raw_by_id(d->id, &raw);
         }
         param_value_txt(val, sizeof(val), d, raw);
-        cell(items[i], sizeof(items[i]), "%-13s %6s",
+        cell(items[i + PROG_QUICK_ROWS], sizeof(items[0]), "%-13s %6s",
              d->name, val);
     }
-    cell(items[n], sizeof(items[n]), "Back");
-    for (int i = 0; i <= n; i++) {
+    cell(items[n + PROG_QUICK_ROWS], sizeof(items[0]), "Back");
+    int total = n + 1 + PROG_QUICK_ROWS;
+    for (int i = 0; i < total; i++) {
         pitems[i] = items[i];
     }
     line(0, (s_edit >= 0) ? "Control Prog*" : "Control Prog",
          (s_edit >= 0) ? COL_EDIT : COL_HEADER);
-    draw_items(pitems, n + 1, s_edit >= 0 ? COL_EDIT : COL_FOCUS);
+    draw_items(pitems, total, s_edit >= 0 ? COL_EDIT : COL_FOCUS);
     line(7, (s_edit >= 0) ? "click=save hold=cancel" : "click=edit",
          (s_edit >= 0) ? COL_EDIT : COL_FOOTER);
-    (void)c;
 }
 
 /* Edit state for the focused param: a shadow value is stepped and shown
@@ -457,6 +466,21 @@ static void prog_edit_commit(void)
     }
     params_set_by_id(tab[s_edit].id, s_edit_raw);
     s_edit = -1;
+}
+
+static void next_user_mode(bbu_ctrl_t *c)
+{
+    static const bbu_mode_t k_user_modes[] = {
+        BBU_MODE_AUTO, BBU_MODE_MANUAL, BBU_MODE_TESTING, BBU_MODE_OFF
+    };
+    int i = 0;
+    for (; i < 4; i++) {
+        if (k_user_modes[i] == c->user_mode) {
+            break;
+        }
+    }
+    i = (i + 1) % 4;
+    bbu_ctrl_request_mode(c, k_user_modes[i]);
 }
 
 static void draw_diag(const bbu_ctrl_t *c, const ui_live_t *lv)
@@ -537,24 +561,36 @@ static int nitems(int scr)
 
 static void on_click_prog(bbu_ctrl_t *c)
 {
-    int n = prog_count() - 1; /* param rows */
+    int n;
+    params_table(&n);
+    int back = n + PROG_QUICK_ROWS;
     if (s_edit < 0) {
-        if (s_cur == n) {          /* Back */
+        if (s_cur == PROG_ROW_MODE) {
+            next_user_mode(c);         /* quick toggle: cycle mode */
+            return;
+        }
+        if (s_cur == PROG_ROW_PUMP) {
+            if (c->user_mode == BBU_MODE_MANUAL ||
+                c->user_mode == BBU_MODE_TESTING) {
+                bbu_ctrl_manual_relay(c, !c->relay_on);
+            }
+            return;
+        }
+        if (s_cur == back) {           /* Back */
             s_scr = SCR_SEL;
             s_cur = 3;
             s_top = 0;
             return;
         }
-        prog_edit_begin(s_cur);    /* begin editing this param */
+        prog_edit_begin(s_cur - PROG_QUICK_ROWS); /* table index */
         return;
     }
-    if (s_edit == s_cur) {
-        prog_edit_commit();        /* click again = save */
+    if (s_edit == s_cur - PROG_QUICK_ROWS) {
+        prog_edit_commit();            /* click again = save */
         return;
     }
     prog_edit_commit();            /* moving to another row: save first */
-    prog_edit_begin(s_cur);
-    (void)c;
+    prog_edit_begin(s_cur - PROG_QUICK_ROWS);
 }
 
 static void on_click(bbu_ctrl_t *c)
