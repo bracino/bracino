@@ -47,7 +47,8 @@ Preferred order when something has to wait:
 - [x] Pump on/off logic on desk `sim` (setpoint / hysteresis / TPU hold)
 - [x] Same loop on dummy AC load (human, 2026-08-25); Auto-start on real wells + pump (human, before 2026-09-01; 009 closed)
 - [x] Ice / boil two-point on the potted NTCs (human, 2026-08-25)
-- [ ] Field install (012 — menus + boot-mode persistence, then node in the plant; ESP-NOW client in per 011, comms default off)
+- [ ] Field install (012 — firmware field-image complete & bench-walked 2026-09-02; deploy held for the bench TWDT panic trial, then remove `CONFIG_ESP_TASK_WDT_PANIC` for the field image; comms stays OFF until the logger exists)
+- [ ] Field logger GW (ack-after-durable-write; include maintenance SoftAP + GPIO2 status LED per DN004 addenda)
 - [x] TFT + encoder UI on protoboard (010 closed 2026-08-28)
 - [x] 2-ESP bench wire test: node client vs bench gateway harness (011 + 013 closed 2026-09-01) — discovery, live telemetry, overnight drain, decimation, 20% frame loss, unreachable→rescan in tens of ms
 - [ ] Gateway builds; ESP-NOW bring-up with control node

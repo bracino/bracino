@@ -32,12 +32,9 @@ over-current. Schematic bump will reflect the absent PPTC.
 - [x] 009 closed: Auto-start on real wells + pump ON when TPO cold (human). Charge-stop not waited — watch a full cycle when convenient, not a blocker
 - [x] CT dispensed with (2026-09-01, 014): firmware `CT_FITTED 0` — A0 ignored, telemetry `ct_state = NOT_FITTED`, no-CT warning gated off (`ct_fitted`); TFT shows `n/f` instead of the amber no-CT WARN; A0 reserved for a later rev. DN001 rev 2 / DN002 updated
 - [x] Boot-mode persistence (DN002 boot behavior) implemented — `bbu/boot` NVS blob (mode + Manual coil state), written by a control-module persist callback that only fires on human/commanded paths (serial / UI / PARAM_SET); Auto loop transitions never write; TESTING never persisted; params auto-save on change. Host tests + IDF build pass; **bench-verified 2026-09-02** (incl. erase_region factory-fresh test → Manual/OFF)
-- [ ] Identity provisioned in NVS (node_type=1, node_id=1) at flash time
+- [x] Identity provisioned in NVS (node_type=1, node_id=1) at flash time — confirmed on unit (serial `ident`; `comms` shows node(1,1))
 - [x] ESP-NOW client compiled in (011 closed); `comms_enabled` NVS default **off**. Enable from UI/serial only when the field logger is present
-- [ ] Hardware loose ends: PPTC (F1) if stock arrived, connector/jumper
-      labels, sensor runs to tank, enclosure serviceable (USB reachable —
-      no OTA transport yet, so a node bug means physical reflash);
-      **schematic bump (v0.09+) reflects snubber + CT removal** (014)
+- [x] Hardware loose ends: PPTC F1 deliberately omitted (deploy decision, risk rationale above); connector/jumper labels done; sensor runs to tanks done; enclosure done; **schematic v0.09 committed** (encoder caps, PPTC omission reflected)
 - [x] TFT field-image menus (2026-09-02, build clean, **bench-walked: usable**):
       - Main: comms status line (disabled/enabled + OK or SCANNING when
         enabled)
@@ -55,7 +52,18 @@ over-current. Schematic bump will reflect the absent PPTC.
       - System Data screen to include firmware revision/build number
       - Note: with `CT_FITTED 0` the no-CT warning never fires; `ct_confirm_s`
         stays listed (registry stability) but is inert
-- [ ] Serial `halt` + UI confirmed before leaving the pump unattended
+- [x] Serial `halt` + UI confirmed before leaving the pump unattended — bench-confirmed on live NTCs (2026-09-02): reboot in Auto → relay opens, re-closes after min_off
+
+## Deploy readiness (2026-09-02, end of session)
+
+**All firmware items done and bench-verified. Node cleared for the wall**
+pending one bench-only experiment: the TWDT panic trial
+(`CONFIG_ESP_TASK_WDT_PANIC=y` — must be removed from sdkconfig.defaults
+for the final field image; a field node must never panic-reboot over a
+transient). One isolated WDT event remains unexplained; the panic trial
+will produce a real backtrace to close it. Field image checklist before
+final flash: remove TWDT panic, comms stays OFF (no logger yet), confirm
+`FW <hash>` on System Data matches the pushed commit.
 
 ## 2026-09-02 bench session (agent fixes, human walk)
 
