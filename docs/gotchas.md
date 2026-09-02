@@ -38,3 +38,29 @@ dwell. GW default is now `DEFAULT_CH 1` (bench master; the install's
 target WiFi is on ch 1 and unlikely to change). Keep ch 6 out of bench
 drills unless testing occlusion deliberately; field DN004 channel choice
 must stay off the house AP's channel (re-survey at install).
+
+## Field reflash without ESP-IDF — standalone esptool (2026-09-02)
+
+`idf.py flash` needs the whole toolchain; a laptop only needs **esptool**
+(`pip install esptool`, works on Windows/mac/Linux) + three .bin files
+copied out of `firmware/node-bbu/build/` at build time:
+
+- `node-bbu.bin` → offset **0x10000** (the app — flash this alone for a
+  normal update; NVS at 0x9000 is untouched, so boot mode/params/identity
+  survive)
+- `partition-table/partition-table.bin` → 0x8000
+- `bootloader/bootloader.bin` → 0x0 (only if bootloader changed)
+
+Full image (matches this project's NO_STUB config — see the erase gotcha
+above):
+
+```bash
+python -m esptool --chip esp32c3 -p COM5 --no-stub -b 460800 \
+  --before default_reset --after hard_reset \
+  write_flash 0x0 bootloader.bin 0x8000 partition-table.bin 0x10000 node-bbu.bin
+```
+
+App-only update: `write_flash 0x10000 node-bbu.bin`. Serial monitor from
+the same laptop: `python -m serial.tools.miniterm COM5 115200`. Copy
+fresh .bin files after every firmware change — a stale app bin is the
+classic field footgun.
