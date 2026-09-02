@@ -9,6 +9,16 @@
 #include "params.h"
 
 static int g_fail;
+static bbu_mode_t g_cb_mode;
+static bool g_cb_relay;
+static int g_cb_calls;
+
+static void persist_cb(bbu_mode_t m, bool relay)
+{
+    g_cb_mode = m;
+    g_cb_relay = relay;
+    g_cb_calls++;
+}
 
 static void expect(int ok, const char *msg)
 {
@@ -196,6 +206,54 @@ int main(void)
     s.tpo = ok_c(20.0f);
     tick_n(&c, s, &p, 1);
     expect(c.mode == BBU_MODE_OFF && !c.relay_on, "TPO recover stays Off");
+
+    /* DN002 boot persistence: human paths fire the cb, Auto loop does not */
+    bbu_ctrl_init(&c);
+    bbu_ctrl_register_persist_cb(persist_cb);
+    g_cb_calls = 0;
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);   /* already boot default? no: init=Manual */
+    expect(g_cb_calls == 1 && g_cb_mode == BBU_MODE_AUTO && !g_cb_relay,
+           "request_mode(AUTO) persists once");
+    s.tpo = ok_c(50.0f);
+    s.tpu = ok_c(30.0f);
+    tick_n(&c, s, &p, 61);
+    expect(c.cycle == BBU_CYCLE_RUNNING && g_cb_calls == 1,
+           "Auto loop start does NOT persist");
+    s.tpo = ok_c(70.0f);
+    s.tpu = ok_c(30.0f);
+    tick_n(&c, s, &p, 200); /* burn min_on_time while hot-top/cold-bottom */
+    expect(c.cycle == BBU_CYCLE_RUNNING && g_cb_calls == 1,
+           "Auto loop still RUNNING, no persist");
+    s.tpu = ok_c(66.0f);
+    tick_n(&c, s, &p, 2);
+    expect(c.cycle == BBU_CYCLE_IDLE && g_cb_calls == 1,
+           "Auto loop stop does NOT persist");
+    bbu_ctrl_manual_relay(&c, true);
+    expect(g_cb_calls == 2 && g_cb_mode == BBU_MODE_MANUAL && g_cb_relay,
+           "manual coil ON persists (Manual/ON)");
+    bbu_ctrl_manual_relay(&c, false);
+    expect(g_cb_calls == 3 && g_cb_mode == BBU_MODE_MANUAL && !g_cb_relay,
+           "manual coil OFF persists (Manual/OFF)");
+    bbu_ctrl_register_persist_cb(NULL);
+
+    /* TESTING is never persisted */
+    bbu_ctrl_init(&c);
+    bbu_ctrl_register_persist_cb(persist_cb);
+    g_cb_calls = 0;
+    bbu_ctrl_request_mode(&c, BBU_MODE_TESTING);
+    expect(g_cb_calls == 0, "TESTING never fires persist cb");
+    bbu_ctrl_manual_relay(&c, true);
+    expect(g_cb_calls == 0 && c.mode == BBU_MODE_TESTING,
+           "coil toggle in TESTING not persisted");
+    tick_n(&c, s, &p, 15 * 60 + 2); /* Test expiry → Auto internally */
+    expect(c.user_mode == BBU_MODE_AUTO && g_cb_calls == 0,
+           "Test expiry (internal Auto) does NOT persist");
+    /* reboot semantics: fresh init then restore-Auto is the caller's job;
+     * here just verify a later Off persists */
+    bbu_ctrl_request_mode(&c, BBU_MODE_OFF);
+    expect(g_cb_calls == 1 && g_cb_mode == BBU_MODE_OFF,
+           "Off persists");
+    bbu_ctrl_register_persist_cb(NULL);
 
     if (g_fail) {
         printf("%d failed\n", g_fail);

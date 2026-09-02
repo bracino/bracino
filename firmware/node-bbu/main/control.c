@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+static bbu_persist_fn_t s_persist_cb;
+
 static bool is_user_mode(bbu_mode_t m)
 {
     return m == BBU_MODE_AUTO || m == BBU_MODE_MANUAL ||
@@ -25,6 +27,25 @@ static void go_running(bbu_ctrl_t *c)
     c->run_s = 0;
     c->warn_maxrun = false;
     c->starts++;
+}
+
+void bbu_ctrl_register_persist_cb(bbu_persist_fn_t fn)
+{
+    s_persist_cb = fn;
+}
+
+/* Persist last-known user mode + Manual coil state. Never called for
+ * TESTING (reboot during Test → Manual/OFF per DN002), never from the
+ * Auto loop's own go_idle/go_running. */
+static void persist_boot(bbu_ctrl_t *c)
+{
+    if (s_persist_cb == NULL) {
+        return;
+    }
+    if (c->user_mode == BBU_MODE_TESTING) {
+        return; /* intrinsically transient — not persisted */
+    }
+    s_persist_cb(c->user_mode, c->relay_on);
 }
 
 void bbu_ctrl_init(bbu_ctrl_t *c)
@@ -54,6 +75,7 @@ const char *bbu_cycle_name(bbu_cycle_t cy)
 
 void bbu_ctrl_request_mode(bbu_ctrl_t *c, bbu_mode_t mode)
 {
+    bbu_mode_t um0 = c->user_mode;
     if (!is_user_mode(mode)) {
         return;
     }
@@ -63,6 +85,9 @@ void bbu_ctrl_request_mode(bbu_ctrl_t *c, bbu_mode_t mode)
     if (c->mode == BBU_MODE_FAULT) {
         if (mode == BBU_MODE_AUTO || mode == BBU_MODE_OFF) {
             go_idle(c);
+        }
+        if (c->user_mode != um0) {
+            persist_boot(c);
         }
         return;
     }
@@ -76,6 +101,9 @@ void bbu_ctrl_request_mode(bbu_ctrl_t *c, bbu_mode_t mode)
     c->mode = mode;
     if (mode == BBU_MODE_AUTO || mode == BBU_MODE_OFF) {
         go_idle(c);
+    }
+    if (c->user_mode != um0) {
+        persist_boot(c);
     }
 }
 
@@ -91,6 +119,12 @@ void bbu_ctrl_manual_relay(bbu_ctrl_t *c, bool on)
         go_running(c);
     } else {
         go_idle(c);
+    }
+    if (c->mode == BBU_MODE_MANUAL) {
+        /* Manual coil state is the operator's explicit pump decision —
+         * a power blip must not silently change it. In TESTING the coil
+         * toggle is transient and is not persisted. */
+        persist_boot(c);
     }
 }
 

@@ -25,6 +25,7 @@
 #include "control.h"
 #include "comms.h"
 #include "ntc.h"
+#include "nvs.h"
 #include "params.h"
 #include "enc.h"
 #include "espnow_schema.h"
@@ -68,6 +69,68 @@ static bool s_sim_tpu;
 static ntc_sample_t s_fake_tpo;
 static ntc_sample_t s_fake_tpu;
 static bool s_hw_relay;
+
+#define PARAMS_NS     "bbu"
+#define BOOT_KEY      "boot"
+#define BOOT_MAGIC    0x32425442u /* 'BTB2' */
+#define BOOT_VER      1u
+
+typedef struct {
+    uint32_t magic;
+    uint32_t ver;
+    uint8_t mode;  /* bbu_mode_t user mode (never TESTING) */
+    uint8_t relay; /* Manual coil state */
+} boot_blob_t;
+
+static void persist_boot_cb(bbu_mode_t user_mode, bool relay_on)
+{
+    nvs_handle_t h;
+    if (nvs_open(PARAMS_NS, NVS_READWRITE, &h) != ESP_OK) {
+        return;
+    }
+    boot_blob_t blob = {
+        .magic = BOOT_MAGIC,
+        .ver = BOOT_VER,
+        .mode = (uint8_t)user_mode,
+        .relay = relay_on ? 1u : 0u,
+    };
+    if (nvs_set_blob(h, BOOT_KEY, &blob, sizeof(blob)) == ESP_OK) {
+        nvs_commit(h);
+    }
+    nvs_close(h);
+}
+
+/* DN002 boot behavior: restore last-known user mode + Manual coil state.
+ * Factory-fresh / invalid blob → Manual/OFF (bbu_ctrl_init default).
+ * Auto re-derives IDLE/RUNNING from sensors; the cycle is not persisted. */
+static void boot_state_restore(void)
+{
+    nvs_handle_t h;
+    if (nvs_open(PARAMS_NS, NVS_READONLY, &h) != ESP_OK) {
+        return;
+    }
+    boot_blob_t blob;
+    size_t len = sizeof(blob);
+    esp_err_t err = nvs_get_blob(h, BOOT_KEY, &blob, &len);
+    nvs_close(h);
+    if (err != ESP_OK || len != sizeof(blob) ||
+        blob.magic != BOOT_MAGIC || blob.ver != BOOT_VER) {
+        return; /* factory-fresh: Manual / coil OFF */
+    }
+    if (blob.mode == BBU_MODE_AUTO || blob.mode == BBU_MODE_OFF) {
+        bbu_ctrl_request_mode(&s_ctrl, (bbu_mode_t)blob.mode);
+        TLOG("boot: restored %s (coil OFF)\n",
+               bbu_mode_name(s_ctrl.user_mode));
+    } else if (blob.mode == BBU_MODE_MANUAL) {
+        if (blob.relay) {
+            bbu_ctrl_manual_relay(&s_ctrl, true);
+        } else {
+            bbu_ctrl_request_mode(&s_ctrl, BBU_MODE_MANUAL);
+        }
+        TLOG("boot: restored Manual coil=%s\n", blob.relay ? "ON" : "OFF");
+    }
+    /* blob.mode == TESTING cannot be persisted; anything else → default */
+}
 
 static void print_help(void);
 static void cmd_comms(char *line); /* defined below; used in handle_line */
@@ -232,7 +295,7 @@ static void print_help(void)
         "  hel <ch> [n]     bench: HELLO burst on fixed channel\n"
         "  prog / st / scan / enc / h\n"
         "GPIO8: idle 100/900, RUNNING steady, alert 300/300.\n"
-        "Boots Manual. CT is loaded/not. Do not hang the real BBU pump.\n");
+        "Boots last saved mode (factory: Manual). CT is loaded/not.\n");
 }
 
 static void cmd_scan(i2c_master_bus_handle_t bus)
@@ -872,6 +935,9 @@ void app_main(void)
      * control struct without a compile-time dependency cycle. */
     params_register_ext_setters(hook_param_set, hook_param_get);
     params_register_changed_cb(param_changed_cb);
+    bbu_ctrl_register_persist_cb(persist_boot_cb);
+    boot_state_restore();
+    apply_ctrl();
     comms_init();
     xTaskCreate(heartbeat_task, "heart", 2048, NULL, 1, NULL);
 
@@ -895,8 +961,9 @@ void app_main(void)
     };
     ESP_ERROR_CHECK(i2c_master_bus_add_device(bus, &dev_cfg, &s_ads));
 
-    TLOG("\n# node-bbu  mode=Manual  loop=DESIGN_NOTE_002  beta=3950  "
+    TLOG("\n# node-bbu  mode=%s  loop=DESIGN_NOTE_002  beta=3950  "
            "relay=GPIO%d heart=GPIO%d\n",
+           bbu_mode_name(s_ctrl.user_mode),
            (int)PIN_RELAY, (int)PIN_HEART);
     cmd_scan(bus);
     params_print();

@@ -96,13 +96,13 @@ bool params_set_by_id(uint8_t id, int32_t v)
         return false;
     }
     switch (id) {
-    case BBU_PARAM_TPO_SETPOINT_C:      s_p.tpo_setpoint_c = v / 10.0f; break;
-    case BBU_PARAM_HYSTERESIS_C:        s_p.hysteresis_c = v / 10.0f; break;
-    case BBU_PARAM_MIN_ON_TIME_S:       s_p.min_on_time_s = (uint32_t)v; break;
-    case BBU_PARAM_MIN_OFF_TIME_S:      s_p.min_off_time_s = (uint32_t)v; break;
-    case BBU_PARAM_CT_CONFIRM_S:        s_p.ct_confirm_s = (uint32_t)v; break;
-    case BBU_PARAM_MIN_TPO_TPU_DELTA_C: s_p.min_tpo_tpu_delta_c = v / 10.0f; break;
-    case BBU_PARAM_MAX_RUN_TIME_MIN:    s_p.max_run_time_min = (uint32_t)v; break;
+    case BBU_PARAM_TPO_SETPOINT_C:      s_p.tpo_setpoint_c = v / 10.0f; params_save(); break;
+    case BBU_PARAM_HYSTERESIS_C:        s_p.hysteresis_c = v / 10.0f; params_save(); break;
+    case BBU_PARAM_MIN_ON_TIME_S:       s_p.min_on_time_s = (uint32_t)v; params_save(); break;
+    case BBU_PARAM_MIN_OFF_TIME_S:      s_p.min_off_time_s = (uint32_t)v; params_save(); break;
+    case BBU_PARAM_CT_CONFIRM_S:        s_p.ct_confirm_s = (uint32_t)v; params_save(); break;
+    case BBU_PARAM_MIN_TPO_TPU_DELTA_C: s_p.min_tpo_tpu_delta_c = v / 10.0f; params_save(); break;
+    case BBU_PARAM_MAX_RUN_TIME_MIN:    s_p.max_run_time_min = (uint32_t)v; params_save(); break;
     default:
         if (s_ext_set && s_ext_set(id, v)) {
             break;
@@ -175,6 +175,13 @@ void params_print(void)
            (double)params_tpo_on_c(), (double)params_tpo_off_c());
 }
 
+/* DN002: every successful local change persists immediately (human-rate
+ * writes; `prog default` still needs an explicit `save` by design). */
+static void autosave(void)
+{
+    params_save();
+}
+
 static bool in_range_f(float v, float lo, float hi)
 {
     return v >= lo && v <= hi;
@@ -239,6 +246,7 @@ bool params_set(const char *name, const char *value)
         return false;
     }
 
+    autosave();
     if (id_ok && s_changed_cb) {
         int32_t raw;
         if (params_get_raw_by_id(id, &raw)) {

@@ -28,7 +28,7 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | Root README / AGENTS / MIT license | Solid |
 | STATUS / ROADMAP / issues notebook | Process solid; this file tracks bench reality |
 | Control-node HW definition | **Settled for the module proto** — ADR 001 + KiCad **v0.08**. Protoboard built |
-| `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002. User modes **Auto / Manual / Test / Off**. Dummy AC load OK. Ice/boil NTCs OK (conversion −5–110 °C). TFT+encoder UI **on protoboard, menus OK** (2026-08-28; 010 closed): Modern DOS 8×16, row DMA + done-wait, 5 ms SW timer, BGR palette. **Boots Manual today**; last-known-mode persistence is 012 (next) |
+| `node-bbu` firmware | **Loop in tree** — DESIGN_NOTE_002. User modes **Auto / Manual / Test / Off**. Dummy AC load OK. Ice/boil NTCs OK (conversion −5–110 °C). TFT+encoder UI **on protoboard, menus OK** (2026-08-28; 010 closed): Modern DOS 8×16, row DMA + done-wait, 5 ms SW timer, BGR palette. **Boots last saved mode as of 2026-09-02** (boot-mode persistence implemented — mode + Manual coil in NVS, written only on human/commanded paths, TESTING never persisted; params auto-save on change; not yet bench-verified); TFT field-image menus are next in 012 |
 | `gateway` firmware | **Not started** — contract settled: DN003 (wire law) + DN004; bench harness spec in issue 013 |
 | MQTT topic + payload schema | **Settled** — [DESIGN_NOTE_004](DESIGN_NOTE_004_gateway_design.md) (2026-08-30). Not implemented |
 | ESP-NOW payload schema | **Settled and evidenced** — [DESIGN_NOTE_003](DESIGN_NOTE_003_espnow_node_schema.md). Implemented in `node-bbu` (011 closed) behind `comms_enabled`; bench harness 013 closed |

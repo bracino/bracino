@@ -65,6 +65,14 @@ typedef struct {
     uint8_t last_fault;
 } bbu_ctrl_t;
 
+/* DN002 boot persistence: fired ONLY from human/commanded paths
+ * (request_mode / manual_relay — serial, UI, or PARAM_SET), never from
+ * Auto loop transitions (the cycle is re-derived from sensors at boot).
+ * TESTING is never reported. main.c writes the NVS boot blob; control.c
+ * stays NVS-free so host tests run bare. */
+typedef void (*bbu_persist_fn_t)(bbu_mode_t user_mode, bool relay_on);
+void bbu_ctrl_register_persist_cb(bbu_persist_fn_t fn);
+
 void bbu_ctrl_init(bbu_ctrl_t *c);
 const char *bbu_mode_name(bbu_mode_t m);
 const char *bbu_cycle_name(bbu_cycle_t cy);

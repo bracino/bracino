@@ -25,7 +25,7 @@ Auto-start on real wells observed; charge-stop not waited (desk-proven).
 
 - [x] 009 closed: Auto-start on real wells + pump ON when TPO cold (human). Charge-stop not waited — watch a full cycle when convenient, not a blocker
 - [x] CT dispensed with (2026-09-01, 014): firmware `CT_FITTED 0` — A0 ignored, telemetry `ct_state = NOT_FITTED`, no-CT warning gated off (`ct_fitted`); TFT shows `n/f` instead of the amber no-CT WARN; A0 reserved for a later rev. DN001 rev 2 / DN002 updated
-- [ ] Boot-mode persistence (DN002 boot behavior) implemented
+- [x] Boot-mode persistence (DN002 boot behavior) implemented — `bbu/boot` NVS blob (mode + Manual coil state), written by a control-module persist callback that only fires on human/commanded paths (serial / UI / PARAM_SET); Auto loop transitions never write; TESTING never persisted; params auto-save on change. Host tests + IDF build pass (2026-09-02, not yet bench-flashed)
 - [ ] Identity provisioned in NVS (node_type=1, node_id=1) at flash time
 - [x] ESP-NOW client compiled in (011 closed); `comms_enabled` NVS default **off**. Enable from UI/serial only when the field logger is present
 - [ ] Hardware loose ends: PPTC (F1) if stock arrived, connector/jumper
