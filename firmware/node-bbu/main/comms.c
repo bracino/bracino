@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "esp_mac.h"
+#include "esp_system.h"
 #include "esp_now.h"
 #include "esp_random.h"
 #include "esp_timer.h"
@@ -40,11 +41,12 @@
 /* ---- tuning (DN003 start values) ---- */
 
 #ifndef COMMS_RING_SAMPLES
-/* DN003 targets a 90 KB ring (7680 samples ~ 32 h); that is tight next to
- * WiFi + UI on a C3. 4096 samples (~17 h at 15 s) is the phase-1 default
- * pending a heap measurement. Override at build time or via serial
- * `ring <n>` (bench knob; reallocates the ring EMPTY). */
-#define COMMS_RING_SAMPLES 4096
+/* DN003: "90 KB ring (7680 samples ~ 32 h at 15 s)" is the stated phase-1
+ * target — raised from the interim 4096 (~17 h) once the degrade-in-halves
+ * OOM path proved out. If the C3 heap can't back 7680 entries (~122 KB),
+ * the halving fallback below lands on a size it can; serial `comms` and
+ * the boot line report the effective cap + free heap. */
+#define COMMS_RING_SAMPLES 7680
 #endif
 
 #define COMMS_TASK_STACK   8192
@@ -59,6 +61,8 @@
 #define SCAN_SHOT2_MS      180 /* second HELLO inside the dwell */
 #define SCAN_BUDGET_MS     9000
 #define SCAN_REST_MS       10000
+#define SCAN_REST_BACKOFF_MS  (60 * 1000)     /* after 3 failed cycles */
+#define SCAN_REST_CAP_MS   (10 * 60 * 1000)   /* after 10 failed cycles */
 #define SCAN_PRIOR_CH      { 1, 6, 11 }
 
 #define RECV_QUEUE_LEN     8
@@ -125,6 +129,7 @@ static uint32_t s_last_capture_ms;
 static uint32_t s_sample_period_s = DEFAULT_SAMPLE_S;
 static uint32_t s_next_heartbeat_ms;
 static uint32_t s_next_scan_ms;
+static uint8_t s_scan_fails; /* consecutive failed FULL-CYCLE attempts */
 static uint8_t s_consec_fail;
 static uint32_t s_admin_seq;   /* PARAM_SET replay guard */
 
@@ -703,6 +708,7 @@ static void scan_attempt(void)
                     s_bound = true;
                     s_state = CS_ONLINE;
                     s_consec_fail = 0;
+                    s_scan_fails = 0;
                     s_batch_out = false;
                     s_next_heartbeat_ms = now_ms() + HEARTBEAT_S * 1000;
                     nvs_save(); /* remember last-known-good channel */
@@ -713,7 +719,23 @@ static void scan_attempt(void)
             }
         }
     }
-    s_next_scan_ms = now_ms() + SCAN_REST_MS; /* rest between attempts */
+    /* Radio courtesy during multi-day waits: a failed FULL pass steps the
+     * rest from 10 s → 1 min (after 3 failures) → 10 min cap (after 10).
+     * Reset on bind. The node may sit buffering for days before the logger
+     * shows up; constant 7 s-on/10 s-off chatter for that long is waste.
+     * Trade-off: worst-case bind latency after re-enable grows to the cap. */
+    if (!s_bound) {
+        s_scan_fails++;
+        uint32_t rest = SCAN_REST_MS;
+        if (s_scan_fails >= 10) {
+            rest = SCAN_REST_CAP_MS;
+        } else if (s_scan_fails >= 3) {
+            rest = SCAN_REST_BACKOFF_MS;
+        }
+        TLOG("comms: scan attempt %lu found nothing — rest %lus\n",
+               (unsigned long)s_scan_fails, (unsigned long)(rest / 1000));
+        s_next_scan_ms = now_ms() + rest;
+    }
 }
 
 static void go_unreachable(void)
@@ -1129,6 +1151,11 @@ void comms_init(void)
         TLOG("comms: ring alloc failed even at 32 entries — comms disabled\n");
         s_enabled = false;
         s_ring_cap = 0;
+    } else {
+        TLOG("comms: ring %u entries (%lu KB), free heap %lu KB\n",
+               s_ring_cap,
+               (unsigned long)(sizeof(fifo_ent_t) * s_ring_cap / 1024),
+               (unsigned long)(esp_get_free_heap_size() / 1024));
     }
 
     s_rx_q = xQueueCreate(RECV_QUEUE_LEN, sizeof(rx_msg_t));
@@ -1181,7 +1208,13 @@ void comms_enable(bool on)
 
 void comms_offer_sample(const comms_sample_t *s)
 {
-    if (!s_enabled || s == NULL) {
+    /* Capture is a NODE-side responsibility (DN003) and runs regardless of
+     * the comms gate: `comms off` means "no radio", not "no history". The
+     * ring is pre-allocated at init, so buffering while disabled is a plain
+     * enqueue — and when the logger finally appears, `comms on` drains the
+     * whole install-day history after anchoring. (Gap found 2026-09-02:
+     * pre-fix, a node with comms off from boot recorded nothing.) */
+    if (s == NULL) {
         return;
     }
     uint32_t now = now_ms();
@@ -1245,9 +1278,10 @@ void comms_status_print(void)
            anchored(), (unsigned long)s_anchor_epoch_s, s_anchor_epoch_ms,
            (unsigned long)s_anchor_clock_ms,
            (unsigned long)s_sample_period_s);
-    TLOG("  fifo=%u/%u outstanding=%d fails=%u admin_seq=%lu\n",
+    TLOG("  fifo=%u/%u outstanding=%d fails=%u admin_seq=%lu heap=%lu\n",
            fifo_count(), s_ring_cap, s_batch_out, s_consec_fail,
-           (unsigned long)s_admin_seq);
+           (unsigned long)s_admin_seq,
+           (unsigned long)esp_get_free_heap_size());
     TLOG("  rx=%lu drop=%lu tx_ok=%lu fail=%lu acks=%lu retrans=%lu\n",
            (unsigned long)s_ct.rx, (unsigned long)s_ct.rx_drop,
            (unsigned long)s_ct.tx_ok, (unsigned long)s_ct.tx_fail,
