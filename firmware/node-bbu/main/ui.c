@@ -320,7 +320,7 @@ static void draw_cnt(const bbu_ctrl_t *c)
          (unsigned long)(c->total_run_s / 3600u),
          (unsigned long)((c->total_run_s / 60u) % 60u));
     cell(items[2], sizeof(items[2]), "Starts   %5lu",
-         (unsigned long)c->starts);
+         (unsigned long)c->starts); /* pump starts (per go_running), not boots */
     /* >1 means buffering (no comms / gateway down) — normal is 0 or 1 */
     cell(items[3], sizeof(items[3]), "FIFO  %4u/%u", cm.fifo, cm.fifo_cap);
     cell(items[4], sizeof(items[4]), "Clear counts");
@@ -335,8 +335,10 @@ static void draw_cnt(const bbu_ctrl_t *c)
 
 static void draw_sys(const bbu_params_t *p)
 {
-    char items[10][32];
-    const char *pitems[10];
+    /* ct_confirm_s deliberately absent: CT is not fitted (issue 014), the
+     * parameter is inert — showing it just invites pointless edits. */
+    char items[9][32];
+    const char *pitems[9];
     cell(items[0], sizeof(items[0]), "Setpt  %5.1fC",
          (double)p->tpo_setpoint_c);
     cell(items[1], sizeof(items[1]), "Hyst    %4.1fK",
@@ -347,18 +349,16 @@ static void draw_sys(const bbu_params_t *p)
          (unsigned long)p->min_off_time_s);
     cell(items[4], sizeof(items[4]), "dT off  %4.1fK",
          (double)p->min_tpo_tpu_delta_c);
-    cell(items[5], sizeof(items[5]), "CT wait  %4lus",
-         (unsigned long)p->ct_confirm_s);
-    cell(items[6], sizeof(items[6]), "Max run  %4lum",
+    cell(items[5], sizeof(items[5]), "Max run  %4lum",
          (unsigned long)p->max_run_time_min);
-    cell(items[7], sizeof(items[0]), "FW    " BRACINO_BUILD_NAME);
-    cell(items[8], sizeof(items[0]), "UTC " BRACINO_BUILD);
-    cell(items[9], sizeof(items[0]), "Back");
-    for (int i = 0; i < 10; i++) {
+    cell(items[6], sizeof(items[0]), "FW    " BRACINO_BUILD_NAME);
+    cell(items[7], sizeof(items[0]), "UTC " BRACINO_BUILD);
+    cell(items[8], sizeof(items[0]), "Back");
+    for (int i = 0; i < 9; i++) {
         pitems[i] = items[i];
     }
     line(0, "System Data", COL_HEADER);
-    draw_items(pitems, 10, COL_FOCUS);
+    draw_items(pitems, 9, COL_FOCUS);
     line(7, "click=ok", COL_FOOTER);
 }
 
@@ -368,7 +368,7 @@ static void draw_sys(const bbu_params_t *p)
  * 20 cols; full DN003 names (min_tpo_tpu_delta_c = 19 chars) leave no room
  * for the value. Keep each ≤ 7 chars; order MUST match params_table(). */
 static const char *const k_short[] = {
-    "setpt", "hyst", "min on", "min off", "ct wt",
+    "setpt", "hyst", "min on", "min off", "dT min",
     "dT min", "maxrun", "mode", "pump", "comms",
 };
 
@@ -520,11 +520,11 @@ static void next_user_mode(bbu_ctrl_t *c)
 
 static void draw_diag(const bbu_ctrl_t *c, const ui_live_t *lv)
 {
-    /* 17 rows max (3 sensor + comms status + 11 comms + Reboot + Back).
-     * The [17] is load-bearing: 16 overflowed the stack and rebooted the
-     * node on screen entry (bench 2026-09-02). */
-    char items[17][32];
-    const char *pitems[17];
+    /* 18 rows max (3 sensor + comms status + 12 comms + Reboot + Back).
+     * The [18] is load-bearing: undersized arrays here overflowed the
+     * stack and rebooted the node on screen entry (bench 2026-09-02). */
+    char items[18][32];
+    const char *pitems[18];
     comms_ui_t cm;
     comms_ui_snapshot(&cm);
     int i = 0;
@@ -553,6 +553,7 @@ static void draw_diag(const bbu_ctrl_t *c, const ui_live_t *lv)
              cm.gw[3], cm.gw[4], cm.gw[5]);
         cell(items[i++], sizeof(items[0]), "Epc  %8lu",
                (unsigned long)cm.epoch_s);
+        cell(items[i++], sizeof(items[0]), "Boot  %4u", cm.boot_session);
         cell(items[i++], sizeof(items[0]), "FIFO %3u/%u", cm.fifo, cm.fifo_cap);
         cell(items[i++], sizeof(items[0]), "Fail %6lu",
                (unsigned long)cm.fails);
@@ -585,14 +586,15 @@ static int nitems(int scr)
     case SCR_SEL:  return 6;
     case SCR_TEMP: return 5;
     case SCR_CNT:  return 6;
-    case SCR_SYS:  return 10;
+    case SCR_SYS:  return 9;
     case SCR_PROG: return prog_count();
     case SCR_DIAG: {
         comms_ui_t cm;
         comms_ui_snapshot(&cm);
-        /* 3 sensor rows + comms status + Reboot + Back; enabled adds 11
-         * comms rows (ch, gw, epoch, fifo, fails, rx, txok, txfl, rtx, dec, ev) */
-        return cm.enabled ? 17 : 6;
+        /* 3 sensor rows + comms status + Reboot + Back; enabled adds 12
+         * comms rows (ch, gw, epoch, boot, fifo, fails, rx, txok, txfl,
+         * rtx, dec, ev) */
+        return cm.enabled ? 18 : 6;
     }
     default:       return 1;
     }
@@ -660,7 +662,7 @@ static void on_click(bbu_ctrl_t *c)
         }
         break;
     case SCR_SYS:
-        if (s_cur == 9) {
+        if (s_cur == 8) {
             s_scr = SCR_SEL;
             s_cur = 2;
             s_top = 0;

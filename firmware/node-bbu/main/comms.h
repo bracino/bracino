@@ -68,6 +68,7 @@ typedef struct {
     bool anchored;
     uint32_t epoch_s;  /* last anchor, 0 = never */
     uint16_t fifo, fifo_cap;
+    uint8_t boot_session; /* changes on every reboot — GW uses it to detect */
     uint32_t fails, rx, tx_ok, tx_fail, retrans, decim, ev_sent;
     uint8_t gw[6];
 } comms_ui_t;

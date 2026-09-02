@@ -1351,6 +1351,7 @@ void comms_ui_snapshot(comms_ui_t *out)
         .epoch_s = s_anchor_epoch_s,
         .fifo = fifo_count(),
         .fifo_cap = s_ring_cap,
+        .boot_session = s_boot_session,
         .fails = s_consec_fail,
         .rx = s_ct.rx,
         .tx_ok = s_ct.tx_ok,
