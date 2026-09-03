@@ -1,6 +1,6 @@
 # 012 — field-install readiness (node-bbu in-plant)
 
-- **Status:** open
+- **Status:** closed 2026-09-03 — node deployed to the plant
 - **Type:** process / hardware
 - **Opened:** 2026-08-30
 - **Refs:** issue 009, issue 011, DESIGN_NOTE_002, docs/STATUS.md
@@ -55,10 +55,19 @@ over-current. Schematic bump will reflect the absent PPTC.
         blob v2 (one-time defaults reset). No CT row in Control Prog.
 - [x] Serial `halt` + UI confirmed before leaving the pump unattended — bench-confirmed on live NTCs (2026-09-02): reboot in Auto → relay opens, re-closes after min_off
 
-## Deploy readiness (2026-09-02, end of session)
+## Deploy readiness (2026-09-02, end of session) — **DEPLOYED 2026-09-03**
 
-**All firmware items done and bench-verified. Node cleared for the wall**
-pending the encoder-WDT re-soak after the 2026-09-03 panic trial.
+**Deployed.** Bench validation: `b749dc3` passed a 5-min desk check (all
+menus, param edits) 2026-09-03 — **deploy image cut**: `CONFIG_ESP_TASK_WDT_PANIC`
+removed from sdkconfig.defaults + sdkconfig (re-add on demand for a real
+bench backtrace; recipe kept as a comment in sdkconfig.defaults). TWDT
+itself stays armed at 5 s, log-only. Field image `060c88d` pushed to
+origin before install. Field report (human, 2026-09-03): **on the wall,
+confirmed controlling the pump**, parameters persisted through the
+deploy reflash (params blob v2 migration proven in the field — tweaks
+applied on the desk survived), NTC values sane. Comms OFF (no logger
+yet). Full charge-stop cycle observation deferred to the logger (015) —
+summer, cycles infrequent.
 
 Panic trial (encoder-provoked, caps on): IDLE starved, `ui` innocent at
 `jal enc_take_steps`. A/B GPIO ISR + 1 ms software cap was not enough;
@@ -125,8 +134,37 @@ unplugged" case. Items:
 Sequence: 009 is closed (Auto-start on real wells). Flash the install image with
 identity + boot persistence, decide comms flag, verify boot → Manual/OFF →
 Auto → power-cycle → Auto on the bench before mounting. Watch a full
-charge-stop cycle on the plant when convenient.
+charge-stop cycle on the plant when convenient. **(Cycle watch executed
+2026-09-03: deferred to the logger — 015 — since cycles are infrequent
+in summer; pump control itself confirmed at install.)**
 
 ## Fix
 
+Field image evolved `d45815d` → `060c88d` over 2026-09-02/03 (details
+above):
+- Encoder A/B GPIO ISR removed — polled on the 5 ms timer (`f0c0274`)
+- `vTaskDelay(1)` in ui loop — HZ=100 made `pdMS_TO_TICKS(5)` 0 (`5697cef`)
+- Counters: 5-min runtime checkpoint + UI-reboot flush; Clear counts
+  two-click confirm; `ct_confirm_s` removed from the wire registry (id 5
+  reserved, params blob v2, CONFIG_VER 3); Home UTC clock (`91a5a19`,
+  `b749dc3`)
+- Deploy image: TWDT panic config stripped, log-only TWDT (`75fc52c`,
+  `060c88d`)
+
 ## Verify
+
+- Bench: WDT re-soaks clean — ~10 min menu abuse + soft reboots on
+  `5697cef`, 5-min desk check (all menus, param edits) on `b749dc3`;
+  new node logs boring (zero TWDT lines)
+- Bench: System Data hash matched the built commit at every stage;
+  `ring`/`tel`/menus walked per the 012 field-image checklist
+- **Field (human, 2026-09-03):** node on the wall, confirmed
+  controlling the pump; parameters as previously set (v2 blob migration
+  + desk tweaks survived the deploy reflash); NTC values sane
+- Deferred to 015: full charge-stop cycle observation via logger
+  telemetry (summer — infrequent cycles)
+- Low-priority bench-hardening items above (serial `st` with TFT
+  unplugged; bare-module graceful no-ADS mode): **won't fix for v1** —
+  the field unit's TFT is permanently fitted, and printf to a dead USB
+  host already degrades gracefully (spin ≤50 ms + drop); noted in
+  gotchas
