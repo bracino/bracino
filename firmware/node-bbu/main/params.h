@@ -10,7 +10,6 @@ typedef struct {
     float hysteresis_c;
     uint32_t min_on_time_s;
     uint32_t min_off_time_s;
-    uint32_t ct_confirm_s;
     float min_tpo_tpu_delta_c;
     uint32_t max_run_time_min;
 } bbu_params_t;

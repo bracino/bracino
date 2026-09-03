@@ -44,7 +44,6 @@ Tune on site. Values below are starting guesses (old-controller memory plus new 
 | `hysteresis_c` | 3.0 | Band around the setpoint |
 | `min_on_time_s` | 180 | Anti-short-cycle once RUNNING |
 | `min_off_time_s` | 60 | Anti-short-cycle once IDLE |
-| `ct_confirm_s` | 10 | After command ON, time allowed before posting a no-CT **warning** (does not change mode). **Inert on CT-less images** (CT_FITTED 0); kept in the param registry (id 5) for contract stability |
 | `min_tpo_tpu_delta_c` | 5.0 | Small top−bottom gap means the tank is largely charged |
 | `max_run_time_min` | 60 | Longest normal load; **warning only**, pump keeps its state |
 
@@ -116,7 +115,7 @@ The node **boots in its last known user mode**, not a fixed default:
 - **TEST is never persisted** (it is intrinsically transient): a reboot
   during Test comes up **Manual / coil OFF**.
 - **All tunable parameters in the Parameters table persist to NVS on
-  change** (setpoint, hysteresis, min on/off times, `ct_confirm_s`,
+  change** (setpoint, hysteresis, min on/off times,
   `min_tpo_tpu_delta_c`, `max_run_time_min`) and are restored at boot.
   They are field-adjustable from the local UI (Control Programming menu)
   and later over `PARAM_SET` — one validated setter path for both
@@ -138,7 +137,7 @@ The loop must run with USB, gateway, and broker absent.
 |-----------|-------|------|
 | TPO open, short, or not in −5–110 °C | **Critical** | `FAULT` (pump OFF) |
 | TPU open, short, not in −5–110 °C, or TPU > TPO | **Severe** | `TPO_ONLY` |
-| CT = none while RUNNING, after `ct_confirm_s` | **Warning** | stay on the standard algorithm (no `TPO_ONLY`) — CT-fitted images only |
+| CT = none while RUNNING | **Warning** | stay on the standard algorithm (no `TPO_ONLY`) — CT-fitted images only; warn window fixed at 10 s (was the `ct_confirm_s` parameter, removed 2026-09-03 when the CT left the design — id 5 reserved) |
 | CT sample unusable / not a clean running-vs-not | **Warning** | same — do not change start/stop — CT-fitted images only |
 | CT present while relay OFF | **Warning** | no mode change — CT-fitted images only |
 | CT not fitted (2026-09-01+, `ct_fitted = false`) | — | no CT warnings can fire; node runs blind to pump current by design (MES-BBU parity) |

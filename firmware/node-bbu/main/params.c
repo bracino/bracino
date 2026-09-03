@@ -11,7 +11,7 @@
 #define PARAMS_NS     "bbu"
 #define PARAMS_KEY    "p1"
 #define PARAMS_MAGIC  0x31425542u /* 'BBU1' */
-#define PARAMS_VER    1u
+#define PARAMS_VER    2u /* v2: ct_confirm_s removed from the struct (014) */
 
 typedef struct {
     uint32_t magic;
@@ -34,7 +34,6 @@ static const bbu_param_desc_t s_table[] = {
     { BBU_PARAM_HYSTERESIS_C,        PTYPE_I16_X10, PARAM_FLAG_RW, 5,   150,   5, "hysteresis_c" },
     { BBU_PARAM_MIN_ON_TIME_S,       PTYPE_U32,     PARAM_FLAG_RW, 0,   3600,  1, "min_on_time_s" },
     { BBU_PARAM_MIN_OFF_TIME_S,      PTYPE_U32,     PARAM_FLAG_RW, 0,   3600,  1, "min_off_time_s" },
-    { BBU_PARAM_CT_CONFIRM_S,        PTYPE_U32,     PARAM_FLAG_RW, 1,   120,   1, "ct_confirm_s" },
     { BBU_PARAM_MIN_TPO_TPU_DELTA_C, PTYPE_I16_X10, PARAM_FLAG_RW, 0,   300,   5, "min_tpo_tpu_delta_c" },
     { BBU_PARAM_MAX_RUN_TIME_MIN,    PTYPE_U32,     PARAM_FLAG_RW, 1,   240,   1, "max_run_time_min" },
     { BBU_PARAM_USER_MODE,           PTYPE_ENUM,    PARAM_FLAG_RW, 0,   3,     1, "user_mode" },
@@ -102,7 +101,6 @@ bool params_set_by_id(uint8_t id, int32_t v)
     case BBU_PARAM_HYSTERESIS_C:        s_p.hysteresis_c = v / 10.0f; params_save(); break;
     case BBU_PARAM_MIN_ON_TIME_S:       s_p.min_on_time_s = (uint32_t)v; params_save(); break;
     case BBU_PARAM_MIN_OFF_TIME_S:      s_p.min_off_time_s = (uint32_t)v; params_save(); break;
-    case BBU_PARAM_CT_CONFIRM_S:        s_p.ct_confirm_s = (uint32_t)v; params_save(); break;
     case BBU_PARAM_MIN_TPO_TPU_DELTA_C: s_p.min_tpo_tpu_delta_c = v / 10.0f; params_save(); break;
     case BBU_PARAM_MAX_RUN_TIME_MIN:    s_p.max_run_time_min = (uint32_t)v; params_save(); break;
     default:
@@ -124,7 +122,6 @@ bool params_get_raw_by_id(uint8_t id, int32_t *raw)
     case BBU_PARAM_HYSTERESIS_C:        *raw = (int32_t)(s_p.hysteresis_c * 10.0f); return true;
     case BBU_PARAM_MIN_ON_TIME_S:       *raw = (int32_t)s_p.min_on_time_s; return true;
     case BBU_PARAM_MIN_OFF_TIME_S:      *raw = (int32_t)s_p.min_off_time_s; return true;
-    case BBU_PARAM_CT_CONFIRM_S:        *raw = (int32_t)s_p.ct_confirm_s; return true;
     case BBU_PARAM_MIN_TPO_TPU_DELTA_C: *raw = (int32_t)(s_p.min_tpo_tpu_delta_c * 10.0f); return true;
     case BBU_PARAM_MAX_RUN_TIME_MIN:    *raw = (int32_t)s_p.max_run_time_min; return true;
     default:
@@ -138,7 +135,6 @@ static void defaults(bbu_params_t *p)
     p->hysteresis_c = 3.0f;
     p->min_on_time_s = 180;
     p->min_off_time_s = 60;
-    p->ct_confirm_s = 10;
     p->min_tpo_tpu_delta_c = 5.0f;
     p->max_run_time_min = 60;
 }
@@ -170,7 +166,6 @@ void params_print(void)
     printf("  hysteresis_c         %.1f\n", (double)s_p.hysteresis_c);
     printf("  min_on_time_s        %lu\n", (unsigned long)s_p.min_on_time_s);
     printf("  min_off_time_s       %lu\n", (unsigned long)s_p.min_off_time_s);
-    printf("  ct_confirm_s         %lu\n", (unsigned long)s_p.ct_confirm_s);
     printf("  min_tpo_tpu_delta_c  %.1f\n", (double)s_p.min_tpo_tpu_delta_c);
     printf("  max_run_time_min     %lu\n", (unsigned long)s_p.max_run_time_min);
     printf("  derived tpo_on=%.1f  tpo_off=%.1f\n",
@@ -225,12 +220,6 @@ bool params_set(const char *name, const char *value)
             return false;
         }
         s_p.min_off_time_s = (uint32_t)d;
-    } else if (strcmp(name, "ct_confirm_s") == 0) {
-        if (d < 1.0 || d > 120.0) {
-            printf("ct_confirm_s 1..120\n");
-            return false;
-        }
-        s_p.ct_confirm_s = (uint32_t)d;
     } else if (strcmp(name, "min_tpo_tpu_delta_c") == 0) {
         if (!in_range_f((float)d, 0.0f, 30.0f)) {
             printf("min_tpo_tpu_delta_c 0..30\n");

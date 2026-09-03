@@ -800,6 +800,12 @@ tag=PARAM_DESCRIPTOR, value = { param_id, type_enum, flags(RO/RW),
 Mode-switching, threshold changes, manual overrides — all become
 `PARAM_SET(param_id, value)`, not bespoke message types.
 
+**Registry revocation:** `param_id` 5 (`ct_confirm_s`) was revoked on
+2026-09-03 — the CT left the BBU design entirely (issue 014, DN001 rev 2).
+The id is **permanently reserved** (never reassigned, never renumbered);
+no gateway existed when it was revoked, so no consumer ever saw it.
+`config_ver` bumped to 3.
+
 **Descriptor lifecycle:** the node advertises `config_ver` in every
 `HELLO`. The gateway caches the descriptor in its registry and re-fetches
 (`CONFIG_GET` → `CONFIG_DESC`) only when the version is unknown or

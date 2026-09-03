@@ -9,6 +9,10 @@
 #define BBU_TPU_INVERT_SLACK_C 1.0f
 #define BBU_TEST_LIMIT_S       (15 * 60)
 #define BBU_STUCK_CONFIRM_S    2
+/* No-CT warn window. Not a parameter anymore: the CT was dropped from the
+ * circuit (014, DN001 rev 2), the warn path is dead on CT-less hardware,
+ * and the value is fixed for the bench/host-test path only. */
+#define BBU_NOCT_CONFIRM_S     10
 
 typedef enum {
     BBU_MODE_MANUAL = 0,

@@ -20,7 +20,7 @@ extern "C" {
 /* ---- protocol versions ---- */
 #define ESPNOW_PROTO_VER   1u   /* envelope format version */
 #define BBU_SCHEMA_VER     1u   /* BBU telemetry struct version */
-#define BBU_CONFIG_VER     2u   /* BBU parameter descriptor table version */
+#define BBU_CONFIG_VER     3u   /* BBU parameter descriptor table version */
 
 /* ESP-NOW application payload ceiling (bench-verify against IDF! DN003). */
 #define ESPNOW_MAX_PAYLOAD 250u
@@ -169,20 +169,23 @@ typedef struct __attribute__((packed)) {
 #define PARAM_RESULT_REJECTED_TYPE   2u
 #define PARAM_RESULT_EXPIRED         3u
 
-/* ---- BBU param_id registry (append-only, frozen once assigned) ----
- * One validated setter path: local UI and PARAM_SET both go through it. */
+/* ---- BBU param_id registry (append-only; ids are never reused) ----
+ * One validated setter path: local UI and PARAM_SET both go through it.
+ * Revocations leave the id permanently reserved (documented here):
+ *   5: ct_confirm_s — REVOKED 2026-09-03 (CT dropped from circuit, issue
+ *      014 / DN001 rev 2). Never deployed: no gateway existed when the id
+ *      was revoked. Do NOT renumber; do NOT reassign id 5. */
 #define BBU_PARAM_TPO_SETPOINT_C     1u  /* I16_X10, 200..900        */
 #define BBU_PARAM_HYSTERESIS_C       2u  /* I16_X10, 5..150          */
 #define BBU_PARAM_MIN_ON_TIME_S      3u  /* U32, 0..3600             */
 #define BBU_PARAM_MIN_OFF_TIME_S     4u  /* U32, 0..3600             */
-#define BBU_PARAM_CT_CONFIRM_S       5u  /* U32, 1..120              */
 #define BBU_PARAM_MIN_TPO_TPU_DELTA_C 6u /* I16_X10, 0..300          */
 #define BBU_PARAM_MAX_RUN_TIME_MIN   7u  /* U32, 1..240              */
 #define BBU_PARAM_USER_MODE          8u  /* ENUM, BBU_MODE_W_*       */
 #define BBU_PARAM_MANUAL_RELAY       9u  /* ENUM, 0/1 (Manual mode)  */
 #define BBU_PARAM_COMMS_ENABLE       10u /* ENUM, 0/1                */
 #define BBU_PARAM_SAMPLE_PERIOD_S    11u /* U32, 5..120, default 15  */
-#define BBU_PARAM_COUNT              11u
+#define BBU_PARAM_COUNT              11u /* registry space; 10 live  */
 
 /* ---- event registry (EVENT payload is ONE TLV: tag = event id) ---- */
 #define EVENT_FAULT_RAISED   0x01u /* value: fault_id u8          */

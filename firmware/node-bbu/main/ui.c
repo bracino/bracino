@@ -352,8 +352,8 @@ static void draw_cnt(const bbu_ctrl_t *c)
 
 static void draw_sys(const bbu_params_t *p)
 {
-    /* ct_confirm_s deliberately absent: CT is not fitted (issue 014), the
-     * parameter is inert — showing it just invites pointless edits. */
+    /* ct_confirm_s removed from the registry (2026-09-03, id 5 reserved):
+     * the CT is gone from this design (014), nothing to edit or show. */
     char items[9][32];
     const char *pitems[9];
     cell(items[0], sizeof(items[0]), "Setpt  %5.1fC",
@@ -385,8 +385,8 @@ static void draw_sys(const bbu_params_t *p)
  * 20 cols; full DN003 names (min_tpo_tpu_delta_c = 19 chars) leave no room
  * for the value. Keep each ≤ 7 chars; order MUST match params_table(). */
 static const char *const k_short[] = {
-    "setpt", "hyst", "min on", "min off", "ct wait",
-    "dT min", "maxrun", "mode", "pump", "comms", "tel s",
+    "setpt", "hyst", "min on", "min off", "dT min",
+    "maxrun", "mode", "pump", "comms", "tel s",
 };
 
 static const char *prog_short(int idx, int n)

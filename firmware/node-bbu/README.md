@@ -61,12 +61,12 @@ If `set-target` was already run for another chip, `idf.py fullclean` first.
 | `scan` | I2C probe |
 | `h` | Help |
 
-CT on this prototype is **on/off only** ([DESIGN_NOTE_001](../../docs/DESIGN_NOTE_001_ct_binary_only.md)). At pot = 2 CCW, 3.3 V: relay off ≈ 0 mV rms; contacts closed / no motor ≈ 37 mV; ~0.15 A fan ≈ 175 mV. A threshold around 80–100 mV is the intended discriminator. On A0, `mid` is bias, not current; it walks after large loads. Missing or unusable CT after `ct_confirm_s` is a **warning only** — the TPO/TPU loop keeps running ([DESIGN_NOTE_002](../../docs/DESIGN_NOTE_002_bbu_control_loop.md)).
+CT on this prototype is **on/off only** ([DESIGN_NOTE_001](../../docs/DESIGN_NOTE_001_ct_binary_only.md)); since issue 014 (2026-09-01) the CT is **not fitted at all** — `ct_confirm_s` was removed from the parameter registry (2026-09-03, id 5 reserved). The no-CT warn path is CT-fitted-images-only and its window is fixed at 10 s.
 
 Free-text lines (`ambient`, `open`, …) are not commands; the sketch prints `unknown`.
 
 GPIO8: idle flash, steady when the relay is on, rapid if a warning/fault is latched (stuck-on, no-CT, max run time, TPO bad, TPO_ONLY, FAULT). Flash over USB with **J7 out**. Do not plug USB while J7 is in.
 
-`prog` names: `tpo_setpoint_c`, `hysteresis_c`, `min_on_time_s`, `min_off_time_s`, `ct_confirm_s`, `min_tpo_tpu_delta_c`, `max_run_time_min`. `save` writes NVS.
+`prog` names: `tpo_setpoint_c`, `hysteresis_c`, `min_on_time_s`, `min_off_time_s`, `min_tpo_tpu_delta_c`, `max_run_time_min`, `sample_period_s`. `save` writes NVS.
 
 Monitor quit: **Ctrl+]**. If the ACM node vanishes after reset, `ls /dev/ttyACM*` and `idf.py -p … flash` again — do not fullclean.

@@ -44,14 +44,15 @@ over-current. Schematic bump will reflect the absent PPTC.
         comms or gateway down)
       - Control Programming: every DN002 parameter field-editable with
         validation + NVS persistence (mode, manual pump, setpoint,
-        hysteresis, min on/off times, ct_confirm_s, min_tpo_tpu_delta_c,
+        hysteresis, min on/off times, min_tpo_tpu_delta_c,
         max_run_time_min, comms enable, sample_period_s 5..120) — parity with the future admin
         panel; build it as the DN003 param_id table so both share one
         validated setter path
         Diagnostics: Include following comms data: channel, gw, anchored, last EPOCH, fifo, fails, rx, tx_ok, fail, retrans, decim ev_sent
       - System Data screen to include firmware revision/build number
-      - Note: with `CT_FITTED 0` the no-CT warning never fires; `ct_confirm_s`
-        stays listed (registry stability) but is inert
+      - Note 2026-09-03: `ct_confirm_s` REMOVED from the registry per human
+        decision (CT defunct, 014) — id 5 reserved, CONFIG_VER 3, params
+        blob v2 (one-time defaults reset). No CT row in Control Prog.
 - [x] Serial `halt` + UI confirmed before leaving the pump unattended — bench-confirmed on live NTCs (2026-09-02): reboot in Auto → relay opens, re-closes after min_off
 
 ## Deploy readiness (2026-09-02, end of session)
@@ -71,7 +72,8 @@ Field-build fixes (2026-09-03, this issue): pump counters saved only on
 pump stop never checkpointed the bench's continuous run — "re-zero upon
 flash". Now saved every 5 min of runtime + on stop/clear/soft-reboot;
 UI DIAG soft-reboot flushes (was serial-only). Clear counts is two-click
-confirmed. `ct_confirm_s` was mislabeled as a second "dT min" → `ct wait`.
+confirmed. `ct_confirm_s` was mislabeled as a second "dT min"; later the
+same day it was removed from the registry entirely (id 5 reserved).
 Home shows UTC clock from the TIME_SYNC anchor (`04 Sep 2026 17:57`).
 
 Field image checklist: **remove `CONFIG_ESP_TASK_WDT_PANIC` from

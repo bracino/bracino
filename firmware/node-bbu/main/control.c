@@ -209,7 +209,7 @@ uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *
     /* CT-less hardware (014): warn_noct can never fire. */
     bool no_ct = s->ct_fitted &&
                  (c->cycle == BBU_CYCLE_RUNNING) &&
-                 (c->cycle_s >= p->ct_confirm_s) &&
+                 (c->cycle_s >= BBU_NOCT_CONFIRM_S) &&
                  !s->ct_present;
     c->warn_noct = no_ct;
 
