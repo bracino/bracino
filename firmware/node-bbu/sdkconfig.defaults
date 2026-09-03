@@ -2,9 +2,9 @@
 CONFIG_IDF_TARGET="esp32c3"
 CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
 CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
-
-# Bench only (remove before field image): task-WDT timeouts panic so we get
-# a REAL backtrace. The TWDT's own register dumps on this board come out
-# corrupted (zeroed MSTATUS/MTVEC, missing backtrace) — see issue 012
-# notes 2026-09-02. A panic routes through the proper panic handler.
-CONFIG_ESP_TASK_WDT_PANIC=y
+# FIELD image: no task-WDT panic (a field node must never panic-reboot over
+# a transient). The bench-only panic build lived here 2026-09-02/03 and was
+# used to name the encoder-WDT culprits (see issue 012, docs/gotchas.md).
+# If you need a REAL backtrace on the desk again, re-add:
+#   CONFIG_ESP_TASK_WDT_PANIC=y
+# TWDT stays enabled at 5 s — it logs dump spam instead of rebooting.

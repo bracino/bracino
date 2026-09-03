@@ -76,11 +76,14 @@ confirmed. `ct_confirm_s` was mislabeled as a second "dT min"; later the
 same day it was removed from the registry entirely (id 5 reserved).
 Home shows UTC clock from the TIME_SYNC anchor (`04 Sep 2026 17:57`).
 
-Field image checklist: **remove `CONFIG_ESP_TASK_WDT_PANIC` from
-sdkconfig.defaults** (a field node must never panic-reboot over a
-transient), bench-walk the new menus/counters/time row, rebuild so
-System Data shows a clean hash, comms stays OFF (no logger yet), confirm
-`FW <hash>` on System Data matches the commit.
+Bench validation: `b749dc3` passed a 5-min desk check (all menus,
+param edits) 2026-09-03 — **deploy image cut**: `CONFIG_ESP_TASK_WDT_PANIC`
+removed from sdkconfig.defaults + sdkconfig (re-add on demand for a real
+bench backtrace; recipe kept as a comment in sdkconfig.defaults). TWDT
+itself stays armed at 5 s, log-only. Deploy checklist: comms stays OFF
+(no logger yet), confirm `FW <hash>` on System Data matches the deploy
+commit, params were reset to defaults once at the b749dc3 boot (re-apply
+tuned values before mounting).
 
 ## 2026-09-02 bench session (agent fixes, human walk)
 
