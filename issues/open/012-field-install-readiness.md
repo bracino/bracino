@@ -57,13 +57,16 @@ over-current. Schematic bump will reflect the absent PPTC.
 ## Deploy readiness (2026-09-02, end of session)
 
 **All firmware items done and bench-verified. Node cleared for the wall**
-pending one bench-only experiment: the TWDT panic trial
-(`CONFIG_ESP_TASK_WDT_PANIC=y` — must be removed from sdkconfig.defaults
-for the final field image; a field node must never panic-reboot over a
-transient). One isolated WDT event remains unexplained; the panic trial
-will produce a real backtrace to close it. Field image checklist before
-final flash: remove TWDT panic, comms stays OFF (no logger yet), confirm
-`FW <hash>` on System Data matches the pushed commit.
+pending the encoder-WDT re-soak after the 2026-09-03 panic trial.
+
+Panic trial (encoder-provoked, caps on): IDLE starved, `ui` innocent at
+`jal enc_take_steps`. A/B GPIO ISR + 1 ms software cap was not enough;
+**A/B now polled on the 5 ms timer (no GPIO ISR).** Re-flash, abuse the
+encoder, confirm no TWDT. Then remove `CONFIG_ESP_TASK_WDT_PANIC` from
+sdkconfig.defaults (a field node must never panic-reboot over a
+transient) and rebuild so System Data shows a clean hash. Field image
+checklist: panic config out, comms stays OFF (no logger yet), confirm
+`FW <hash>` on System Data matches the commit.
 
 ## 2026-09-02 bench session (agent fixes, human walk)
 

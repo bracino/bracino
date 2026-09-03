@@ -1,19 +1,17 @@
 #include "enc.h"
 
 #include "driver/gpio.h"
-#include "esp_attr.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/portmacro.h"
-#include "soc/gpio_struct.h"
 #include "soc/io_mux_reg.h"
 
 #define TAG "enc"
 
 /*
- * 4-state gray-code table. Invalid bounce edges are 0.
+ * 4-state gray-code table. Invalid bounce / skipped states are 0.
  * Four valid edges per detent on a typical mechanical encoder.
  */
 static const int8_t k_quad[16] = {
@@ -23,26 +21,25 @@ static const int8_t k_quad[16] = {
      0, +1, -1,  0
 };
 
-/* Switch timing is wall-clock so a slow TFT redraw cannot starve hold/click. */
-#define SW_POLL_US       5000LL
+/*
+ * A/B and SW share this timer. Mechanical rotation is tens of edges/s;
+ * 5 ms is well above Nyquist and bounce shorter than one period nets 0
+ * through k_quad. Do not put A/B on a GPIO ISR: even a raw handler with
+ * a 1 ms software cap starved IDLE (TWDT, 2026-09-02 and 2026-09-03) —
+ * ISR *entry* cost at chatter rates is the load, not the work inside.
+ */
+#define ENC_POLL_US      5000LL
 #define SW_DEBOUNCE_N    3          /* 15 ms stable */
 #define SW_CLICK_MIN_US  25000LL    /* ignore taps shorter than this */
 #define SW_HOLD_US       800000LL   /* long-press → home */
 
 enum { SW_IDLE = 0, SW_PRESSED, SW_HELD };
 
-static volatile int32_t s_raw;
+static int32_t s_raw;
 static int32_t s_raw_taken;
 static int s_net;
-static volatile uint8_t s_ab;
-static volatile uint32_t s_isr_supp; /* edges dropped by the storm limiter */
-
-/* ISR rate cap: mechanical rotation is ≤40 edges/s per pin (4 edges/detent);
- * a bouncing/floating wire is kHz+. Without this cap an ISR storm starves
- * IDLE (TWDT fires, everything frozen) — seen on the bench 2026-09-02.
- * 1 ms min edge spacing absorbs contact bounce and costs nothing. */
-#define ENC_MIN_EDGE_US 1000LL
-static volatile int64_t s_last_edge_us;
+static uint8_t s_ab;
+static uint32_t s_skip; /* level changed but k_quad said invalid */
 
 static portMUX_TYPE s_mux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -57,66 +54,45 @@ static int s_sw = 1;
 
 static esp_timer_handle_t s_timer;
 
-/* Raw ISR registered via gpio_isr_register (NOT the per-pin framework).
- * Rationale: during edge chatter every edge costs a framework dispatch
- * (context save/restore) BEFORE any rate limiter could run — that
- * interrupt-level load starved IDLE for >5 s and tripped the TWDT
- * (bench 2026-09-02, panic backtrace: ui asleep in vTaskDelay while IDLE
- * starved = the load was interrupt-level, not task-level). One raw ISR
- * services both pins: entry cost only, then the 1 ms rate cap rejects
- * chatter. Nothing else in node-bbu uses GPIO interrupts; revisit if
- * that ever changes. */
-static void IRAM_ATTR enc_isr(void *arg)
-{
-    (void)arg;
-    /* only our two edges should be pending; clear just those */
-    if ((GPIO.status.val & ENC_EDGE_MASK) == 0) {
-        return;
-    }
-    GPIO.status_w1tc.val = ENC_EDGE_MASK;
-
-    int64_t now = esp_timer_get_time();
-    if (now - s_last_edge_us < ENC_MIN_EDGE_US) {
-        s_isr_supp++;
-        return; /* bounce/noise storm: drop the edge */
-    }
-    s_last_edge_us = now;
-    int a = (GPIO.in.val >> ENC_PIN_A) & 1;
-    int b = (GPIO.in.val >> ENC_PIN_B) & 1;
-    uint8_t level = (uint8_t)((a << 1) | b);
-    uint8_t idx = (uint8_t)((s_ab << 2) | level);
-    s_ab = level;
-    int8_t d = k_quad[idx & 15];
-    if (d) {
-        s_raw += d;
-    }
-}
-
 void enc_poll(void)
 {
-    int raw = gpio_get_level(ENC_PIN_SW) ? 1 : 0; /* 0 = pressed */
+    int a = gpio_get_level(ENC_PIN_A) ? 1 : 0;
+    int b = gpio_get_level(ENC_PIN_B) ? 1 : 0;
+    uint8_t level = (uint8_t)((a << 1) | b);
+
+    int sw_raw = gpio_get_level(ENC_PIN_SW) ? 1 : 0; /* 0 = pressed */
     int64_t now = esp_timer_get_time();
 
-    if (raw == s_sw_cand) {
+    if (sw_raw == s_sw_cand) {
         if (s_sw_cand_n < SW_DEBOUNCE_N) {
             s_sw_cand_n++;
         }
     } else {
-        s_sw_cand = raw;
+        s_sw_cand = sw_raw;
         s_sw_cand_n = 1;
     }
 
     portENTER_CRITICAL(&s_mux);
 
+    uint8_t prev = s_ab;
+    uint8_t idx = (uint8_t)((prev << 2) | level);
+    s_ab = level;
+    int8_t d = k_quad[idx & 15];
+    if (d) {
+        s_raw += d;
+    } else if (prev != level) {
+        s_skip++;
+    }
+
     if (s_sw_cand_n >= SW_DEBOUNCE_N && s_sw_cand != s_sw_stable) {
-        int prev = s_sw_stable;
+        int prev_sw = s_sw_stable;
         s_sw_stable = s_sw_cand;
         s_sw = s_sw_stable;
 
-        if (prev == 1 && s_sw_stable == 0) {
+        if (prev_sw == 1 && s_sw_stable == 0) {
             s_sw_phase = SW_PRESSED;
             s_press_us = now;
-        } else if (prev == 0 && s_sw_stable == 1) {
+        } else if (prev_sw == 0 && s_sw_stable == 1) {
             if (s_sw_phase == SW_PRESSED &&
                 (now - s_press_us) >= SW_CLICK_MIN_US) {
                 s_click = true;
@@ -167,28 +143,23 @@ void enc_init(void)
     s_press_us = 0;
     s_click = false;
     s_hold = false;
+    s_raw = 0;
+    s_raw_taken = 0;
+    s_net = 0;
+    s_skip = 0;
 
-    /* IO-MUX glitch filter: pulses shorter than 2 IO-MUX clock cycles
-     * (~50–125 ns) never become interrupts. Handles the sub-µs spikes;
-     * the 1 ms rate cap below handles RC-threshold chatter. */
+    /* IO-MUX glitch filter still helps gpio_get_level (sub-µs spikes).
+     * v0.09 A/B/SW caps handle the slower RC chatter. */
     PIN_FILTER_EN(IO_MUX_GPIO0_REG);
     PIN_FILTER_EN(IO_MUX_GPIO1_REG);
     PIN_FILTER_EN(IO_MUX_GPIO5_REG);
-
-    /* Raw registration — no framework per-pin dispatch (see enc_isr). */
-    gpio_set_intr_type(ENC_PIN_A, GPIO_INTR_ANYEDGE);
-    gpio_set_intr_type(ENC_PIN_B, GPIO_INTR_ANYEDGE);
-    ESP_ERROR_CHECK(gpio_isr_register(enc_isr, NULL,
-                                      ESP_INTR_FLAG_IRAM, NULL));
-    gpio_intr_enable(ENC_PIN_A);
-    gpio_intr_enable(ENC_PIN_B);
 
     /* Independent of UI/TFT: never miss press/release during a redraw. */
     const esp_timer_create_args_t targs = {
         .callback = &enc_timer_cb,
         .arg = NULL,
         .dispatch_method = ESP_TIMER_TASK,
-        .name = "enc_sw",
+        .name = "enc",
         .skip_unhandled_events = true,
     };
     esp_err_t err = esp_timer_create(&targs, &s_timer);
@@ -196,7 +167,7 @@ void enc_init(void)
         ESP_LOGE(TAG, "timer %s", esp_err_to_name(err));
         return;
     }
-    err = esp_timer_start_periodic(s_timer, SW_POLL_US);
+    err = esp_timer_start_periodic(s_timer, ENC_POLL_US);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "timer start %s", esp_err_to_name(err));
     }
@@ -204,22 +175,28 @@ void enc_init(void)
 
 int enc_take_steps(void)
 {
+    int steps = 0;
+    portENTER_CRITICAL(&s_mux);
     /* Ignore turn while the switch is down — click, don't scroll. */
     if (s_sw_stable == 0) {
         s_raw_taken = s_raw;
-        return 0;
+    } else {
+        int32_t delta = s_raw - s_raw_taken;
+        steps = (int)(delta / 4);
+        s_raw_taken += (int32_t)steps * 4;
+        s_net += steps;
     }
-    int32_t raw = s_raw;
-    int32_t delta = raw - s_raw_taken;
-    int steps = (int)(delta / 4);
-    s_raw_taken += (int32_t)steps * 4;
-    s_net += steps;
+    portEXIT_CRITICAL(&s_mux);
     return steps;
 }
 
 int enc_net(void)
 {
-    return s_net;
+    int n;
+    portENTER_CRITICAL(&s_mux);
+    n = s_net;
+    portEXIT_CRITICAL(&s_mux);
+    return n;
 }
 
 void enc_levels(int *a, int *b, int *sw)
@@ -257,7 +234,11 @@ bool enc_take_hold(void)
     return v;
 }
 
-uint32_t enc_isr_suppressed(void)
+uint32_t enc_skipped(void)
 {
-    return s_isr_supp;
+    uint32_t n;
+    portENTER_CRITICAL(&s_mux);
+    n = s_skip;
+    portEXIT_CRITICAL(&s_mux);
+    return n;
 }

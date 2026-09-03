@@ -647,8 +647,8 @@ static void handle_line(char *line, i2c_master_bus_handle_t bus)
     } else if (strcmp(line, "enc") == 0) {
         int a = 0, b = 0, sw = 0;
         enc_levels(&a, &b, &sw);
-        TLOG("enc A=%d B=%d SW=%d net=%d supp=%lu (SW 0=pressed)\n",
-               a, b, sw, enc_net(), (unsigned long)enc_isr_suppressed());
+        TLOG("enc A=%d B=%d SW=%d net=%d skip=%lu (SW 0=pressed)\n",
+               a, b, sw, enc_net(), (unsigned long)enc_skipped());
     } else if (strcmp(line, "scan") == 0) {
         cmd_scan(bus);
     } else if (strcmp(line, "st") == 0 || strcmp(line, "status") == 0) {

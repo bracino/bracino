@@ -39,21 +39,30 @@ target WiFi is on ch 1 and unlikely to change). Keep ch 6 out of bench
 drills unless testing occlusion deliberately; field DN004 channel choice
 must stay off the house AP's channel (re-survey at install).
 
-## Encoder A/B lines: ISR storm on bounce (2026-09-02)
+## Encoder A/B lines: never a GPIO ISR (2026-09-02 / 03)
 
 Symptom: intermittent task-WDT fire — IDLE starved, `ui` listed as the
-running task, garbage register dumps. Root cause: the A/B ISR had no rate
-limit; a bouncing/floating encoder wire generates kHz edge storms that
-run at interrupt priority and freeze everything. Screen-correlated on the
-bench because the trigger was physical contact with the board during
-handling, not the screen itself. Firmware fix: the A/B ISR now drops
-edges within 1 ms of the previous accepted edge (legit rotation ≤40
-edges/s), and serial `enc` reports `supp=<n>` dropped edges.
+running task, garbage register dumps. Provoked by touching / turning the
+encoder. Root cause: A/B on a GPIO ISR. A bouncing or slow-RC edge
+chatters at kHz+; every edge is an interrupt-level entry, IDLE never
+runs. `ui` is innocent (asleep in `vTaskDelay` or at the top of its loop
+feeding the TWDT). Screen-correlated because handling the board is what
+moves the encoder, not the screen itself.
 
-Hardware answer for v0.09: small caps A/B (and SW) to ground — 10–100 nF
-against the GPIO pull-ups (τ ≈ 0.1–1 ms) kills bounce before the ISR
-sees it. Don't go much above 100 nF or legitimate fast rotation starts
-to round off.
+A 1 ms software rate cap inside a *raw* (`gpio_isr_register`) ISR was
+not enough: dropped edges still pay the ISR entry cost. Panic trial
+2026-09-03 (caps fitted, raw ISR + cap + IO-MUX filter all in) still
+starved IDLE while `ui` sat on `jal enc_take_steps`. Serial `enc` used
+to report `supp=` (rate-capped edges); it now reports `skip=` (gray-code
+invalid samples).
+
+Firmware answer: **poll A/B on the same 5 ms timer as SW.** Mechanical
+rotation is tens of edges/s; the gray-code table already maps bounce and
+skipped states to 0. No GPIO interrupt means no interrupt-level load.
+
+Hardware still helps: v0.09 10–100 nF A/B/SW to ground against the GPIO
+pull-ups (τ ≈ 0.1–1 ms). Don't go much above 100 nF or legitimate fast
+rotation starts to round off.
 
 ## Build alias auto-default (2026-09-02)
 
