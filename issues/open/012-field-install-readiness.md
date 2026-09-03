@@ -64,11 +64,21 @@ Panic trial (encoder-provoked, caps on): IDLE starved, `ui` innocent at
 **A/B now polled on the 5 ms timer (no GPIO ISR).** Second dump on that
 image (menu-surfing): `ui` had just returned from `enc_take_hold`.
 Cause: `pdMS_TO_TICKS(5)==0` at HZ=100 — ui never blocked. **Fix:
-`vTaskDelay(1)`.** Re-flash, abuse the encoder, confirm no TWDT. Then
-remove `CONFIG_ESP_TASK_WDT_PANIC` from sdkconfig.defaults (a field node
-must never panic-reboot over a transient) and rebuild so System Data
-shows a clean hash. Field image checklist: panic config out, comms stays
-OFF (no logger yet), confirm `FW <hash>` on System Data matches the commit.
+`vTaskDelay(1)`.** Re-soak on `5697cef` (2026-09-03): ~10 min menu
+abuse + soft reboots, **zero TWDT** — panic trial done, culprit named.
+
+Field-build fixes (2026-09-03, this issue): pump counters saved only on
+pump stop never checkpointed the bench's continuous run — "re-zero upon
+flash". Now saved every 5 min of runtime + on stop/clear/soft-reboot;
+UI DIAG soft-reboot flushes (was serial-only). Clear counts is two-click
+confirmed. `ct_confirm_s` was mislabeled as a second "dT min" → `ct wait`.
+Home shows UTC clock from the TIME_SYNC anchor (`04 Sep 2026 17:57`).
+
+Field image checklist: **remove `CONFIG_ESP_TASK_WDT_PANIC` from
+sdkconfig.defaults** (a field node must never panic-reboot over a
+transient), bench-walk the new menus/counters/time row, rebuild so
+System Data shows a clean hash, comms stays OFF (no logger yet), confirm
+`FW <hash>` on System Data matches the commit.
 
 ## 2026-09-02 bench session (agent fixes, human walk)
 

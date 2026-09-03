@@ -1,4 +1,7 @@
-/* Host test for control.c — no IDF.  gcc -I../main -o test_control test_control.c ../main/control.c ../main/ntc.c -lm */
+/* Host test for control.c — no IDF.
+ * gcc -I../main -I../../shared/bracino_schema/include -o /tmp/test_control \
+ *     test_control.c ../main/control.c ../main/ntc.c -lm
+ * (params.h includes espnow_schema.h, hence the second -I.) */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

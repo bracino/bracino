@@ -79,6 +79,11 @@ static bool s_hw_relay;
 #define STATS_KEY     "stats"
 #define STATS_MAGIC   0x32535442u /* 'BTS2' */
 #define STATS_VER     1u
+/* Periodic checkpoint while the pump runs. Bench reality: the pump starts
+ * at boot and can run for the whole session, so "save on stop" alone never
+ * wrote the lifetime total — every reflash read as "counters re-zero".
+ * 5 min of accumulated runtime per write is human-rate NVS wear. */
+#define STATS_CHECKPOINT_S 300u
 
 typedef struct {
     uint32_t magic;
@@ -87,9 +92,12 @@ typedef struct {
     uint32_t starts;
 } stats_blob_t;
 
-/* Pump lifetime counters: saved on each pump stop, on clear, and before a
- * soft reboot. Human-rate NVS wear. A power blip mid-run loses the current
- * run's seconds + one start — accepted (documented in issue 012). */
+static uint32_t s_stats_saved_run_s; /* total_run_s at last successful save */
+
+/* Pump lifetime counters: saved on each pump stop, on clear, before a
+ * soft reboot, and every STATS_CHECKPOINT_S of pump runtime. Human-rate
+ * NVS wear. A power blip mid-run loses at most the checkpoint interval of
+ * the current run + one start — accepted (documented in issue 012). */
 static void stats_save(void)
 {
     nvs_handle_t h;
@@ -102,8 +110,9 @@ static void stats_save(void)
         .total_run_s = s_ctrl.total_run_s,
         .starts = s_ctrl.starts,
     };
-    if (nvs_set_blob(h, STATS_KEY, &blob, sizeof(blob)) == ESP_OK) {
-        nvs_commit(h);
+    if (nvs_set_blob(h, STATS_KEY, &blob, sizeof(blob)) == ESP_OK &&
+        nvs_commit(h) == ESP_OK) {
+        s_stats_saved_run_s = s_ctrl.total_run_s;
     }
     nvs_close(h);
 }
@@ -112,6 +121,7 @@ static void stats_clear_cb(uint32_t total_run_s, uint32_t starts)
 {
     (void)total_run_s;
     (void)starts;
+    s_stats_saved_run_s = 0; /* total just zeroed; save() re-updates on success */
     stats_save();
 }
 
@@ -130,6 +140,7 @@ static void stats_restore(void)
         s_ctrl.total_run_s = blob.total_run_s;
         s_ctrl.starts = blob.starts;
     }
+    s_stats_saved_run_s = s_ctrl.total_run_s;
 }
 
 typedef struct {
@@ -988,6 +999,10 @@ static void monitor_task(void *arg)
 
         if (ev & BBU_EVT_CYCLE) {
             stats_save(); /* pump start/stop: human-rate NVS wear */
+        } else if (s_ctrl.relay_on &&
+                   s_ctrl.total_run_s - s_stats_saved_run_s >=
+                       STATS_CHECKPOINT_S) {
+            stats_save(); /* periodic checkpoint while running */
         }
 
         vTaskDelay(pdMS_TO_TICKS(1000));

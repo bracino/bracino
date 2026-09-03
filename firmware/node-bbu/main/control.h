@@ -74,9 +74,13 @@ typedef void (*bbu_persist_fn_t)(bbu_mode_t user_mode, bool relay_on);
 void bbu_ctrl_register_persist_cb(bbu_persist_fn_t fn);
 
 /* Fired when stats are reset (bbu_ctrl_clear_stats) so the caller can
- * persist the cleared values. */
+ * persist the cleared values. Also reused as a pre-reboot flush. */
 typedef void (*bbu_stats_fn_t)(uint32_t total_run_s, uint32_t starts);
 void bbu_ctrl_register_stats_cb(bbu_stats_fn_t fn);
+
+/* Ask the registered callback to persist counters NOW (UI soft reboot,
+ * periodic checkpoint). No-op if no callback registered. */
+void bbu_ctrl_save_stats(bbu_ctrl_t *c);
 
 void bbu_ctrl_init(bbu_ctrl_t *c);
 const char *bbu_mode_name(bbu_mode_t m);

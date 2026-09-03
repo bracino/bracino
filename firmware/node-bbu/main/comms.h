@@ -70,6 +70,7 @@ typedef struct {
     uint8_t boot_session; /* changes on every reboot — GW uses it to detect */
     uint32_t fails, rx, tx_ok, tx_fail, retrans, decim, ev_sent;
     uint8_t gw[6];
+    uint32_t utc_s; /* current UTC (anchor + elapsed); 0 = never anchored */
 } comms_ui_t;
 void comms_ui_snapshot(comms_ui_t *out);
 void comms_bench_hello_burst(uint8_t ch, int count); /* bench: fixed-ch HELLO burst */

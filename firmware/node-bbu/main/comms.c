@@ -1372,6 +1372,12 @@ void comms_ui_snapshot(comms_ui_t *out)
         .retrans = s_ct.retrans,
         .decim = s_ct.decim_passes,
         .ev_sent = s_ct.ev_sent,
+        /* Current wall time: anchor epoch + elapsed. Benign racy with
+         * apply_time_sync (same policy as the rest of this snapshot). */
+        .utc_s = anchored()
+                     ? s_anchor_epoch_s +
+                           (now_ms() - s_anchor_clock_ms) / 1000u
+                     : 0,
     };
     memcpy(out->gw, s_gw_mac, sizeof(out->gw));
 }

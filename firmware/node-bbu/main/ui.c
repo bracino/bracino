@@ -13,6 +13,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -51,6 +52,7 @@ static int s_top;
 static int s_edit = -1;   /* SCR_PROG: param-table index being edited */
 static int32_t s_edit_raw; /* shadow value while editing (commit on click) */
 static bool s_rbt_arm;     /* SCR_DIAG: reboot row armed (click twice) */
+static bool s_clr_arm;     /* SCR_CNT: clear-counts row armed (click twice) */
 
 /* Quick rows above the DN003 table (pre-012 behavior kept for habit): */
 #define PROG_QUICK_ROWS 2
@@ -67,6 +69,7 @@ static void go_home(void)
     s_top = 0;
     s_edit = -1;
     s_rbt_arm = false;
+    s_clr_arm = false;
     s_dirty = true;
 }
 
@@ -240,13 +243,30 @@ static void draw_home(const bbu_ctrl_t *c, const ui_live_t *lv, const bbu_params
     cell(l, sizeof(l), "TPU   %s", t);
     line(2, l, lv->tpu.ok ? COL_FG : COL_BAD);
 
-    cell(l, sizeof(l), "Pump %s",
-         c->user_mode == BBU_MODE_OFF ? "HALTED"
-                                      : (c->relay_on ? "ON" : "OFF"));
+    /* Pump + setpoint share a row so Home fits the UTC clock line. */
+    cell(l, sizeof(l), "Pump %s  Set %4.0fC",
+         (c->user_mode == BBU_MODE_OFF ? "HALT"
+                                       : (c->relay_on ? "ON" : "OFF")),
+         (double)p->tpo_setpoint_c);
     line(3, l, c->relay_on ? COL_OK : COL_FG);
 
-    cell(l, sizeof(l), "Set    %4.0f C", (double)p->tpo_setpoint_c);
-    line(4, l, COL_FG);
+    comms_ui_t cm;
+    comms_ui_snapshot(&cm);
+    if (cm.utc_s != 0) {
+        time_t tsec = (time_t)cm.utc_s;
+        struct tm tm;
+        gmtime_r(&tsec, &tm);
+        static const char *const k_mon[] = {
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        };
+        cell(l, sizeof(l), "%02d %s %04d %02d:%02d",
+             tm.tm_mday, k_mon[tm.tm_mon % 12], tm.tm_year + 1900,
+             tm.tm_hour, tm.tm_min);
+        line(4, l, COL_FG);
+    } else {
+        line(4, "-- --- ---- --:--", COL_DIM); /* not anchored yet */
+    }
 
     char cl[32];
     comms_link_txt(cl, sizeof(cl));
@@ -318,14 +338,16 @@ static void draw_cnt(const bbu_ctrl_t *c)
          (unsigned long)c->starts); /* pump starts (per go_running), not boots */
     /* >1 means buffering (no comms / gateway down) — normal is 0 or 1 */
     cell(items[3], sizeof(items[3]), "FIFO  %4u/%u", cm.fifo, cm.fifo_cap);
-    cell(items[4], sizeof(items[4]), "Clear counts");
+    cell(items[4], sizeof(items[4]),
+         s_clr_arm ? "Sure? click" : "Clear counts");
     cell(items[5], sizeof(items[5]), "Back");
     for (int i = 0; i < 6; i++) {
         pitems[i] = items[i];
     }
     line(0, "Counters", COL_HEADER);
     draw_items(pitems, 6, COL_FOCUS);
-    line(7, "click=ok", COL_FOOTER);
+    line(7, s_clr_arm ? "click=CLEAR" : "click=ok",
+         s_clr_arm ? COL_BAD : COL_FOOTER);
 }
 
 static void draw_sys(const bbu_params_t *p)
@@ -363,7 +385,7 @@ static void draw_sys(const bbu_params_t *p)
  * 20 cols; full DN003 names (min_tpo_tpu_delta_c = 19 chars) leave no room
  * for the value. Keep each ≤ 7 chars; order MUST match params_table(). */
 static const char *const k_short[] = {
-    "setpt", "hyst", "min on", "min off", "dT min",
+    "setpt", "hyst", "min on", "min off", "ct wait",
     "dT min", "maxrun", "mode", "pump", "comms", "tel s",
 };
 
@@ -633,7 +655,9 @@ static void on_click_prog(bbu_ctrl_t *c)
 static void on_click(bbu_ctrl_t *c)
 {
     bool was_rbt = s_rbt_arm;
+    bool was_clr = s_clr_arm;
     s_rbt_arm = false;             /* any other click disarms reboot */
+    s_clr_arm = false;             /* ...and clear-counts confirm */
     switch (s_scr) {
     case SCR_HOME:
         s_scr = SCR_SEL;
@@ -669,7 +693,10 @@ static void on_click(bbu_ctrl_t *c)
             if (was_rbt) {
                 /* Two-click confirm done: full restart through the
                  * normal boot path (NVS mode/params/identity restore).
-                 * Relay GPIO is driven low before restore logic runs. */
+                 * Relay GPIO is driven low before restore logic runs.
+                 * Flush lifetime counters first — serial `reboot` did
+                 * this, the UI path was missing it (bench 2026-09-03). */
+                bbu_ctrl_save_stats(c);
                 esp_restart();
             }
             s_rbt_arm = true;      /* first click: arm */
@@ -683,7 +710,11 @@ static void on_click(bbu_ctrl_t *c)
         break;
     case SCR_CNT:
         if (s_cur == 4) {
-            bbu_ctrl_clear_stats(c);
+            if (was_clr) {
+                bbu_ctrl_clear_stats(c);
+            } else {
+                s_clr_arm = true; /* first click: arm (mirror reboot) */
+            }
         } else if (s_cur == 5) {
             s_scr = SCR_SEL;
             s_cur = 1;

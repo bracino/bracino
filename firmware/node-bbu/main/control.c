@@ -40,6 +40,14 @@ void bbu_ctrl_register_stats_cb(bbu_stats_fn_t fn)
     s_stats_cb = fn;
 }
 
+void bbu_ctrl_save_stats(bbu_ctrl_t *c)
+{
+    (void)c;
+    if (s_stats_cb) {
+        s_stats_cb(c->total_run_s, c->starts);
+    }
+}
+
 /* Persist last-known user mode + Manual coil state. Never called for
  * TESTING (reboot during Test → Manual/OFF per DN002), never from the
  * Auto loop's own go_idle/go_running. */
