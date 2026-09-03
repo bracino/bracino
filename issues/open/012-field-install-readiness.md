@@ -45,7 +45,7 @@ over-current. Schematic bump will reflect the absent PPTC.
       - Control Programming: every DN002 parameter field-editable with
         validation + NVS persistence (mode, manual pump, setpoint,
         hysteresis, min on/off times, ct_confirm_s, min_tpo_tpu_delta_c,
-        max_run_time_min, comms enable) — parity with the future admin
+        max_run_time_min, comms enable, sample_period_s 5..120) — parity with the future admin
         panel; build it as the DN003 param_id table so both share one
         validated setter path
         Diagnostics: Include following comms data: channel, gw, anchored, last EPOCH, fifo, fails, rx, tx_ok, fail, retrans, decim ev_sent
@@ -61,12 +61,14 @@ pending the encoder-WDT re-soak after the 2026-09-03 panic trial.
 
 Panic trial (encoder-provoked, caps on): IDLE starved, `ui` innocent at
 `jal enc_take_steps`. A/B GPIO ISR + 1 ms software cap was not enough;
-**A/B now polled on the 5 ms timer (no GPIO ISR).** Re-flash, abuse the
-encoder, confirm no TWDT. Then remove `CONFIG_ESP_TASK_WDT_PANIC` from
-sdkconfig.defaults (a field node must never panic-reboot over a
-transient) and rebuild so System Data shows a clean hash. Field image
-checklist: panic config out, comms stays OFF (no logger yet), confirm
-`FW <hash>` on System Data matches the commit.
+**A/B now polled on the 5 ms timer (no GPIO ISR).** Second dump on that
+image (menu-surfing): `ui` had just returned from `enc_take_hold`.
+Cause: `pdMS_TO_TICKS(5)==0` at HZ=100 — ui never blocked. **Fix:
+`vTaskDelay(1)`.** Re-flash, abuse the encoder, confirm no TWDT. Then
+remove `CONFIG_ESP_TASK_WDT_PANIC` from sdkconfig.defaults (a field node
+must never panic-reboot over a transient) and rebuild so System Data
+shows a clean hash. Field image checklist: panic config out, comms stays
+OFF (no logger yet), confirm `FW <hash>` on System Data matches the commit.
 
 ## 2026-09-02 bench session (agent fixes, human walk)
 

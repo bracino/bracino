@@ -364,7 +364,7 @@ static void draw_sys(const bbu_params_t *p)
  * for the value. Keep each ≤ 7 chars; order MUST match params_table(). */
 static const char *const k_short[] = {
     "setpt", "hyst", "min on", "min off", "dT min",
-    "dT min", "maxrun", "mode", "pump", "comms",
+    "dT min", "maxrun", "mode", "pump", "comms", "tel s",
 };
 
 static const char *prog_short(int idx, int n)
@@ -417,8 +417,9 @@ static void draw_prog(const bbu_ctrl_t *c)
 {
     int n;
     const bbu_param_desc_t *tab = params_table(&n);
-    char items[13][32];
-    const char *pitems[13];
+    /* Must be >= n + 1 + PROG_QUICK_ROWS (was 13 at 10 params; 14 at 11). */
+    char items[16][32];
+    const char *pitems[16];
 
     cell(items[0], sizeof(items[0]), "Mode %8s",
          bbu_mode_name(c->user_mode));
@@ -805,6 +806,9 @@ void ui_task(void *arg)
             }
             s_dirty = false;
         }
-        vTaskDelay(pdMS_TO_TICKS(5));
+        /* HZ=100 → pdMS_TO_TICKS(5)==0, which yields but does not block,
+         * so ui stays ready and IDLE never runs (TWDT, 2026-09-03 soak).
+         * 1 tick = 10 ms; encoder SW is on its own 5 ms timer. */
+        vTaskDelay(1);
     }
 }

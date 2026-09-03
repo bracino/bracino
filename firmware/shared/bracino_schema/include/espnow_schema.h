@@ -20,7 +20,7 @@ extern "C" {
 /* ---- protocol versions ---- */
 #define ESPNOW_PROTO_VER   1u   /* envelope format version */
 #define BBU_SCHEMA_VER     1u   /* BBU telemetry struct version */
-#define BBU_CONFIG_VER     1u   /* BBU parameter descriptor table version */
+#define BBU_CONFIG_VER     2u   /* BBU parameter descriptor table version */
 
 /* ESP-NOW application payload ceiling (bench-verify against IDF! DN003). */
 #define ESPNOW_MAX_PAYLOAD 250u
@@ -181,7 +181,8 @@ typedef struct __attribute__((packed)) {
 #define BBU_PARAM_USER_MODE          8u  /* ENUM, BBU_MODE_W_*       */
 #define BBU_PARAM_MANUAL_RELAY       9u  /* ENUM, 0/1 (Manual mode)  */
 #define BBU_PARAM_COMMS_ENABLE       10u /* ENUM, 0/1                */
-#define BBU_PARAM_COUNT              10u
+#define BBU_PARAM_SAMPLE_PERIOD_S    11u /* U32, 5..120, default 15  */
+#define BBU_PARAM_COUNT              11u
 
 /* ---- event registry (EVENT payload is ONE TLV: tag = event id) ---- */
 #define EVENT_FAULT_RAISED   0x01u /* value: fault_id u8          */

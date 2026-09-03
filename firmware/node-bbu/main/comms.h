@@ -23,10 +23,9 @@ typedef struct {
     uint8_t  fault_flags; /* BBU_FAULT_* bits */
 } comms_sample_t;
 
-/* Hooks for params that live outside params.c (ids 8/9/10: user mode,
- * manual relay, comms enable). Registered by main.c; return false on
- * rejection (range). This is the same validated setter path the local
- * UI uses — nothing arriving over ESP-NOW can do more than the UI can. */
+/* Hooks for params that live outside params.c (ids 8/9/10/11: user mode,
+ * manual relay, comms enable, sample period). Registered by main.c; return
+ * false on rejection (range). Same validated setter path as the local UI. */
 typedef struct {
     bool (*set)(uint8_t param_id, int32_t value);
     bool (*get)(uint8_t param_id, int32_t *out_value);
@@ -75,7 +74,8 @@ typedef struct {
 void comms_ui_snapshot(comms_ui_t *out);
 void comms_bench_hello_burst(uint8_t ch, int count); /* bench: fixed-ch HELLO burst */
 bool comms_set_ident(uint8_t node_type, uint8_t node_id); /* NVS-persisted */
-void comms_set_sample_period_s(uint32_t s);               /* default 15  */
+void comms_set_sample_period_s(uint32_t s); /* 5..120, default 15; NVS */
+uint32_t comms_sample_period_s(void);
 bool comms_ring_resize(uint16_t samples); /* bench: reallocates EMPTY ring */
 uint8_t comms_node_type(void);
 uint8_t comms_node_id(void);

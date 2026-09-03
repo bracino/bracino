@@ -52,7 +52,7 @@ typedef void (*params_changed_fn_t)(uint8_t id, int32_t raw);
 void params_register_changed_cb(params_changed_fn_t fn);
 
 /* Hook pair for ids that live outside params.c (USER_MODE 8, MANUAL_RELAY
- * 9, COMMS_ENABLE 10) — main.c routes them to the control struct / comms
- * gate. Both return false when the value is invalid. */
+ * 9, COMMS_ENABLE 10, SAMPLE_PERIOD_S 11) — main.c routes them. Both
+ * return false when the value is invalid. Id 11 is comms NVS, not p1. */
 void params_register_ext_setters(bool (*set)(uint8_t id, int32_t v),
                                  bool (*get)(uint8_t id, int32_t *out));

@@ -39,6 +39,14 @@ target WiFi is on ch 1 and unlikely to change). Keep ch 6 out of bench
 drills unless testing occlusion deliberately; field DN004 channel choice
 must stay off the house AP's channel (re-survey at install).
 
+## `pdMS_TO_TICKS(5)` is 0 at `CONFIG_FREERTOS_HZ=100` (2026-09-03)
+
+`5 * 100 / 1000` truncates to 0. `vTaskDelay(0)` yields but does **not**
+block, so a prio-1 task stays Ready and IDLE never runs — TWDT on IDLE
+while the dump shows that task at loop top (enc_take_hold return,
+2026-09-03 poll-fix soak). Use `vTaskDelay(1)` (1 tick = 10 ms) or
+`pdMS_TO_TICKS(10)`. esp_timer periods in microseconds are unaffected.
+
 ## Encoder A/B lines: never a GPIO ISR (2026-09-02 / 03)
 
 Symptom: intermittent task-WDT fire — IDLE starved, `ui` listed as the

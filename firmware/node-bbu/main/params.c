@@ -40,6 +40,7 @@ static const bbu_param_desc_t s_table[] = {
     { BBU_PARAM_USER_MODE,           PTYPE_ENUM,    PARAM_FLAG_RW, 0,   3,     1, "user_mode" },
     { BBU_PARAM_MANUAL_RELAY,        PTYPE_ENUM,    PARAM_FLAG_RW, 0,   1,     1, "manual_relay" },
     { BBU_PARAM_COMMS_ENABLE,        PTYPE_ENUM,    PARAM_FLAG_RW, 0,   1,     1, "comms_enable" },
+    { BBU_PARAM_SAMPLE_PERIOD_S,     PTYPE_U32,     PARAM_FLAG_RW, 5,   120,   5, "sample_period_s" },
 };
 
 const bbu_param_desc_t *params_table(int *count)
@@ -71,8 +72,9 @@ bool params_id_from_name(const char *name, uint8_t *id)
     return false;
 }
 
-/* ids 8/9/10 live outside params.c (mode/relay/comms gate) — main.c
- * registers one hook pair; this is still a single validated setter path. */
+/* ids 8/9/10/11 live outside params.c (mode/relay/comms/tel period) —
+ * main.c registers one hook pair; still a single validated setter path.
+ * sample_period_s is NOT in the params NVS blob (would bust p1 size). */
 static bool (*s_ext_set)(uint8_t id, int32_t v);
 static bool (*s_ext_get)(uint8_t id, int32_t *v);
 
@@ -241,6 +243,11 @@ bool params_set(const char *name, const char *value)
             return false;
         }
         s_p.max_run_time_min = (uint32_t)d;
+    } else if (id_ok && id == BBU_PARAM_SAMPLE_PERIOD_S) {
+        if (!params_set_by_id(id, (int32_t)d)) {
+            printf("sample_period_s 5..120\n");
+            return false;
+        }
     } else {
         printf("unknown param '%s'\n", name);
         return false;

@@ -276,6 +276,7 @@ static void nvs_save(void)
     nvs_set_u8(h, "ntype", s_node_type);
     nvs_set_u8(h, "nid", s_node_id);
     nvs_set_u8(h, "ch", s_channel);
+    nvs_set_u8(h, "per", (uint8_t)s_sample_period_s);
     nvs_commit(h);
     nvs_close(h);
 }
@@ -298,6 +299,9 @@ static void nvs_load(void)
     }
     if (nvs_get_u8(h, "ch", &v) == ESP_OK && v >= 1 && v <= 13) {
         s_channel = v;
+    }
+    if (nvs_get_u8(h, "per", &v) == ESP_OK && v >= 5 && v <= 120) {
+        s_sample_period_s = v;
     }
     nvs_close(h);
 }
@@ -1305,11 +1309,20 @@ bool comms_set_ident(uint8_t node_type, uint8_t node_id)
 
 void comms_set_sample_period_s(uint32_t s)
 {
-    if (s == 0) {
-        s = 1;
+    if (s < 5u) {
+        s = 5;
+    }
+    if (s > 120u) {
+        s = 120;
     }
     s_sample_period_s = s;
+    nvs_save();
     TLOG("comms: sample period %lus\n", (unsigned long)s_sample_period_s);
+}
+
+uint32_t comms_sample_period_s(void)
+{
+    return s_sample_period_s;
 }
 
 bool comms_ring_resize(uint16_t samples)

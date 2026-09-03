@@ -347,7 +347,7 @@ static void print_help(void)
         "  sim clear        use real NTCs again\n"
         "  comms [on|off]   ESP-NOW client (DN003); 'comms' = status\n"
         "  ident T I        provision node_type/id (NVS)\n"
-        "  tel <sec>        telemetry capture period (default 15)\n"
+        "  tel <sec>        telemetry capture period (5..120, default 15)\n"
         "  ring <n>         resize FIFO ring EMPTY (bench decimation)\n"
         "  hel <ch> [n]     bench: HELLO burst on fixed channel\n"
         "  prog / st / scan / enc / h\n"
@@ -758,7 +758,7 @@ static bool mode_from_wire(uint8_t w, bbu_mode_t *out)
     }
 }
 
-/* Param ids 8/9/10 live outside params.c — the hooks keep ONE validated
+/* Param ids 8/9/10/11 live outside params.c — the hooks keep ONE validated
  * setter path: PARAM_SET and the serial UI both land here. */
 static bool hook_param_set(uint8_t id, int32_t v)
 {
@@ -786,6 +786,9 @@ static bool hook_param_set(uint8_t id, int32_t v)
     case BBU_PARAM_COMMS_ENABLE:
         comms_enable(v != 0);
         return true;
+    case BBU_PARAM_SAMPLE_PERIOD_S:
+        comms_set_sample_period_s((uint32_t)v);
+        return true;
     default:
         return false;
     }
@@ -806,6 +809,9 @@ static bool hook_param_get(uint8_t id, int32_t *v)
         return true;
     case BBU_PARAM_COMMS_ENABLE:
         *v = comms_enabled() ? 1 : 0;
+        return true;
+    case BBU_PARAM_SAMPLE_PERIOD_S:
+        *v = (int32_t)comms_sample_period_s();
         return true;
     default:
         return false;
@@ -861,7 +867,9 @@ static void cmd_comms(char *line)
     }
     unsigned int v;
     if (sscanf(line, "tel %u", &v) == 1) {
-        comms_set_sample_period_s(v);
+        if (!params_set_by_id(BBU_PARAM_SAMPLE_PERIOD_S, (int32_t)v)) {
+            TLOG("tel 5..120 s (step 5)\n");
+        }
         return;
     }
     if (sscanf(line, "ring %u", &v) == 1) {
