@@ -1,0 +1,5 @@
+# Gateway: ESP32-WROOM dev module (UART0 console @115200)
+CONFIG_IDF_TARGET="esp32"
+
+# Bench/field pass 1: keep TWDT log-only (default). No panic-reboot over a
+# transient on a wall-mounted device (node-bbu saga, STATUS 2026-09-03).
