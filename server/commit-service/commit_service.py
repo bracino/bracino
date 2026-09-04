@@ -162,9 +162,12 @@ class Commit:
         age = None
         if self.last_commit_wall is not None:
             age = round(time.monotonic() - self.last_commit_wall, 1)
+        # 90 s staleness = backend down per the DN004 health gate the
+        # gateway applies to this same topic — report honestly.
+        ok = age is None or age < 90.0
         self.client.publish(
             "bracino/gateway/health",
-            json.dumps({"ok": True, "last_commit_age_s": age,
+            json.dumps({"ok": ok, "last_commit_age_s": age,
                         "lines": self.lines_written}),
             qos=1, retain=True)
 
