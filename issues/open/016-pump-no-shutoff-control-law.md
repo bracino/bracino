@@ -52,6 +52,19 @@ wanted, set `tpo_setpoint_c = 58` from the local UI, no reflash needed.
 peak tracker + display helpers), `test/test_control.c` (new: stop at
 setpoint, restart level, cooling backstop, warm-up no-chatter).
 
+## Jacket-bump residual (accepted, observe — human 2026-09-04)
+
+Cold tank + heat-soaked jacket can record a peak from **jacket flush**, not
+burner fire: TPO bumps above the restart level, falls while the boiler is
+dragging its jacket down through its stat, tank equalises → backstop stops
+the pump once. The burner lights during `min_off`; the **restart resets the
+peak**, so the next cycle charges normally to the charged stop. Bound: at
+most **one** spurious stop/restart pair per soaked-jacket event, and it
+cannot loop (each stop flushes the jacket cooler). The same trace is also
+the correct abort if the burner never lights at all. **Accepted; 015 logger
+data adjudicates** whether to sustain-arm the peak (hold-above-level timer).
+The bump-fall signature is the same signal as 017's boiler-out warning.
+
 ## Verify
 
 - [x] Host unit tests pass (`gcc` on `test_control.c`, includes the four
