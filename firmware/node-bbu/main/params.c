@@ -135,7 +135,7 @@ static void defaults(bbu_params_t *p)
     p->hysteresis_c = 3.0f;
     p->min_on_time_s = 180;
     p->min_off_time_s = 60;
-    p->min_tpo_tpu_delta_c = 5.0f;
+    p->min_tpo_tpu_delta_c = 1.5f;
     p->max_run_time_min = 60;
 }
 

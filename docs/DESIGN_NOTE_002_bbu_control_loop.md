@@ -44,7 +44,7 @@ Tune on site. Values below are starting guesses (old-controller memory plus new 
 | `hysteresis_c` | 3.0 | **Restart gap below the setpoint** — applies only while the tank is cooling (016) |
 | `min_on_time_s` | 180 | Anti-short-cycle once RUNNING |
 | `min_off_time_s` | 60 | Anti-short-cycle once IDLE |
-| `min_tpo_tpu_delta_c` | 5.0 | Small top−bottom gap means the tank is largely charged |
+| `min_tpo_tpu_delta_c` | 1.5 | Small top−bottom gap means the tank is largely charged. **1.5 (016):** field recollection 2026-09-04 — a fully loaded tank showed TPO≈TPU within ~1 °C, and the boiler (own limit 61 °C, above our setpoint) holds fire until the return water meets its threshold, so the store equalises near the setpoint before the pump should stop |
 | `max_run_time_min` | 60 | Longest normal load; **warning only**, pump keeps its state |
 
 Derived, not stored (revised 2026-09-04, issue 016):
