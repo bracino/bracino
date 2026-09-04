@@ -34,9 +34,25 @@ python3 fake_publisher.py --count 50 --interval 0.2
 ## Layer-1 acceptance (issue 015 drill list)
 
 1. JSONL lines match published samples; watermarks monotonic, last
-   watermark == max capture_ms written.
+   watermark == max capture_ms written. **PASSED 2026-09-04** (50 lines,
+   0→9800 in monotonic steps).
 2. Kill the service mid-stream → watermarks/health stall; restart →
    `commit_state.json` resumes the dedupe cursor; no duplicate lines
-   when the publisher re-sends overlapping samples.
+   when the publisher re-sends overlapping samples. **PASSED 2026-09-04**
+   (kill+restart+replay; one duplicate found and fixed — equality case
+   in the skip condition — and the crash-window caveat below recorded).
 3. Publisher re-send of already-committed capture_ms → zero new lines,
-   zero watermark regression.
+   zero watermark regression. **PASSED 2026-09-04** (10 replays → 0
+   watermarks, cursor unchanged).
+
+## Known limitation: crash window
+
+The JSONL line and the dedupe cursor are two separate files. A kill (or
+power cut) between `fsync(jsonl)` and `fsync(commit_state.json)` leaves a
+sample written but the cursor behind — a later replay writes that sample
+again. Accepted: the final Influx write is idempotent on
+(node_type, node_id, boot_session, timestamp), so the duplicate is
+absorbed at ingestion; JSONL analysis can dedupe on the same key.
+Fixing it properly would require one atomic commit for both files
+(single store), which is exactly the complexity the streaming design
+refuses to take on.

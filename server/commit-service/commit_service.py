@@ -119,8 +119,8 @@ class Commit:
             log(f"!! telemetry without capture_ms {node_type}/{node_id}")
             return
         if st["boot_session"] == boot and st["capture_ms"] is not None \
-                and not wrap_le(st["capture_ms"], cap):
-            return  # duplicate (retransmitted batch after lost ack)
+                and wrap_le(cap, st["capture_ms"]):
+            return  # duplicate: cap <= cursor (retransmitted batch / replay)
 
         self.out.write(json.dumps(line) + "\n")
         self.out.flush()
