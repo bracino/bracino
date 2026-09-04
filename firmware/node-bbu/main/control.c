@@ -27,6 +27,7 @@ static void go_running(bbu_ctrl_t *c)
     c->relay_on = true;
     c->run_s = 0;
     c->warn_maxrun = false;
+    c->peak_tpo_c = -1000.0f;
     c->starts++;
 }
 
@@ -151,14 +152,17 @@ void bbu_ctrl_clear_stats(bbu_ctrl_t *c)
     }
 }
 
-static float on_c(const bbu_params_t *p)
+/* 016: hysteresis belongs to the cooling side only. The pump stops as
+ * soon as the tank top reaches the setpoint (dT satisfied); the restart
+ * waits until the tank has cooled a full hysteresis below it. */
+static float on_c(const bbu_params_t *p) /* restart (start) threshold */
 {
-    return p->tpo_setpoint_c - p->hysteresis_c * 0.5f;
+    return p->tpo_setpoint_c - p->hysteresis_c;
 }
 
-static float off_c(const bbu_params_t *p)
+static float off_c(const bbu_params_t *p) /* stop threshold */
 {
-    return p->tpo_setpoint_c + p->hysteresis_c * 0.5f;
+    return p->tpo_setpoint_c;
 }
 
 uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *p)
@@ -265,11 +269,24 @@ uint32_t bbu_ctrl_tick(bbu_ctrl_t *c, const bbu_sense_t *s, const bbu_params_t *
             go_running(c);
         }
     } else {
+        /* Track the cycle peak of TPO: the cooling backstop may only fire
+         * after TPO has actually been warm this cycle, so a fresh start on
+         * a mixed (dT-ok) tank does not self-stop during boiler warm-up. */
+        if (s->tpo.ok && s->tpo.c > c->peak_tpo_c) {
+            c->peak_tpo_c = s->tpo.c;
+        }
         bool min_on = c->cycle_s >= p->min_on_time_s;
         bool tpo_hi = s->tpo.c >= off_c(p);
         bool charged = (c->mode == BBU_MODE_TPO_ONLY) ||
                        (s->tpu.ok && (s->tpo.c - s->tpu.c) <= p->min_tpo_tpu_delta_c);
-        if (min_on && tpo_hi && charged) {
+        /* 016 cooling backstop: the tank top has been above the restart
+         * level this cycle and has now fallen back to it with the delta
+         * collapsed — the boiler is no longer contributing, so stop
+         * instead of pumping heat through the idle jacket. Without this
+         * the stop condition (TPO >= setpoint) becomes unreachable once
+         * TPO decays below the setpoint while running. */
+        bool cooled = s->tpo.c <= on_c(p) && c->peak_tpo_c > on_c(p);
+        if (min_on && charged && (tpo_hi || cooled)) {
             go_idle(c);
         }
     }

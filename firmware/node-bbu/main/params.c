@@ -149,14 +149,16 @@ const bbu_params_t *params_get(void)
     return &s_p;
 }
 
+/* 016: the setpoint IS the pump-stop threshold; hysteresis is the
+ * restart gap below it (applies while the tank is cooling). */
 float params_tpo_on_c(void)
 {
-    return s_p.tpo_setpoint_c - s_p.hysteresis_c * 0.5f;
+    return s_p.tpo_setpoint_c - s_p.hysteresis_c;
 }
 
 float params_tpo_off_c(void)
 {
-    return s_p.tpo_setpoint_c + s_p.hysteresis_c * 0.5f;
+    return s_p.tpo_setpoint_c;
 }
 
 void params_print(void)
@@ -168,7 +170,7 @@ void params_print(void)
     printf("  min_off_time_s       %lu\n", (unsigned long)s_p.min_off_time_s);
     printf("  min_tpo_tpu_delta_c  %.1f\n", (double)s_p.min_tpo_tpu_delta_c);
     printf("  max_run_time_min     %lu\n", (unsigned long)s_p.max_run_time_min);
-    printf("  derived tpo_on=%.1f  tpo_off=%.1f\n",
+    printf("  derived restart_at=%.1f  stop_at=%.1f\n",
            (double)params_tpo_on_c(), (double)params_tpo_off_c());
 }
 

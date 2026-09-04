@@ -32,6 +32,8 @@ void params_set_defaults(void);
 bool params_set(const char *name, const char *value);
 int params_save(void);
 void params_print(void);
+/* Derived thresholds (016): off = setpoint (pump stop); on = setpoint −
+ * hysteresis (pump restart while the tank is cooling). */
 float params_tpo_on_c(void);
 float params_tpo_off_c(void);
 

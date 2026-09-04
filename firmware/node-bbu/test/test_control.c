@@ -104,6 +104,61 @@ int main(void)
     tick_n(&c, s, &p, 2);
     expect(c.cycle == BBU_CYCLE_IDLE && !c.relay_on, "stop when charged");
 
+    /* 016: charged stop is at the SETPOINT (60), not setpoint+hyst/2.
+     * Restart level is setpoint-hysteresis (57). */
+    bbu_ctrl_init(&c);
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
+    s.tpo = ok_c(55.0f);   /* <= 57 → start */
+    s.tpu = ok_c(51.0f);
+    s.ct_present = true;
+    tick_n(&c, s, &p, 61);
+    expect(c.cycle == BBU_CYCLE_RUNNING, "016 start at setpoint-hysteresis");
+    s.tpo = ok_c(59.9f);   /* below setpoint: no stop even with dT ok */
+    s.tpu = ok_c(57.0f);
+    tick_n(&c, s, &p, 250); /* burn min_on_time below the setpoint */
+    expect(c.cycle == BBU_CYCLE_RUNNING, "016 no stop below setpoint (rising, not cooled)");
+    s.tpo = ok_c(60.1f);   /* setpoint reached, dT 3.1 <= 5 */
+    tick_n(&c, s, &p, 2);
+    expect(c.cycle == BBU_CYCLE_IDLE, "016 stop at setpoint + dT satisfied");
+
+    /* 016: restart while cooling — TPO falls to restart level */
+    s.tpo = ok_c(56.0f);
+    tick_n(&c, s, &p, 58);
+    expect(c.cycle == BBU_CYCLE_IDLE, "016 still IDLE during min_off");
+    tick_n(&c, s, &p, 2);
+    expect(c.cycle == BBU_CYCLE_RUNNING, "016 restart at setpoint-hysteresis");
+
+    /* 016 cooling backstop: boiler vanished mid-cycle. TPO peaked above
+     * the restart level, then fell back with dT collapsed → stop. */
+    bbu_ctrl_init(&c);
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
+    s.tpo = ok_c(56.0f);   /* start */
+    s.tpu = ok_c(20.0f);
+    s.ct_present = true;
+    tick_n(&c, s, &p, 61);
+    expect(c.cycle == BBU_CYCLE_RUNNING, "backstop: started");
+    s.tpo = ok_c(61.0f);   /* peak recorded */
+    tick_n(&c, s, &p, 200);
+    expect(c.cycle == BBU_CYCLE_RUNNING, "backstop: boiler still contributing (dT big)");
+    s.tpo = ok_c(56.5f);   /* fell back below restart level 57 */
+    s.tpu = ok_c(52.0f);   /* dT 4.5 <= 5: tank equalising, boiler gone */
+    tick_n(&c, s, &p, 3);
+    expect(c.cycle == BBU_CYCLE_IDLE && !c.relay_on,
+           "backstop: cooling stop after peak + collapsed dT");
+
+    /* 016: no backstop before the tank has been warm — fresh start on a
+     * mixed tank must not self-stop during boiler warm-up. */
+    bbu_ctrl_init(&c);
+    bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
+    s.tpo = ok_c(56.0f);
+    s.tpu = ok_c(56.0f);   /* dT 0: charged-looking from tick one */
+    s.ct_present = true;
+    tick_n(&c, s, &p, 61);
+    expect(c.cycle == BBU_CYCLE_RUNNING, "warm-up: started");
+    tick_n(&c, s, &p, 250); /* TPO never rose above 57 */
+    expect(c.cycle == BBU_CYCLE_RUNNING,
+           "warm-up: no backstop without a peak above restart level");
+
     /* TPO fault → FAULT, pump off */
     bbu_ctrl_request_mode(&c, BBU_MODE_AUTO);
     s.tpo = ok_c(50.0f);

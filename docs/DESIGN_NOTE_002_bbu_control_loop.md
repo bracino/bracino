@@ -1,7 +1,7 @@
 # Design note 002 — BBU offline control loop (emulate MES-BBU)
 
 **Status:** Implemented. Desk `sim` walk-through passed (2026-08-22). Dummy AC load validated (2026-08-25). Thermometer / plant proof still open.  
-**Date:** 2026-08-22 (CT warn-only 2026-08-25; boot-mode persistence 2026-08-30; CT dropped from circuit 2026-09-01)  
+**Date:** 2026-08-22 (CT warn-only 2026-08-25; boot-mode persistence 2026-08-30; CT dropped from circuit 2026-09-01; **control law revised 2026-09-04 — issue 016: hysteresis on the cooling side only, cooling backstop**)  
 **Applies to:** `firmware/node-bbu` local loop on the v0.08 protoboard  
 **Does not apply to:** gateway, MQTT, or a later ACS node. Local TFT/encoder is on-node I/O (not the network path).
 
@@ -40,25 +40,25 @@ Tune on site. Values below are starting guesses (old-controller memory plus new 
 
 | Parameter | Default | Role |
 |-----------|---------|------|
-| `tpo_setpoint_c` | 60.0 | Target top-of-tank temperature |
-| `hysteresis_c` | 3.0 | Band around the setpoint |
+| `tpo_setpoint_c` | 60.0 | **Pump-stop threshold.** Shutoff as soon as the tank top reaches it (with dT satisfied) |
+| `hysteresis_c` | 3.0 | **Restart gap below the setpoint** — applies only while the tank is cooling (016) |
 | `min_on_time_s` | 180 | Anti-short-cycle once RUNNING |
 | `min_off_time_s` | 60 | Anti-short-cycle once IDLE |
 | `min_tpo_tpu_delta_c` | 5.0 | Small top−bottom gap means the tank is largely charged |
 | `max_run_time_min` | 60 | Longest normal load; **warning only**, pump keeps its state |
 
-Derived, not stored:
+Derived, not stored (revised 2026-09-04, issue 016):
 
-- `tpo_on_threshold` = `tpo_setpoint_c − hysteresis_c / 2` → **58.5 °C** with the defaults
-- `tpo_off_threshold` = `tpo_setpoint_c + hysteresis_c / 2` → **61.5 °C** with the defaults
+- `tpo_off_threshold` = `tpo_setpoint_c` → **60 °C** with the defaults — pump **stops** once TPO reaches the setpoint (and dT is satisfied)
+- `tpo_on_threshold` = `tpo_setpoint_c − hysteresis_c` → **57 °C** with the defaults — pump may **restart** only after the tank has cooled a full hysteresis below the stop point
 
 A **small** `(TPO − TPU)` means the thermocline has collapsed / the store is full. A **large** delta means hot top, cold bottom — still room to charge.
 
 ## Why TPU is in the stop condition
 
-While loading, TPO rises quickly (hot flow enters the top). Stopping on TPO alone reheats a thin layer and drops back to IDLE — the classic short cycle on a tall tank. The old behaviour was: keep pumping until **TPU also comes up**, i.e. a useful volume has been pushed down. Formalised as `(TPO − TPU) ≤ min_tpo_tpu_delta_c` **and** TPO already at/above the off threshold.
+While loading, TPO rises quickly (hot flow enters the top). Stopping on TPO alone reheats a thin layer and drops back to IDLE — the classic short cycle on a tall tank. The old behaviour was: keep pumping until **TPU also comes up**, i.e. a useful volume has been pushed down. Formalised as `(TPO − TPU) ≤ min_tpo_tpu_delta_c` **and** TPO already at/above the setpoint.
 
-The boiler may drop out on its own jacket long before that. The pump can still run; that is fine.
+The boiler may drop out on its own jacket long before that. **But not for long (016):** once the boiler is satisfied and TPO decays while the pump circulates through the idle jacket, the pump is no longer pushing heat *down* — it is equalising and cooling the store. When dT has collapsed **and** TPO has fallen back to the restart level (`setpoint − hysteresis`) after having been above it this cycle (peak-tracked), the loop stops: the boiler is demonstrably not contributing. Peak tracking prevents a fresh start on a mixed tank from self-stopping during boiler warm-up. Without this backstop the charged-stop condition becomes unreachable once TPO falls below the setpoint mid-cycle — the field failure that prompted 016 (pump ran on with the boiler satisfied at 61 °C because the old `setpoint + hyst/2` off-threshold, 61.5 °C, sat *above the boiler's own limit*).
 
 ## Modes and states
 
@@ -87,15 +87,19 @@ There is **no** mode called Normal. Serial `auto` enters Auto. `on` / `off` / `t
 Inside Auto (and Auto*):
 
 ```text
-IDLE --(TPO ≤ tpo_on_threshold && off-timer expired)──► RUNNING
-  ▲                                                     │
-  │                                                     │ min_on_time done
-  │                                                     │ && TPO ≥ tpo_off_threshold
-  │                                                     │ && (TPO − TPU) ≤ min_tpo_tpu_delta_c
-  └──────────────────────(command OFF)──────────────────┘
+IDLE --(TPO ≤ setpoint−hysteresis && off-timer expired)──► RUNNING
+  ▲                                                        │
+  │                                                        │ min_on_time done
+  │                                                        │ && [ TPO ≥ setpoint (charged)
+  │                                                        │      || TPO fell back to
+  │                                                        │        setpoint−hysteresis after
+  │                                                        │        peaking above it (016
+  │                                                        │        boiler-gone backstop) ]
+  │                                                        │ && (TPO − TPU) ≤ min_tpo_tpu_delta_c
+  └──────────────────────(command OFF)────────────────────┘
 ```
 
-In `TPO_ONLY` the stop line is only `min_on_time` done **and** `TPO ≥ tpo_off_threshold`.
+In `TPO_ONLY` dT is forced satisfied: the stop line is `min_on` done, `TPO ≥ setpoint`, **or** the cooling backstop (TPO fell back to `setpoint − hysteresis` after peaking above it).
 
 Bring-up firmware boots **Manual / coil OFF** (factory default — see Boot
 behavior, below). `auto` enters Auto.

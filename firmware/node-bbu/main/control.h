@@ -65,6 +65,7 @@ typedef struct {
     uint32_t total_run_s;
     uint32_t starts;
     uint32_t stuck_s;
+    float peak_tpo_c;   /* highest TPO this RUNNING cycle (016 cooling stop) */
     uint8_t tpo_only_src; /* bit0 TPU (TPO_ONLY). CT is warn-only. */
     uint8_t last_fault;
 } bbu_ctrl_t;
