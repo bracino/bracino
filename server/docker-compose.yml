@@ -1,0 +1,19 @@
+# Bracino phase-1 stack — compose-lite.
+#
+# Bench state (issue 015): mosquitto only. The commit service (DN005
+# skeleton) currently runs on the VM host against this broker — see
+# commit-service/README.md — and graduates into compose as it grows.
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: bracino-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto-data:/mosquitto/data
+
+volumes:
+  mosquitto-data:
