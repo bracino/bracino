@@ -90,6 +90,10 @@ Full rules: [`issues/README.md`](issues/README.md).
 
 ## Coding norms
 
+### Design comments before code
+
+- When the human raises a **long observation or comment that touches design/architecture** (plant behavior, control law, protocol shape), **discuss it first** — trace the scenario, agree on where we're going and why — **before** writing code. Once both are clear, then code. Quick fixes with no design content can still just be done.
+
 ### Firmware (ESP-IDF / C)
 
 - Clear C; match in-tree style when it exists.
