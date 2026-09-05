@@ -14,13 +14,14 @@
  *
  * Warming raises tap voltage — same topology/polarity as the node NTCs.
  *
- * IMPORTANT anchor: this part measured R_ntc ≈ 8.11 kΩ at 27 °C, ~17 %
- * below a nominal 10 k β3950 spec — the part is NOT behaving as a 10 k
- * reference. So the conversion anchors empirically on the measured pair
- * (T0 = 27.0 °C, R0 = 8100 Ω) and uses beta only for slope. Error away
- * from the anchor is beta-dominated, ±1–2 °C across the outdoor range —
- * accepted for a nice-to-have. TODO(human): ice/boil two-point like the
- * node NTCs got; re-anchor R0/T0 (and possibly beta) from that data.
+ * IMPORTANT anchor: the Arduino sketch proof measured R_ntc ≈ 8.11 kΩ at
+ * 27 °C — but the DVM ice/boil two-point (31.9 kΩ @ 0.8 °C, 686 Ω @
+ * 99.0 °C) gives beta ≈ 3986 and R(25 °C) ≈ 9.8 kΩ: a normal 10 k-class
+ * part. The sketch's low reading was the uncalibrated ADC chain
+ * over-reading the tap ~6 % (predicted tap 1.72 V, sketch saw 1.82 V).
+ * So the conversion anchors on the DVM pair, not the ADC-derived one.
+ * Residual error is the divider/ADC chain itself — check the status
+ * page reading against a reference thermometer on the wall mount.
  *
  * Publishes every 30 s to bracino/gateway/telemetry (DN004 addendum:
  * gateway-local measurements, QoS 0, non-retained). Not node-batch data —
@@ -47,9 +48,9 @@
 #define PIN_NTC        GPIO_NUM_33
 #define V_RAIL         3.33f      /* measured on this board */
 #define R_FIXED        9810.0f    /* measured */
-#define R0_OHM         8100.0f    /* measured at T0 (see header) */
-#define T0_C           27.0f
-#define BETA           3950.0f
+#define R0_OHM         9797.0f    /* from DVM two-point (see header) */
+#define T0_C           25.0f
+#define BETA           3986.0f    /* from DVM ice/boil two-point */
 #define SAMPLE_PERIOD_S 30
 #define NUM_SAMPLES    64
 
