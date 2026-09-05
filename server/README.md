@@ -75,6 +75,8 @@ chmod 600 .env
 ```bash
 docker compose up -d mosquitto commit
 docker compose logs --tail 20 commit     # connected, subscribed
+# docker compose auto-loads .env; your shell does not — export first
+set -a; . ./.env; set +a
 mosquitto_sub -h localhost -t 'bracino/#' -u bracino -P "$MQTT_PASS" -v &
 mosquitto_pub -h localhost -t 'bracino/test' -m ping -u bracino -P "$MQTT_PASS"
 ```
