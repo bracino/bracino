@@ -7,6 +7,41 @@
 
 ---
 
+## SESSION LOG 2026-09-05/06 (late-night bench + t520 bring-up)
+
+Stage-B backend **VERIFIED end-to-end** (human on t520, ~01:00):
+
+- mosquitto auth'd, commit-service health `ok:true` (~30 s period),
+  gateway `status` LWT + acker `time` topic flowing
+- `/var/lib/bracino/commit/telemetry.jsonl` writing (55 lines pre-fake);
+  repo `data/` is the local-bench path — t520 live path is the one above
+- `fake_publisher` on t520 runs via `docker compose run --rm commit
+  python fake_publisher.py --count 5 --host mosquitto` (image already
+  contains it; `--host mosquitto` required; README updated `9cc823e`)
+- Runbook auth trap fixed: shells don't auto-load `.env` (`390b8d1`)
+- GW firmware: `s` now prints UTC wall time + LED-table health as text,
+  single evaluator with the LED (`4102806`)
+- Tree cleaned: generated gateway `sdkconfig` gitignored (`7268458`)
+
+**Open: sim node cannot find the GW.** Bisect state: backend exonerated;
+next step is `s` on GW serial (mode / health / `rx=` counters). Decision
+tree: ACTIVE + HELLO=0 → suspect STA modem power-save eating ESP-NOW
+frames (new vs bench master, which had no STA); fix ready:
+`esp_wifi_set_ps(WIFI_PS_NONE)`. ACTIVE + HELLO climbing → ack direction.
+WAIT_BACKEND → chase that leg.
+
+**Confirmed bug, fix agreed but NOT applied:** `restore_time()` (net.c)
+computes `gw_now_ms()/1000 - epoch_up` in u32 across boots → underflow →
+clock set to es + 2³² s (year 2162) on every reboot until MQTT time
+lands. Fix: restore from `epoch_s` alone (uptime deltas across boots are
+meaningless). Awaited human go + DN004 checkpoint wording touch-up.
+
+Still pending: wall-node flash of `a32aca2` + delta 1.5 (016), untracked
+docs/CONTEXT + HW_REFS + control_loop_notes.txt gitignore-or-commit
+decision, stale 001–008 notebook sweep.
+
+---
+
 ## DESIGN SETTLED 2026-09-04 (discussion with human; supersedes the
 ## open questions below — kept for the record)
 
