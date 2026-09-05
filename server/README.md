@@ -98,6 +98,18 @@ docker compose --profile influx up -d      # + INFLUX_TOKEN/INFLUX_PASSWORD in .
 
 Commit service gains `INFLUX_URL`/`INFLUX_TOKEN`-gated line-protocol tailing (JSONL remains the ack path). Grafana stays on the desktop, pointed at `http://192.168.1.215:8086`.
 
+### Gotchas seen in stage B
+
+- **Bind-mount path auto-created as a directory**: if `docker compose up`
+  runs before a mounted file exists (e.g. `mosquitto/passwd`), docker
+  creates the missing host path as a root-owned *directory*. Broker then
+  fails with `Unable to open pwfile` forever. Fix: `rmdir` it, generate
+  the file, `docker compose up -d`.
+- **passwd generation needs `-it`**: without stdin attach, `mosquitto_passwd`
+  reads EOF → `Empty password`.
+- **passwd ownership**: generated as root:0600; chown to the image's
+  broker uid (`docker run --rm eclipse-mosquitto:2 id mosquitto`).
+
 ## commit-service bench (unchanged)
 
 The VM bench workflow (venv, fake_publisher, layer-1 drills 1–3 results) lives in [`commit-service/README.md`](commit-service/README.md). The service falls back to anonymous MQTT when `MQTT_USER`/`MQTT_PASS` are unset, so drills keep working against an auth-less bench broker.
