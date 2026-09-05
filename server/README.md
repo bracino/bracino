@@ -54,9 +54,10 @@ sudo mkdir -p /var/lib/bracino/commit && sudo chown 1000:1000 /var/lib/bracino/c
 docker run -it --rm -v "$PWD/mosquitto:/mosquitto/config" eclipse-mosquitto:2 \
   mosquitto_passwd -c /mosquitto/config/passwd bracino
 # ↑ -it required: without stdin attach, passwd reads EOF → "Empty password"
-sudo chown 1883:1883 mosquitto/passwd && chmod 640 mosquitto/passwd
-# generated as root:0600 otherwise; broker (uid 1883) couldn't read it
-cat mosquitto/passwd    # expect: bracino:$7$… (hash, not plaintext)
+sudo chown 1883:1883 mosquitto/passwd
+ls -l mosquitto/passwd      # -rw------- ... 1883 1883 — 0600 is what we want
+sudo cat mosquitto/passwd   # expect: bracino:$7$… (hash, not plaintext)
+# plain `cat` denies you on purpose; only the broker (uid 1883) reads it
 ```
 
 ### 3. Secrets
