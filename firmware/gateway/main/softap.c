@@ -135,6 +135,7 @@ static void append_status(char *b, size_t cap)
              "<table>"
              "<tr><th>wifi</th><td>%s (ssid '%s')</td></tr>"
              "<tr><th>broker</th><td>%s</td></tr>"
+             "<tr><th>broker user</th><td>%s</td></tr>"
              "<tr><th>time</th><td>%s (src %s)</td></tr>"
              "<tr><th>backend health</th><td>%s</td></tr>"
              "<tr><th>ext. ambient</th><td>%s</td></tr>"
@@ -145,6 +146,7 @@ static void append_status(char *b, size_t cap)
              PAT[pat], PAT[pat],
              gw_wifi_up() ? "up" : "DOWN", ssid_e,
              gw_broker_up() ? "connected" : broker,
+             gw_net_mqtt_user() ? gw_net_mqtt_user() : "(anonymous)",
              gw_time_valid() ? "valid" : "INVALID", gw_time_source(),
              gw_health_age_ms() == UINT32_MAX
                  ? "never seen"
@@ -198,6 +200,8 @@ static const char PROV_FORM[] =
     "<tr><th>WiFi password</th><td><input name='pass' type='password'></td></tr>"
     "<tr><th>Broker host</th><td><input name='bhost' value='%s'></td></tr>"
     "<tr><th>Broker port</th><td><input name='bport' value='%s'></td></tr>"
+    "<tr><th>MQTT user</th><td><input name='muser' value='%s'></td></tr>"
+    "<tr><th>MQTT password</th><td><input name='mpass' type='password'></td></tr>"
     "</table><p><input type='submit' value='save + reboot'></p>"
     "</form><p>Saving reboots the gateway. The node keeps buffering "
     "until the gateway returns (DN003).</p>";
@@ -205,14 +209,16 @@ static const char PROV_FORM[] =
 static esp_err_t h_prov(httpd_req_t *req)
 {
     static char body[1024];
-    char ssid_e[72], bh_e[72], bp[8];
+    char ssid_e[72], bh_e[72], bp[8], mu_e[72];
     char bh[72];
+    const char *mu = gw_net_mqtt_user();
     gw_net_broker_str(bh, sizeof(bh));
     esc(gw_net_ssid(), ssid_e, sizeof(ssid_e));
     esc(bh, bh_e, sizeof(bh_e));
+    esc(mu ? mu : "", mu_e, sizeof(mu_e));
     snprintf(bp, sizeof(bp), "%lu",
              (unsigned long)gw_nvs_get_u32("bport", 1883));
-    snprintf(body, sizeof(body), PROV_FORM, ssid_e, bh_e, bp);
+    snprintf(body, sizeof(body), PROV_FORM, ssid_e, bh_e, bp, mu_e);
     http_send(req, PAGE_HEAD, body, PAGE_TAIL);
     return ESP_OK;
 }
@@ -272,6 +278,7 @@ static esp_err_t h_save(httpd_req_t *req)
 {
     static char body[512];
     char ssid[33], pass[65], bhost[64], bport[8];
+    char muser[33], mpass[65];
 
     int len = req->content_len;
     if (len <= 0 || len >= (int)sizeof(body)) {
@@ -289,6 +296,8 @@ static esp_err_t h_save(httpd_req_t *req)
     form_field(body, "pass", pass, sizeof(pass));
     form_field(body, "bhost", bhost, sizeof(bhost));
     form_field(body, "bport", bport, sizeof(bport));
+    form_field(body, "muser", muser, sizeof(muser));
+    form_field(body, "mpass", mpass, sizeof(mpass));
 
     if (ssid[0]) {
         gw_nvs_set_str("ssid", ssid);
@@ -301,6 +310,13 @@ static esp_err_t h_save(httpd_req_t *req)
     }
     if (bport[0]) {
         gw_nvs_set_u32("bport", (uint32_t)atoi(bport));
+    }
+    /* MQTT auth: blank mpass keeps the stored one (same rule as WiFi) */
+    if (muser[0]) {
+        gw_nvs_set_str("muser", muser);
+        if (mpass[0]) {
+            gw_nvs_set_str("mpass", mpass);
+        }
     }
 
     char msg[512];

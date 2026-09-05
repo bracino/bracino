@@ -103,6 +103,7 @@ bool gw_broker_up(void);
 uint32_t gw_health_age_ms(void);                 /* UINT32_MAX = never seen */
 const char *gw_net_ssid(void);                   /* provisioned SSID or "" */
 void gw_net_broker_str(char *out, size_t n);     /* "host:port" */
+const char *gw_net_mqtt_user(void);              /* provisioned MQTT user or NULL */
 void gw_net_mqtt_restart(void);                  /* after broker NVS change */
 void gw_net_init(void);                          /* WiFi+MQTT+time bring-up */
 

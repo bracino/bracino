@@ -535,6 +535,6 @@ unaffected.** The chain-wide version of this table is DN006.
   9.81 kΩ to GND — measured values hardcoded with an empirical anchor
   pair, see `firmware/gateway/main/amb.c`; ice/boil two-point pending).
 - **Broker host**: the backend stack's home is the NAS (HP t520 thin
-  client, Ubuntu Server, static **192.168.0.215**, house LAN, 24/7).
+  client, Ubuntu Server, static **192.168.1.215**, house LAN, 24/7).
   Mosquitto on **1883** (IANA standard). Default broker host in gateway
   firmware NVS defaults matches.

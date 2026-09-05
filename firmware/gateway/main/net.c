@@ -114,6 +114,7 @@ static void time_set_src(uint64_t unix_s, uint16_t ms, const char *src)
 static char s_ssid[33], s_pass[65];
 static char s_bhost[64];
 static uint32_t s_bport;
+static char s_muser[33], s_mpass[65];   /* MQTT auth (NVS muser/mpass) */
 
 /* ---- NVS config ---- */
 
@@ -169,12 +170,17 @@ void gw_net_broker_str(char *out, size_t n)
     snprintf(out, n, "%s:%lu", s_bhost, (unsigned long)s_bport);
 }
 
+/* NULL when anonymous (no muser in NVS) — status page + serial use it */
+const char *gw_net_mqtt_user(void) { return s_muser[0] ? s_muser : NULL; }
+
 static void load_config(void)
 {
     gw_nvs_get_str("ssid", s_ssid, sizeof(s_ssid), "");
     gw_nvs_get_str("pass", s_pass, sizeof(s_pass), "");
-    gw_nvs_get_str("bhost", s_bhost, sizeof(s_bhost), "192.168.0.215");
+    gw_nvs_get_str("bhost", s_bhost, sizeof(s_bhost), "192.168.1.215");
     s_bport = gw_nvs_get_u32("bport", 1883);
+    gw_nvs_get_str("muser", s_muser, sizeof(s_muser), "");
+    gw_nvs_get_str("mpass", s_mpass, sizeof(s_mpass), "");
 }
 
 static void checkpoint_time(void)
@@ -342,6 +348,11 @@ static void start_mqtt(void)
 
     const esp_mqtt_client_config_t cfg = {
         .broker.address.uri = uri,
+        /* single shared MQTT user (t520 mosquitto, allow_anonymous
+         * false); empty NVS muser = anonymous, keeps bench drills
+         * working against an auth-less broker */
+        .credentials.username = s_muser[0] ? s_muser : NULL,
+        .credentials.authentication.password = s_mpass[0] ? s_mpass : NULL,
         .session.keepalive = 30,
         .session.last_will = {
             .topic = STATUS_TOPIC,
@@ -488,11 +499,10 @@ void gw_net_init(void)
      * (bench 2026-09-05: phone join/leave loop + unreachable pages). */
     esp_netif_t *ap_netif = esp_netif_create_default_wifi_ap();
     ESP_ERROR_CHECK(esp_netif_dhcps_stop(ap_netif));
-    esp_netif_ip_info_t ap_ip = {
-        .ip      = { .addr = IPADDR4_INIT_BYTES(192, 168, 5, 1) },
-        .gw      = { .addr = IPADDR4_INIT_BYTES(192, 168, 5, 1) },
-        .netmask = { .addr = IPADDR4_INIT_BYTES(255, 255, 255, 0) },
-    };
+    esp_netif_ip_info_t ap_ip = { 0 };
+    IP4_ADDR(&ap_ip.ip, 192, 168, 5, 1);
+    IP4_ADDR(&ap_ip.gw, 192, 168, 5, 1);
+    IP4_ADDR(&ap_ip.netmask, 255, 255, 255, 0);
     ESP_ERROR_CHECK(esp_netif_set_ip_info(ap_netif, &ap_ip));
     ESP_ERROR_CHECK(esp_netif_dhcps_start(ap_netif));
 

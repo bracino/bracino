@@ -38,6 +38,11 @@ STATE_PATH = os.path.join(DATA_DIR, "commit_state.json")
 
 MQTT_HOST = os.environ.get("MQTT_HOST", "localhost")
 MQTT_PORT = int(os.environ.get("MQTT_PORT", "1883"))
+# Single shared MQTT user (t520, allow_anonymous false). Unset =
+# anonymous, which keeps VM bench drills working against an auth-less
+# broker with zero config.
+MQTT_USER = os.environ.get("MQTT_USER") or None
+MQTT_PASS = os.environ.get("MQTT_PASS") or None
 
 HEALTH_PERIOD_S = 30
 TIME_PERIOD_S = 10
@@ -228,6 +233,8 @@ class Commit:
     def run(self):
         c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,
                         client_id="bracino-commit-svc")
+        if MQTT_USER:
+            c.username_pw_set(MQTT_USER, MQTT_PASS)
         c.on_connect = self.on_connect
         c.on_message = self.on_message
         self.client = c

@@ -17,6 +17,7 @@ the publisher mid-run (health keeps publishing, commit age grows).
 import argparse
 import json
 import math
+import os
 import time
 
 import paho.mqtt.client as mqtt
@@ -24,6 +25,8 @@ import paho.mqtt.client as mqtt
 ap = argparse.ArgumentParser()
 ap.add_argument("--host", default="localhost")
 ap.add_argument("--port", type=int, default=1883)
+ap.add_argument("--user", default=os.environ.get("MQTT_USER"))
+ap.add_argument("--pass", dest="password", default=os.environ.get("MQTT_PASS"))
 ap.add_argument("--node-type", type=int, default=1)
 ap.add_argument("--node-id", type=int, default=2)
 ap.add_argument("--count", type=int, default=30, help="0 = forever")
@@ -55,6 +58,8 @@ def sample(i):
 
 
 c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="fake-pub")
+if args.user:
+    c.username_pw_set(args.user, args.password)
 c.connect(args.host, args.port, keepalive=30)
 c.loop_start()
 topic = f"bracino/node/{args.node_type}/{args.node_id}/telemetry"

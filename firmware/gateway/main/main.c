@@ -836,6 +836,7 @@ static void print_help(void)
         "gateway (015): ESP-NOW bridge, commit-watermark-gated BATCH_ACK\n"
         "  n <unix_s>  set epoch (fallback; sntp/mqtt preferred)\n"
         "  b <host> [port]  set broker (NVS; applies immediately)\n"
+        "  u <user> [pass]  set MQTT auth (NVS; empty user = anonymous)\n"
         "  t           push TIME_SYNC to all nodes\n"
         "  s           status (also GPIO27 long-press → softAP pages)\n"
         "  h           this help\n");
@@ -852,6 +853,28 @@ static void cmd_set_broker(char *args)
     gw_nvs_set_str("bhost", host);
     gw_nvs_set_u32("bport", (uint32_t)port);
     TLOG("broker -> %s:%d (NVS)\n", host, port);
+    gw_net_mqtt_restart();
+}
+
+static void cmd_set_mqtt_auth(char *args)
+{
+    char user[33] = "", pass[65] = "";
+    if (sscanf(args, "%32s %64s", user, pass) < 1) {
+        TLOG("usage: u <user> [pass]  |  u -  (clear to anonymous)\n");
+        return;
+    }
+    if (strcmp(user, "-") == 0) {
+        gw_nvs_set_str("muser", "");
+        gw_nvs_set_str("mpass", "");
+        TLOG("mqtt auth cleared (anonymous) (NVS)\n");
+    } else {
+        gw_nvs_set_str("muser", user);
+        if (pass[0]) {
+            gw_nvs_set_str("mpass", pass);
+        }
+        TLOG("mqtt user '%s' set%s (NVS)\n", user,
+             pass[0] ? "+pass" : " (pass unchanged)");
+    }
     gw_net_mqtt_restart();
 }
 
@@ -895,6 +918,8 @@ static void console_loop(void)
                 }
             } else if (line[0] == 'b' && line[1] == ' ') {
                 cmd_set_broker(line + 2);
+            } else if (line[0] == 'u' && line[1] == ' ') {
+                cmd_set_mqtt_auth(line + 2);
             } else if (strcmp(line, "t") == 0) {
                 for (int i = 0; i < gw_node_cnt; i++) {
                     if (gw_nodes[i].in_use) {
