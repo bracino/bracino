@@ -35,11 +35,12 @@
 #include "freertos/task.h"
 
 #include "gw.h"
+#include "amb.h"
 #include "bracino_log.h"
 
 /* ---- pins ---- */
 
-#define PIN_LED GPIO_NUM_2
+#define PIN_LED GPIO_NUM_16 /* moved from GPIO2 (GW rev: brighter LED) */
 #define LED_ACTIVE_HIGH 1
 #define PIN_BUTTON GPIO_NUM_27 /* softap.c — chosen because GPIO12/0/2/15
                                 * are strapping pins on classic ESP32 */
@@ -953,6 +954,7 @@ void app_main(void)
 
     /* uplink first (wifi/broker/time/state machine) */
     gw_net_init();
+    amb_start();
 
     xTaskCreate(proc_task, "proc", 12288, NULL, 3, NULL);
     xTaskCreate(led_task, "led", 3072, NULL, 1, NULL);

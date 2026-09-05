@@ -121,6 +121,13 @@ static void append_status(char *b, size_t cap)
         }
     }
 
+    char amb[40];
+    if (amb_fault()) {
+        snprintf(amb, sizeof(amb), "FAULT %s", amb_fault());
+    } else {
+        snprintf(amb, sizeof(amb), "%.1f C", (double)amb_temp_c());
+    }
+
     snprintf(b + strlen(b), cap - strlen(b),
              "<h2>gateway %s</h2><p>LED: <b>%s</b></p>"
              "<table>"
@@ -128,6 +135,7 @@ static void append_status(char *b, size_t cap)
              "<tr><th>broker</th><td>%s</td></tr>"
              "<tr><th>time</th><td>%s (src %s)</td></tr>"
              "<tr><th>backend health</th><td>%s</td></tr>"
+             "<tr><th>ext. ambient</th><td>%s</td></tr>"
              "<tr><th>mode</th><td>%s</td></tr>"
              "<tr><th>uptime</th><td>%lu s</td></tr>"
              "</table><h3>nodes</h3><table><tr><th>role</th><th>mac</th>"
@@ -140,7 +148,8 @@ static void append_status(char *b, size_t cap)
                  ? "never seen"
                  : (gw_health_age_ms() < 90000 ? "fresh" : "STALE"),
              gw_mode == GW_ACTIVE ? "ACTIVE" : "WAIT_BACKEND",
-             (unsigned long)(gw_now_ms() / 1000));
+             (unsigned long)(gw_now_ms() / 1000),
+             amb);
     for (int i = 0; i < gw_node_cnt; i++) {
         gw_node_t *n = &gw_nodes[i];
         char anchor[32] = "?";

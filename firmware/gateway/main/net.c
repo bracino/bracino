@@ -173,7 +173,7 @@ static void load_config(void)
 {
     gw_nvs_get_str("ssid", s_ssid, sizeof(s_ssid), "");
     gw_nvs_get_str("pass", s_pass, sizeof(s_pass), "");
-    gw_nvs_get_str("bhost", s_bhost, sizeof(s_bhost), "192.168.122.80");
+    gw_nvs_get_str("bhost", s_bhost, sizeof(s_bhost), "192.168.0.215");
     s_bport = gw_nvs_get_u32("bport", 1883);
 }
 

@@ -509,3 +509,29 @@ unaffected.** The chain-wide version of this table is DN006.
 - Bench items: ESP-NOW payload ceiling vs IDF version; stop-and-wait
   drain throughput with several nodes draining simultaneously (shared
   with DN003).
+
+## Addenda — field/bench notes 2026-09-04 (issue 015)
+
+- **Gateway-local telemetry topic added**: `bracino/gateway/telemetry`
+  (GW→, non-retained, QoS 0). Payload:
+  `{"t_amb": <°C float>, "fault": null|"OPEN"|"SHORT", "gw_ts": "<ISO-8601 UTC>"}`.
+  Carries **gateway-local measurements** — the logger-gateway's exterior
+  ambient NTC (GPIO33, ADC1_CH7) is the first and only citizen. This is
+  NOT node-batch data: no `BATCH_ACK`/watermark involvement, node DN003
+  contract untouched. Dedupe/idempotence downstream is on `gw_ts`.
+  Framing decision: the gateway reports *about itself* as infrastructure
+  (option A); it does NOT masquerade as `NODE_TYPE_WEATHER` (id 5) — if a
+  real weather node exists in phase 2, it takes the duty over properly.
+  Influx mapping (DN005): own measurement `gw_ambient`, tags none needed
+  (single gateway), fields `t_amb` float / `fault` int (0=ok,1=OPEN,2=SHORT),
+  timestamp from `gw_ts`.
+- **Gateway hardware pins (logger-gateway bench rev)**: status LED moved
+  to **GPIO16** (brighter LED, GPIO→LED→6.7 kΩ→GND, active-high);
+  maintenance button unchanged on **GPIO27** (pull-up, pressed = LOW);
+  ambient NTC divider on **GPIO33** (NTC high side to measured 3.33 V rail,
+  9.81 kΩ to GND — measured values hardcoded with an empirical anchor
+  pair, see `firmware/gateway/main/amb.c`; ice/boil two-point pending).
+- **Broker host**: the backend stack's home is the NAS (HP t520 thin
+  client, Ubuntu Server, static **192.168.0.215**, house LAN, 24/7).
+  Mosquitto on **1883** (IANA standard). Default broker host in gateway
+  firmware NVS defaults matches.

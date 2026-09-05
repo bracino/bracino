@@ -156,6 +156,25 @@ class Commit:
         self.last_commit_wall = time.monotonic()
         log(f"event: {line}")
 
+    # ---- gateway-local ambient (issue 015 DN004 addendum) ----
+
+    def handle_gw_ambient(self, msg):
+        """bracino/gateway/telemetry — gateway-local measurement.
+        Not node-batch data: no watermark involvement. QoS 0, non-retained,
+        no dedupe needed (clean-session sub; duplicates would only come
+        from a same-session duplicate publish, which doesn't happen)."""
+        try:
+            t = json.loads(msg)
+        except ValueError:
+            log("!! bad JSON on gw telemetry")
+            return
+        line = {"kind": "gw_ambient", **t}
+        self.out.write(json.dumps(line) + "\n")
+        self.out.flush()
+        os.fsync(self.out.fileno())
+        self.lines_written += 1
+        self.last_commit_wall = time.monotonic()
+
     # ---- periodic publications ----
 
     def publish_health(self):
@@ -185,11 +204,15 @@ class Commit:
         client.subscribe([
             ("bracino/node/+/+/telemetry", 0),
             ("bracino/node/+/+/event", 1),
+            ("bracino/gateway/telemetry", 0),
         ])
         self.last_commit_wall = None  # gap: commit age restarts
 
     def on_message(self, client, _u, m):
         parts = m.topic.split("/")
+        if m.topic == "bracino/gateway/telemetry":
+            self.handle_gw_ambient(m.payload)
+            return
         # bracino/node/<t>/<id>/<leaf>
         if len(parts) != 5 or parts[1] != "node":
             return
