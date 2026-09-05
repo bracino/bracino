@@ -733,6 +733,22 @@ static int led_eval(void)
     return 0;
 }
 
+/* Same table as the LED, in words — the serial view must agree with the
+ * blink view (single evaluator: led_eval()). */
+static void health_str(char *out, size_t n)
+{
+    static const char *const desc[] = {
+        "OK (solid)",
+        "1 blink: no WiFi",
+        "2 blinks: WiFi but no broker",
+        "3 blinks: no valid time",
+        "4 blinks: no acks (watermark stale)",
+        "5 blinks: no node seen",
+    };
+    int pat = led_eval();
+    snprintf(out, n, "%d: %s", pat, desc[pat]);
+}
+
 static void led_write(bool on)
 {
 #if LED_ACTIVE_HIGH
@@ -777,9 +793,19 @@ static void registry_print(void)
     wifi_second_chan_t sc;
     esp_wifi_get_channel(&prim, &sc);
 
-    TLOG("mode=%s ch=%u time=%s (src %s)\n",
+    char utc[32] = "?";
+    if (gw_time_valid()) {
+        time_t sec = (time_t)(gw_epoch_ms() / 1000ULL);
+        struct tm tm;
+        gmtime_r(&sec, &tm);
+        strftime(utc, sizeof(utc), "%Y-%m-%d %H:%M:%S UTC", &tm);
+    }
+    TLOG("mode=%s ch=%u time=%s (src %s) = %s\n",
          gw_mode == GW_ACTIVE ? "ACTIVE" : "WAIT_BACKEND", prim,
-         gw_time_valid() ? "valid" : "INVALID", gw_time_source());
+         gw_time_valid() ? "valid" : "INVALID", gw_time_source(), utc);
+    char hstr[72];
+    health_str(hstr, sizeof(hstr));
+    TLOG("health=%s\n", hstr);
     char bstr[72];
     gw_net_broker_str(bstr, sizeof(bstr));
     TLOG("wifi=%d ssid='%s' broker=%d (%s) health_age=%lus\n",
