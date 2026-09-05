@@ -25,8 +25,10 @@
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "amb.h"
 
 #include "gw.h"
+#include "amb.h"
 #include "bracino_log.h"
 
 #define PIN_BUTTON     GPIO_NUM_27 /* pull-up; pressed = LOW */
@@ -147,9 +149,9 @@ static void append_status(char *b, size_t cap)
              gw_health_age_ms() == UINT32_MAX
                  ? "never seen"
                  : (gw_health_age_ms() < 90000 ? "fresh" : "STALE"),
+             amb,
              gw_mode == GW_ACTIVE ? "ACTIVE" : "WAIT_BACKEND",
-             (unsigned long)(gw_now_ms() / 1000),
-             amb);
+             (unsigned long)(gw_now_ms() / 1000));
     for (int i = 0; i < gw_node_cnt; i++) {
         gw_node_t *n = &gw_nodes[i];
         char anchor[32] = "?";

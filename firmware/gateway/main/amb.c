@@ -146,14 +146,14 @@ static void amb_task(void *arg)
 
 void amb_start(void)
 {
-    const adc_oneshot_unit_init_t_t unit_cfg = {
+    const adc_oneshot_unit_init_cfg_t unit_cfg = {
         .unit_id = ADC_UNIT_1,
-        .ulp_mode = ADC_ULP_MODE_DISABLED,
+        .ulp_mode = ADC_ULP_MODE_DISABLE,
     };
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&unit_cfg, &s_unit));
 
     const adc_oneshot_chan_cfg_t chan_cfg = {
-        .atten = ADC_ATTEN_DB_11,
+        .atten = ADC_ATTEN_DB_12,
         .bitwidth = ADC_BITWIDTH_DEFAULT,
     };
     ESP_ERROR_CHECK(adc_oneshot_config_channel(s_unit, ADC_CHANNEL_7,
@@ -164,7 +164,7 @@ void amb_start(void)
     if (adc_cali_create_scheme_line_fitting(
             &(adc_cali_line_fitting_config_t){
                 .unit_id = ADC_UNIT_1,
-                .atten = ADC_ATTEN_DB_11,
+                .atten = ADC_ATTEN_DB_12,
                 .bitwidth = ADC_BITWIDTH_DEFAULT,
             },
             &s_cali) != ESP_OK) {
