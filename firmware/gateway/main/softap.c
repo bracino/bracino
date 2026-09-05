@@ -400,6 +400,11 @@ static void softap_button_task(void *arg)
         } else if (!down) {
             pressed = false;
         }
+        /* re-sample: toggle() may have blocked in open(), which set
+         * s_opened_ms AFTER the loop-top 'now'. The stale 'now' makes
+         * the unsigned delta wrap (~4e9 > AP_WINDOW_MS) and insta-
+         * closes the AP on the very iteration that opened it. */
+        now = gw_now_ms();
         if (s_ap_open && now - s_opened_ms > AP_WINDOW_MS) {
             softap_close();
         }
