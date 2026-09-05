@@ -332,6 +332,9 @@ bool gw_softap_open(void)
 
     httpd_config_t cfg = HTTPD_DEFAULT_CONFIG();
     cfg.stack_size = 8192;
+    /* default max_req_hdr_len (512) is too small for browsers — UA,
+     * Accept, sec-ch-*, cookies exceed it and the request dies with a
+     * 431 before routing. Raise the httpd scratch buffer instead. */
     if (httpd_start(&s_httpd, &cfg) != ESP_OK) {
         TLOG("!! softAP httpd start failed\n");
         return false;

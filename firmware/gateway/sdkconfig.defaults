@@ -3,3 +3,7 @@ CONFIG_IDF_TARGET="esp32"
 
 # Bench/field pass 1: keep TWDT log-only (default). No panic-reboot over a
 # transient on a wall-mounted device (node-bbu saga, STATUS 2026-09-03).
+
+# softAP provisioning pages: browsers send >512B of headers (UA, Accept,
+# sec-ch-*, cookies) — default scratch buffer rejected them with 431.
+CONFIG_HTTPD_MAX_REQ_HDR_LEN=2048
