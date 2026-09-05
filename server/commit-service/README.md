@@ -31,6 +31,17 @@ mosquitto_sub -t 'bracino/gateway/commit' -t 'bracino/gateway/health' -v
 python3 fake_publisher.py --count 50 --interval 0.2
 ```
 
+On the t520 (no venv; the image already carries fake_publisher + paho):
+
+```bash
+cd ~/bracino/server
+set -a; . ./.env; set +a
+docker compose run --rm commit python fake_publisher.py \
+  --count 5 --interval 0.2 --host mosquitto
+# --host mosquitto is required: the script defaults to localhost,
+# which is not the broker from inside the container.
+```
+
 ## Layer-1 acceptance (issue 015 drill list)
 
 1. JSONL lines match published samples; watermarks monotonic, last
