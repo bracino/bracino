@@ -87,3 +87,6 @@ ephemera/
 # Session bridge (local only; see AGENTS.md)
 session-kickoff.md
 session-kickoff.md.bak
+
+# ESP-IDF generated (full config lives in sdkconfig.defaults)
+firmware/gateway/sdkconfig
