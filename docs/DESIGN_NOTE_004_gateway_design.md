@@ -443,7 +443,10 @@ A field-maintenance overlay, never part of the control path:
      in WAIT_BACKEND, live ESP-NOW data is infeasible by design — that
      troubleshooting belongs on the node's bench, not over this AP.)
 - **Channel coupling, stated as behavior:** softAP and STA share one
-  radio channel. During ACTIVE the AP sits on the STA channel by
+  radio channel. AP subnet is static **192.168.5.1/24** (DHCP .5.x to
+  maintenance clients) — NOT the IDF default 192.168.4.1, which collides
+  with Starlink routers (bench 2026-09-05: phone join/leave loop,
+  unreachable pages). During ACTIVE the AP sits on the STA channel by
   construction. In WAIT_BACKEND the AP pins the channel until STA
   association succeeds, then the radio jumps and AP clients are
 dropped (case 1 above).

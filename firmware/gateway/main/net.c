@@ -483,7 +483,18 @@ void gw_net_init(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     s_sta_netif = esp_netif_create_default_wifi_sta();
     (void)s_sta_netif;
-    esp_netif_create_default_wifi_ap();  /* softAP overlay (softap.c) */
+    /* AP netif: static 192.168.5.1/24 — the IDF default 192.168.4.1
+     * collides with Starlink routers, which use the same base address
+     * (bench 2026-09-05: phone join/leave loop + unreachable pages). */
+    esp_netif_t *ap_netif = esp_netif_create_default_wifi_ap();
+    ESP_ERROR_CHECK(esp_netif_dhcps_stop(ap_netif));
+    esp_netif_ip_info_t ap_ip = {
+        .ip      = { .addr = IPADDR4_INIT_BYTES(192, 168, 5, 1) },
+        .gw      = { .addr = IPADDR4_INIT_BYTES(192, 168, 5, 1) },
+        .netmask = { .addr = IPADDR4_INIT_BYTES(255, 255, 255, 0) },
+    };
+    ESP_ERROR_CHECK(esp_netif_set_ip_info(ap_netif, &ap_ip));
+    ESP_ERROR_CHECK(esp_netif_dhcps_start(ap_netif));
 
     wifi_init_config_t wcfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&wcfg));
