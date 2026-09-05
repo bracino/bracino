@@ -51,10 +51,9 @@ sudo mkdir -p /var/lib/bracino/commit && sudo chown 1000:1000 /var/lib/bracino/c
 ### 2. Broker auth
 
 ```bash
-docker run --rm -v "$PWD/mosquitto:/mosquitto/config" eclipse-mosquitto:2 \
+docker run -it --rm -v "$PWD/mosquitto:/mosquitto/config" eclipse-mosquitto:2 \
   mosquitto_passwd -c /mosquitto/config/passwd bracino
-# ↑ don't drop the command tail — bare `docker run ... eclipse-mosquitto:2`
-# starts the BROKER, which then errors on the missing passwd file.
+# ↑ -it required: without stdin attach, passwd reads EOF → "Empty password"
 sudo chown 1883:1883 mosquitto/passwd && chmod 640 mosquitto/passwd
 # generated as root:0600 otherwise; broker (uid 1883) couldn't read it
 cat mosquitto/passwd    # expect: bracino:$7$… (hash, not plaintext)
