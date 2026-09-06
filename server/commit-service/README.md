@@ -31,6 +31,13 @@ mosquitto_sub -t 'bracino/gateway/commit' -t 'bracino/gateway/health' -v
 python3 fake_publisher.py --count 50 --interval 0.2
 ```
 
+**Log-file hygiene (2026-09-06):** the JSONL is re-opened fresh per line
+(the fsync dominates cost, so this is free). Deleting, moving, or
+rotating `telemetry.jsonl` is always safe — the next write re-creates
+it at the canonical path. Earlier behavior (one held startup handle)
+silently orphaned writes when the file was `mv`'d/deleted: acks kept
+flowing into an unlinked inode.
+
 On the t520 (no venv; the image already carries fake_publisher + paho):
 
 ```bash

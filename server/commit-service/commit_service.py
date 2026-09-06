@@ -72,9 +72,22 @@ class Commit:
     def __init__(self):
         os.makedirs(DATA_DIR, exist_ok=True)
         self.state = self._load_state()
-        self.out = open(JSONL_PATH, "a", encoding="utf-8")
         self.last_commit_wall = None
         self.lines_written = 0
+
+    def _append_line(self, line):
+        """Open-append-fsync-close per line. The fsync dominates cost, so
+        the fresh handle is free — and it means an mv/deletion/rotation of
+        the log file can never orphan writes: 2026-09-06 a `mv` of the
+        jsonl left the held startup handle appending into a renamed inode
+        (watermarks advanced, file vanished). Rotation in stage C relies
+        on this being safe."""
+        with open(JSONL_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(line) + "\n")
+            f.flush()
+            os.fsync(f.fileno())
+        self.lines_written += 1
+        self.last_commit_wall = time.monotonic()
 
     def _load_state(self):
         try:
@@ -127,11 +140,7 @@ class Commit:
                 and wrap_le(cap, st["capture_ms"]):
             return  # duplicate: cap <= cursor (retransmitted batch / replay)
 
-        self.out.write(json.dumps(line) + "\n")
-        self.out.flush()
-        os.fsync(self.out.fileno())
-        self.lines_written += 1
-        self.last_commit_wall = time.monotonic()
+        self._append_line(line)
         st["capture_ms"] = cap
         st["boot_session"] = boot
         self._save_state()
@@ -154,11 +163,7 @@ class Commit:
                     "%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                 **{k: v for k, v in t.items()
                    if k not in ("kind", "node_type", "node_id")}}
-        self.out.write(json.dumps(line) + "\n")
-        self.out.flush()
-        os.fsync(self.out.fileno())
-        self.lines_written += 1
-        self.last_commit_wall = time.monotonic()
+        self._append_line(line)
         log(f"event: {line}")
 
     # ---- gateway-local ambient (issue 015 DN004 addendum) ----
@@ -174,11 +179,7 @@ class Commit:
             log("!! bad JSON on gw telemetry")
             return
         line = {"kind": "gw_ambient", **t}
-        self.out.write(json.dumps(line) + "\n")
-        self.out.flush()
-        os.fsync(self.out.fileno())
-        self.lines_written += 1
-        self.last_commit_wall = time.monotonic()
+        self._append_line(line)
 
     # ---- periodic publications ----
 
@@ -255,7 +256,6 @@ class Commit:
         log("shutting down")
         c.loop_stop()
         c.disconnect()
-        self.out.close()
 
 
 if __name__ == "__main__":
