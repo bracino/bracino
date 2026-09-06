@@ -28,6 +28,7 @@
 #include "amb.h"
 
 #include "gw.h"
+#include "bracino_build_id.h"
 #include "amb.h"
 #include "bracino_log.h"
 
@@ -140,6 +141,7 @@ static void append_status(char *b, size_t cap)
              "<tr><th>backend health</th><td>%s</td></tr>"
              "<tr><th>ext. ambient</th><td>%s</td></tr>"
              "<tr><th>mode</th><td>%s</td></tr>"
+             "<tr><th>firmware</th><td>%s (build %s)</td></tr>"
              "<tr><th>uptime</th><td>%lu s</td></tr>"
              "</table><h3>nodes</h3><table><tr><th>role</th><th>mac</th>"
              "<th>last seen</th><th>anchor</th></tr>",
@@ -153,6 +155,7 @@ static void append_status(char *b, size_t cap)
                  : (gw_health_age_ms() < 90000 ? "fresh" : "STALE"),
              amb,
              gw_mode == GW_ACTIVE ? "ACTIVE" : "WAIT_BACKEND",
+             BRACINO_BUILD_NAME, BRACINO_BUILD,
              (unsigned long)(gw_now_ms() / 1000));
     for (int i = 0; i < gw_node_cnt; i++) {
         gw_node_t *n = &gw_nodes[i];

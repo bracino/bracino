@@ -36,6 +36,7 @@
 
 #include "gw.h"
 #include "amb.h"
+#include "bracino_build_id.h"
 #include "bracino_log.h"
 
 /* ---- pins ---- */
@@ -775,11 +776,13 @@ static void led_task(void *arg)
         } else {
             led_write(false);
             vTaskDelay(pdMS_TO_TICKS(1000));
+            /* 200ms on / 200ms off — a 5-blink pattern spans 2.0s, slow
+             * enough to count by eye on the wall-mounted unit. */
             for (int i = 0; i < pat; i++) {
                 led_write(true);
-                vTaskDelay(pdMS_TO_TICKS(150));
+                vTaskDelay(pdMS_TO_TICKS(200));
                 led_write(false);
-                vTaskDelay(pdMS_TO_TICKS(150));
+                vTaskDelay(pdMS_TO_TICKS(200));
             }
         }
     }
@@ -803,6 +806,7 @@ static void registry_print(void)
     TLOG("mode=%s ch=%u time=%s (src %s) = %s\n",
          gw_mode == GW_ACTIVE ? "ACTIVE" : "WAIT_BACKEND", prim,
          gw_time_valid() ? "valid" : "INVALID", gw_time_source(), utc);
+    TLOG("fw=%s build=%s\n", BRACINO_BUILD_NAME, BRACINO_BUILD);
     char hstr[72];
     health_str(hstr, sizeof(hstr));
     TLOG("health=%s\n", hstr);
