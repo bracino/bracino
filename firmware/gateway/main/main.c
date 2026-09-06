@@ -822,7 +822,11 @@ static void registry_print(void)
              ? 0
              : (unsigned long)(gw_health_age_ms() / 1000));
     if (amb_fault()) {
-        TLOG("ext_amb=FAULT %s\n", amb_fault());
+        int mv;
+        float t;
+        amb_diag(&mv, &t);
+        TLOG("ext_amb=FAULT %s (raw=%dmV conv=%.1f C)\n", amb_fault(),
+             mv, (double)t);
     } else {
         TLOG("ext_amb=%.1f C\n", (double)amb_temp_c());
     }

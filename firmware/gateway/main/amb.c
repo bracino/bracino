@@ -67,10 +67,20 @@ static adc_oneshot_unit_handle_t s_unit;
 static adc_cali_handle_t s_cali;
 static volatile float s_temp_c;
 static char s_fault[8];            /* "" = ok */
+/* last sample + conversion regardless of fault — the serial 's' line
+ * shows these so RANGE flags come with the numbers that earned them */
+static volatile int s_last_mv = -1;
+static volatile float s_last_t_c;
 
 const char *amb_fault(void) { return s_fault[0] ? s_fault : NULL; }
 
 float amb_temp_c(void) { return s_temp_c; }
+
+void amb_diag(int *mv, float *t_c)
+{
+    *mv = s_last_mv;
+    *t_c = s_last_t_c;
+}
 
 static bool adc_read_avg_mv(int *out_mv)
 {
@@ -117,8 +127,7 @@ static void convert(int mv, float *temp_c, const char **fault)
      * a floating tap above V_OPEN converts to ~-31 °C and passed as
      * valid) */
     if (*temp_c < -20.0f || *temp_c > 60.0f) {
-        *fault = "RANGE";
-        *temp_c = 0.0f;
+        *fault = "RANGE";   /* keep *temp_c — diagnostics show the miss */
     }
 }
 
@@ -131,6 +140,8 @@ static void amb_task(void *arg)
             const char *f = NULL;
             float t = 0.0f;
             convert(mv, &t, &f);
+            s_last_mv = mv;
+            s_last_t_c = t;
             if (f) {
                 strncpy(s_fault, f, sizeof(s_fault) - 1);
             } else {

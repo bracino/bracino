@@ -9,5 +9,6 @@
 void amb_start(void);   /* sampling + publish task */
 
 /* latest reading for the status page; NULL-safe before first sample */
-const char *amb_fault(void);    /* NULL = ok, else "OPEN"/"SHORT" */
+const char *amb_fault(void);    /* NULL = ok, else "OPEN"/"SHORT"/"RANGE" */
 float amb_temp_c(void);         /* valid only when amb_fault() == NULL */
+void amb_diag(int *mv, float *t_c); /* last sample + conversion, even on fault */
