@@ -33,6 +33,7 @@
 #include "espnow_schema.h"
 #include "ui.h"
 #include "bracino_log.h"
+#include "bracino_build_id.h"
 
 #define PIN_RELAY          GPIO_NUM_10
 #define PIN_HEART          GPIO_NUM_8
@@ -480,6 +481,7 @@ static void cmd_status(void)
            s_led_pat == LED_RUNNING ? "steady" : "idle",
            (unsigned long)s_ctrl.run_s,
            (unsigned long)s_ctrl.cycle_s);
+    TLOG("fw=%s build=%s\n", BRACINO_BUILD_NAME, BRACINO_BUILD);
     if (s_ctrl.warn_stuck) {
         TLOG("WARN stuck-on (CT present while relay OFF)\n");
     }
@@ -1060,8 +1062,9 @@ void app_main(void)
     };
     ESP_ERROR_CHECK(i2c_master_bus_add_device(bus, &dev_cfg, &s_ads));
 
-    TLOG("\n# node-bbu  mode=%s  loop=DESIGN_NOTE_002  beta=3950  "
-           "relay=GPIO%d heart=GPIO%d\n",
+    TLOG("\n# node-bbu fw=%s build=%s  mode=%s  loop=DESIGN_NOTE_002  "
+           "beta=3950  relay=GPIO%d heart=GPIO%d\n",
+           BRACINO_BUILD_NAME, BRACINO_BUILD,
            bbu_mode_name(s_ctrl.user_mode),
            (int)PIN_RELAY, (int)PIN_HEART);
     cmd_scan(bus);
