@@ -78,6 +78,14 @@ typedef struct {
     uint32_t tx_ok, tx_fail;
     uint32_t acks_sent, acks_held;   /* held = decoded but not acked */
     uint32_t samples_published;
+    /* raw wire counters — recv_cb truth, before any validation:
+     * rx_raw = every callback invocation; rx_drop = filtered out
+     * (bad len / short frame / wrong proto or type); last_rssi of the
+     * most recent raw frame (-1 if none). Distinguishes "deaf" from
+     * "receiving but rejecting" (bench law: firmware belief vs driver
+     * truth — silence here cost a session). */
+    uint32_t rx_raw, rx_drop;
+    int8_t last_rssi;
 } gw_ct_t;
 extern gw_ct_t gw_ct;
 

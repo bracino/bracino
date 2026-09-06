@@ -223,7 +223,10 @@ static void send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
 
 static void recv_cb(const esp_now_recv_info_t *info, const uint8_t *data, int len)
 {
+    gw_ct.rx_raw++;
+    gw_ct.last_rssi = info->rx_ctrl ? info->rx_ctrl->rssi : -1;
     if (data == NULL || len <= 0 || len > ESPNOW_MAX_PAYLOAD) {
+        gw_ct.rx_drop++;
         return;
     }
     rx_msg_t rx;
@@ -612,6 +615,7 @@ static void handle_rx(const rx_msg_t *m)
     const espnow_envelope_t *e = (const espnow_envelope_t *)m->data;
     if (m->len < ESPNOW_ENV_SIZE || e->proto_ver != ESPNOW_PROTO_VER ||
         e->msg_type == MSG_INVALID || e->msg_type > MSG_PARAM_ACK) {
+        gw_ct.rx_drop++;
         return;
     }
     gw_ct.rx[e->msg_type]++;
@@ -854,6 +858,9 @@ static void registry_print(void)
          (unsigned long)gw_ct.tx_ok, (unsigned long)gw_ct.tx_fail,
          (unsigned long)gw_ct.acks_sent, (unsigned long)gw_ct.acks_held,
          (unsigned long)gw_ct.samples_published);
+    TLOG("  raw=%lu drop=%lu last_rssi=%d\n",
+         (unsigned long)gw_ct.rx_raw, (unsigned long)gw_ct.rx_drop,
+         gw_ct.rx_raw ? gw_ct.last_rssi : -1);
     if (!gw_time_valid()) {
         TLOG("  TIME INVALID — nodes buffer but don't transmit (DN003). "
              "Set via sntp/mqtt/serial: n <unix_s>\n");
