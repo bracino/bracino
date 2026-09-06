@@ -821,6 +821,11 @@ static void registry_print(void)
          gw_health_age_ms() == UINT32_MAX
              ? 0
              : (unsigned long)(gw_health_age_ms() / 1000));
+    if (amb_fault()) {
+        TLOG("ext_amb=FAULT %s\n", amb_fault());
+    } else {
+        TLOG("ext_amb=%.1f C\n", (double)amb_temp_c());
+    }
     for (int i = 0; i < gw_node_cnt; i++) {
         gw_node_t *n = &gw_nodes[i];
         TLOG("  node(%u,%u) mac=" MACSTR " cfg_ver=%u last_seen=%lus ago "

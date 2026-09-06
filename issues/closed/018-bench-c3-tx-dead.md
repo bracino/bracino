@@ -1,6 +1,6 @@
 # 018 — Bench C3 TX radiation failure; commissioning RF smoke-test for new nodes
 
-- **Status:** open
+- **Status:** closed
 - **Type:** hardware / bench process
 - **Opened:** 2026-09-06
 - **Refs:** issues/closed/013 (proven bench pair), `firmware/gateway` b34efe9 (raw/drop/rssi counters), `firmware/node-bbu` bdf4a44 (serial fw hash), `docs/STATUS.md` (pending)
@@ -52,6 +52,15 @@ part of the proven 013 bench pair? If yes the radio degraded in service
 (ESD?); if no, it never worked — a module-quality flag (counterfeit C3
 supermini radios are known flaky).
 
+## Root cause (2026-09-06, same day — depaneling nick)
+
+Close inspection of the C3: the module had been cut/ snapped from a
+panel too close to the antenna — **nicking both the antenna and a
+mid-layer trace**. RX still worked; TX did not. Board tagged DO-NOT-USE.
+Replacement C3 soldered, flashed — GW bound within one scan: health=0,
+HEARTBEATs, 46/46 batches acked, CONFIG_DESC exchanged. **Fix confirmed
+on iron.**
+
 ## Disposition
 
 - Board physically tagged: `C3 7c:4f:ad:d1:7f:d8 — TX no radiate, raw=0
@@ -62,6 +71,10 @@ supermini radios are known flaky).
   `bench-master-fixture — golden board` for the project's duration. Once
   a working C3 is proven, it becomes the golden node fixture likewise.
   Future bench work pins against golden boards to minimize variables.
+- **Panel-feeding lesson:** any dev board depaneled/snapped from a
+  multi-module PCB gets a visual antenna+edge inspection before it earns
+  a slot in a test fixture — a nicked mid-layer trace can leave RX alive
+  and TX dead, which masquerades as everything else in this file.
 
 ## Commissioning RF smoke-test (process change)
 
@@ -84,9 +97,13 @@ driver truth" — now extended to the TX side.
 
 ## Fix
 
-_(pending: replacement C3 on fixture, GW sees HELLO)_
+Replaced C3 (antenna + mid-layer trace nicked by depaneling — see root
+cause above). Commissioning RF smoke-test ran as specified: hel burst
+heard at GW, then comms on → full bind.
 
 ## Verify
 
-_(pending: raw=HELLO count climbing on GW b34efe9 `s`; LED leaves
-5-blink state; bind completes)_
+GW `s` after bind: health=0 (solid), rx=HELLO=2 HEARTBEAT=342
+TELEMETRY_BATCH=46, tx_ok=49 acks_sent=46 held=46 — 46/46 batches
+committed. Node mac `7c:4f:ad:d1:83:04`, cfg_ver=3, anchor set.
+Confirmed on iron 2026-09-06.

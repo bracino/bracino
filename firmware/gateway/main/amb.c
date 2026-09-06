@@ -1,4 +1,9 @@
-/* amb.c — exterior ambient NTC on ADC1_CH7 (issue 015, low priority).
+/* amb.c — exterior ambient NTC on GPIO33 = ADC1_CH5 (issue 015, low
+ * priority; 2026-09-06 fix: was configured on ADC_CHANNEL_7, which on
+ * ESP32 is GPIO35 — a floating input-only pin. The wired GPIO33 divider
+ * read ~2.0 V ≈ 26 °C on a DVM while the firmware published −31.3 °C
+ * from the floating ghost channel. GPIO33 is ADC1_CH5 (ADC1, since ADC2
+ * cannot sample while WiFi is up). */
  *
  * Divider (bench-proven with an Arduino sketch, human 2026-09-04):
  *
@@ -45,7 +50,7 @@
 #include "gw.h"
 #include "bracino_log.h"
 
-#define PIN_NTC        GPIO_NUM_33
+#define PIN_NTC        GPIO_NUM_33   /* = ADC1_CH5 on ESP32 — see header */
 #define V_RAIL         3.33f      /* measured on this board */
 #define R_FIXED        9810.0f    /* measured */
 #define R0_OHM         9797.0f    /* from DVM two-point (see header) */
@@ -108,6 +113,13 @@ static void convert(int mv, float *temp_c, const char **fault)
     float t_k = 1.0f / (1.0f / (T0_C + 273.15f) +
                         logf(r_ntc / R0_OHM) / BETA);
     *temp_c = t_k - 273.15f;
+    /* implausible reading = wiring/radio fault, not weather (018 lesson:
+     * a floating tap above V_OPEN converts to ~-31 °C and passed as
+     * valid) */
+    if (*temp_c < -20.0f || *temp_c > 60.0f) {
+        *fault = "RANGE";
+        *temp_c = 0.0f;
+    }
 }
 
 static void amb_task(void *arg)
@@ -127,17 +139,16 @@ static void amb_task(void *arg)
             }
 
             if (gw_time_valid() && gw_broker_up()) {
-                char ts[32], json[160];
+                char ts[32], fj[12], json[160];
+                /* fault strings are fixed internal names — safe to inline */
+                snprintf(fj, sizeof(fj), f ? "\"%s\"" : "null", f ? f : "");
                 time_t sec = time(NULL);
                 struct tm tm;
                 gmtime_r(&sec, &tm);
                 strftime(ts, sizeof(ts), "%Y-%m-%dT%H:%M:%SZ", &tm);
                 snprintf(json, sizeof(json),
                          "{\"t_amb\":%.1f,\"fault\":%s,\"gw_ts\":\"%s\"}",
-                         (double)s_temp_c,
-                         f ? (f[0] == 'O' ? "\"OPEN\"" : "\"SHORT\"")
-                           : "null",
-                         ts);
+                         (double)s_temp_c, fj, ts);
                 gw_mqtt_publish("bracino/gateway/telemetry", json, 0, false);
             }
         }
