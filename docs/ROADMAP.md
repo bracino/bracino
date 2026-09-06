@@ -48,12 +48,12 @@ Preferred order when something has to wait:
 - [x] Same loop on dummy AC load (human, 2026-08-25); Auto-start on real wells + pump (human, before 2026-09-01; 009 closed)
 - [x] Ice / boil two-point on the potted NTCs (human, 2026-08-25)
 - [x] Field install (012 closed 2026-09-03 — deploy image `060c88d` on the wall, human-confirmed controlling the pump; comms OFF; charge-stop cycle verification deferred to the logger)
-- [ ] Field logger GW (015 — next: ack-after-durable-write, maintenance SoftAP + GPIO2 status LED per DN004 addenda, drains install-day history; charge-stop cycle verification lands here)
+- [ ] Field logger GW (015 — stage A/B done: t520 chain verified, **GW deployed to boiler room 2026-09-06**; stage C remaining: Influx write + rotation + dashboards. Wall-node reflash `bdf4a44` + `min_tpo_tpu_delta_c` 1.5 once install-day history drains; charge-stop cycle verification lands here)
 - [x] TFT + encoder UI on protoboard (010 closed 2026-08-28)
 - [x] 2-ESP bench wire test: node client vs bench gateway harness (011 + 013 closed 2026-09-01) — discovery, live telemetry, overnight drain, decimation, 20% frame loss, unreachable→rescan in tens of ms
-- [ ] Gateway builds; ESP-NOW bring-up with control node
-- [ ] MQTT publish path + retained state / LWT
-- [ ] Commit service (DN005): MQTT → Influx with commit watermarks; chain-health + notifications
+- [x] **Gateway built + deployed (2026-09-06):** ESP-NOW bring-up with the control node proven end-to-end (bind, telemetry, watermarks); DN004 addenda in (status SoftAP, GPIO2 LED, ack-on-watermark). Commissioning RF smoke-test mandatory for new hardware — [018](../issues/closed/018-bench-c3-tx-dead.md)
+- [x] MQTT publish path + retained state / LWT (015 stage B verified on t520 2026-09-05/06)
+- [ ] Commit service (DN005): **stage B live on t520** — JSONL source of truth + commit watermarks + health topic. Remaining: stage C Influx projection + JSONL rotation (compress — ~10× on this data) + chain-health notifications
 - [ ] `server/docker-compose.yml` + Mosquitto config (persistence on) in git
 - [ ] Influx write path + one Grafana dashboard (events stream + annotations per DN006)
 - [ ] Admin panel (descriptor-driven; DN003 PARAM_SET path)
