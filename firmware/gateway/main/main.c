@@ -828,7 +828,10 @@ static void registry_print(void)
         TLOG("ext_amb=FAULT %s (raw=%dmV conv=%.1f C)\n", amb_fault(),
              mv, (double)t);
     } else {
-        TLOG("ext_amb=%.1f C\n", (double)amb_temp_c());
+        int mv;
+        float t;
+        amb_diag(&mv, &t);
+        TLOG("ext_amb=%.1f C (ext_amb_mV=%d)\n", (double)amb_temp_c(), mv);
     }
     for (int i = 0; i < gw_node_cnt; i++) {
         gw_node_t *n = &gw_nodes[i];
