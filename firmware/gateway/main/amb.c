@@ -19,6 +19,15 @@
  *
  * Warming raises tap voltage — same topology/polarity as the node NTCs.
  *
+ * PLACEMENT (2026-09-06 bench finding): the bead must be thermally free
+ * of the gateway PCB — on pigtails, off the board surface. A bead flat
+ * on/near the powered board read ~35 °C in a ~28 °C room (board heat);
+ * finger test moved it only 2.3 °C, confirming thermal anchoring to the
+ * board mass. At wall mount the bead must see ambient air, not the
+ * enclosure wall. The conversion chain itself verified honest against a
+ * DVM (second batch NTC: R25 9.83 kΩ, β 3990 — within 0.1 °C of the
+ * firmware anchor at the same tap voltage).
+ *
  * IMPORTANT anchor: the Arduino sketch proof measured R_ntc ≈ 8.11 kΩ at
  * 27 °C — but the DVM ice/boil two-point (31.9 kΩ @ 0.8 °C, 686 Ω @
  * 99.0 °C) gives beta ≈ 3986 and R(25 °C) ≈ 9.8 kΩ: a normal 10 k-class
