@@ -77,7 +77,7 @@ static bool adc_read_avg_mv(int *out_mv)
     int raw = 0;
     for (int i = 0; i < NUM_SAMPLES; i++) {
         int r;
-        if (adc_oneshot_read(s_unit, ADC_CHANNEL_7, &r) != ESP_OK) {
+        if (adc_oneshot_read(s_unit, ADC_CHANNEL_5, &r) != ESP_OK) {
             return false;
         }
         raw += r;
@@ -168,7 +168,7 @@ void amb_start(void)
         .atten = ADC_ATTEN_DB_12,
         .bitwidth = ADC_BITWIDTH_DEFAULT,
     };
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(s_unit, ADC_CHANNEL_7,
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(s_unit, ADC_CHANNEL_5,
                                                &chan_cfg));
 
     /* eFuse two-point calibration if this chip has it; NULL otherwise
