@@ -3,7 +3,7 @@
  * ESP32 is GPIO35 — a floating input-only pin. The wired GPIO33 divider
  * read ~2.0 V ≈ 26 °C on a DVM while the firmware published −31.3 °C
  * from the floating ghost channel. GPIO33 is ADC1_CH5 (ADC1, since ADC2
- * cannot sample while WiFi is up). */
+ * cannot sample while WiFi is up).
  *
  * Divider (bench-proven with an Arduino sketch, human 2026-09-04):
  *
