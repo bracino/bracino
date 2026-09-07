@@ -94,6 +94,7 @@ typedef enum {
     TLV_PARAM_RESULT      = 0x0F, /* u8 */
     TLV_PREV_VALUE        = 0x10, /* n B */
     TLV_NEW_VALUE         = 0x11, /* n B */
+    TLV_EVENT_CAPTURE_MS  = 0x12, /* u32 LE: node clock_ms at EVENT offer time */
 } tlv_tag_t;
 
 /* ---- liveness / wake registries ---- */

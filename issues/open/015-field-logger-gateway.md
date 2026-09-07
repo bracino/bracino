@@ -30,11 +30,10 @@ frames (new vs bench master, which had no STA); fix ready:
 `esp_wifi_set_ps(WIFI_PS_NONE)`. ACTIVE + HELLO climbing → ack direction.
 WAIT_BACKEND → chase that leg.
 
-**Confirmed bug, fix agreed but NOT applied:** `restore_time()` (net.c)
-computes `gw_now_ms()/1000 - epoch_up` in u32 across boots → underflow →
-clock set to es + 2³² s (year 2162) on every reboot until MQTT time
-lands. Fix: restore from `epoch_s` alone (uptime deltas across boots are
-meaningless). Awaited human go + DN004 checkpoint wording touch-up.
+**Confirmed bug — FIX APPLIED IN-TREE 2026-09-07 (rides GW flash):**
+`restore_time()` now restores from `epoch_s` alone (u32 uptime-delta
+underflow eliminated); `epoch_up` checkpoint dropped; DN004 amended.
+See 019 (the 05 Sep field anomaly it explains) and 021 (detection chain).
 
 Still pending: wall-node flash of `a32aca2` + delta 1.5 (016), untracked
 docs/CONTEXT + HW_REFS + control_loop_notes.txt gitignore-or-commit

@@ -507,7 +507,8 @@ static void handle_batch(const rx_msg_t *m, const espnow_envelope_t *e,
     }
 }
 
-static void handle_event(const rx_msg_t *m, const espnow_envelope_t *e)
+static void handle_event(const rx_msg_t *m, const espnow_envelope_t *e,
+                         const gw_node_t *n)
 {
     if (m->len < ESPNOW_ENV_SIZE + 2) {
         return;
@@ -516,10 +517,21 @@ static void handle_event(const rx_msg_t *m, const espnow_envelope_t *e)
     uint8_t vlen = m->data[ESPNOW_ENV_SIZE + 1];
     const uint8_t *v = m->data + ESPNOW_ENV_SIZE + 2;
 
-    char json[224] = { 0 };
+    /* Optional capture_ms TLV (issue 020): node clock_ms at event offer
+     * time. Old-node streams have no trailing TLV — capture_ms stays 0.
+     * Send pacing during a drain burst does NOT reflect event chronology. */
+    const uint8_t *cap_p = m->data + ESPNOW_ENV_SIZE + 2 + vlen;
+    size_t cap_avail = m->len - (ESPNOW_ENV_SIZE + 2 + vlen);
+    uint32_t capture_ms = 0;
+    if (cap_avail >= 6 && cap_p[0] == TLV_EVENT_CAPTURE_MS && cap_p[1] == 4) {
+        capture_ms = (uint32_t)cap_p[2] | ((uint32_t)cap_p[3] << 8) |
+                     ((uint32_t)cap_p[4] << 16) | ((uint32_t)cap_p[5] << 24);
+    }
+
+    char json[384] = { 0 };
     if (tag == EVENT_FAULT_RAISED || tag == EVENT_FAULT_CLEARED) {
         snprintf(json, sizeof(json),
-                 "{\"event\":\"%s\",\"fault_id\":%u}", event_name(tag),
+                 "{\"event\":\"%s\",\"fault_id\":%u", event_name(tag),
                  vlen >= 1 ? v[0] : 0);
     } else if (tag == EVENT_PARAM_CHANGED && vlen >= 1) {
         char hex[3 * 12 + 1] = "";
@@ -529,14 +541,14 @@ static void handle_event(const rx_msg_t *m, const espnow_envelope_t *e)
             strncat(hex, b, sizeof(hex) - strlen(hex) - 1);
         }
         snprintf(json, sizeof(json),
-                 "{\"event\":\"PARAM_CHANGED\",\"param_id\":%u,\"value_hex\":\"%s\"}",
+                 "{\"event\":\"PARAM_CHANGED\",\"param_id\":%u,\"value_hex\":\"%s\"",
                  v[0], hex);
     } else if (tag == EVENT_CONFIG_CHANGED && vlen >= 1) {
         snprintf(json, sizeof(json),
-                 "{\"event\":\"CONFIG_CHANGED\",\"config_ver\":%u}", v[0]);
+                 "{\"event\":\"CONFIG_CHANGED\",\"config_ver\":%u", v[0]);
     } else if (tag == EVENT_BATTERY_WARN && vlen >= 1) {
         snprintf(json, sizeof(json),
-                 "{\"event\":\"BATTERY_WARN\",\"level_pct\":%u}", v[0]);
+                 "{\"event\":\"BATTERY_WARN\",\"level_pct\":%u", v[0]);
     } else {
         char hex[3 * 8 + 1] = "";
         for (uint8_t i = 0; i < vlen && i < 8; i++) {
@@ -545,7 +557,32 @@ static void handle_event(const rx_msg_t *m, const espnow_envelope_t *e)
             strncat(hex, b, sizeof(hex) - strlen(hex) - 1);
         }
         snprintf(json, sizeof(json),
-                 "{\"event\":\"UNKNOWN_%02x\",\"value_hex\":\"%s\"}", tag, hex);
+                 "{\"event\":\"UNKNOWN_%02x\",\"value_hex\":\"%s\"", tag, hex);
+    }
+
+    /* Stamped events: same anchor arithmetic as telemetry samples. Events
+     * and telemetry hang together inside one boot session this way. */
+    if (capture_ms != 0 && n != NULL && n->anchor.have &&
+        n->anchor.epoch_total_ms != 0 && gw_time_valid()) {
+        char ts[32];
+        int64_t d = (int64_t)(int32_t)(capture_ms - n->anchor.node_clock_ms);
+        uint64_t ems = n->anchor.epoch_total_ms + (uint64_t)d;
+        iso_utc(ems, ts, sizeof(ts));
+        char tail[96];
+        snprintf(tail, sizeof(tail),
+                 ",\"capture_ms\":%lu,\"boot_session\":%u,\"node_ts\":\"%s\"}",
+                 (unsigned long)capture_ms, e->boot_session, ts);
+        strncat(json, tail, sizeof(json) - strlen(json) - 1);
+    } else {
+        if (capture_ms != 0) {
+            char tail[48];
+            snprintf(tail, sizeof(tail),
+                     ",\"capture_ms\":%lu,\"boot_session\":%u}",
+                     (unsigned long)capture_ms, e->boot_session);
+            strncat(json, tail, sizeof(json) - strlen(json) - 1);
+        } else {
+            strncat(json, "}", sizeof(json) - strlen(json) - 1);
+        }
     }
 
     char topic[48];
@@ -553,6 +590,24 @@ static void handle_event(const rx_msg_t *m, const espnow_envelope_t *e)
              e->node_type, e->node_id);
     gw_mqtt_publish(topic, json, 1, false);
     TLOG("EVENT %s\n", json);
+}
+
+/* ---- node online/offline status (issue 021) ----
+ * Retained so the backend sees the last known state across broker
+ * restarts and offline subscribers catch up on connect. Cleared when
+ * ANY frame from the node arrives (dispatcher unreach-clear path). */
+static void node_status_publish(const gw_node_t *n, bool online)
+{
+    char topic[48], json[128];
+    snprintf(topic, sizeof(topic), "bracino/node/%u/%u/status",
+             n->type, n->id);
+    snprintf(json, sizeof(json),
+             "{\"online\":%s,\"silent_s\":%lu,\"boot_session\":%u}",
+             online ? "true" : "false",
+             (unsigned long)(online ? 0
+                                    : (gw_now_ms() - n->last_seen_ms) / 1000),
+             n->last_boot);
+    gw_mqtt_publish(topic, json, 1, true);
 }
 
 static void handle_config_desc(const rx_msg_t *m, const espnow_envelope_t *e,
@@ -624,6 +679,7 @@ static void handle_rx(const rx_msg_t *m)
     if (n != NULL && n->flagged_unreach) {
         n->flagged_unreach = false;
         TLOG("node(%u,%u) frames resumed\n", e->node_type, e->node_id);
+        node_status_publish(n, true);
     }
 
     switch (e->msg_type) {
@@ -650,7 +706,7 @@ static void handle_rx(const rx_msg_t *m)
         if (n) {
             n->last_seen_ms = gw_now_ms();
         }
-        handle_event(m, e);
+        handle_event(m, e, n);
         break;
     case MSG_CONFIG_DESC:
         if (n) {
@@ -687,6 +743,7 @@ static void proc_task(void *arg)
                 n->flagged_unreach = true;
                 TLOG("!! node(%u,%u) silent for %lus\n", n->type, n->id,
                      (unsigned long)((gw_now_ms() - n->last_seen_ms) / 1000));
+                node_status_publish(n, false);
             }
         }
     }

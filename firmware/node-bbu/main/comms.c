@@ -66,7 +66,8 @@
 #define SCAN_PRIOR_CH      { 1, 6, 11 }
 
 #define RECV_QUEUE_LEN     8
-#define EVENT_QUEUE_LEN    8
+#define EVENT_QUEUE_LEN    24 /* probe-swap bursts raise/clear both probes
+                            * at once; depth 8 dropped TPU events (issue 020) */
 #define PARAM_DEFAULT_TTL_S 60
 
 #define DEFAULT_SAMPLE_S   15
@@ -94,6 +95,9 @@ typedef struct {
     uint8_t id;
     uint8_t len;
     uint8_t val[10];
+    uint32_t capture_ms; /* stamped at offer: node clock_ms at event time.
+                          * Without it, drained events can only be placed by
+                          * send pacing — true times are lost (issue 020). */
 } ev_msg_t;
 
 /* ---- state ---- */
@@ -547,6 +551,7 @@ void comms_offer_event(uint8_t event_id, const uint8_t *value, uint8_t len)
     e->id = event_id;
     e->len = len;
     memcpy(e->val, value, len);
+    e->capture_ms = now_ms();
     s_ev_cnt++;
     portEXIT_CRITICAL(&s_fifo_mu);
 }
@@ -1077,14 +1082,22 @@ static void online_step(void)
     if (!s_batch_out) {
         ev_msg_t ev;
         if (ev_pop(&ev)) {
-            /* EVENT payload is ONE TLV: tag = event id */
-            uint8_t tlv[2 + sizeof(ev.val)];
-            tlv[0] = ev.id;
-            tlv[1] = ev.len;
-            memcpy(tlv + 2, ev.val, ev.len);
+            /* EVENT payload: event TLV + capture_ms TLV (issue 020). The
+             * capture stamp is the node clock at offer time — send pacing
+             * during a drain burst does NOT reflect event chronology. */
+            uint8_t tlv[2 + sizeof(ev.val) + 6];
+            size_t tn = 0;
+            tlv[tn++] = ev.id;
+            tlv[tn++] = ev.len;
+            memcpy(tlv + tn, ev.val, ev.len);
+            tn += ev.len;
+            tlv[tn++] = TLV_EVENT_CAPTURE_MS;
+            tlv[tn++] = 4;
+            wr_u32(tlv + tn, ev.capture_ms);
+            tn += 4;
             uint8_t buf[ESPNOW_MAX_PAYLOAD];
             size_t len = env_build(buf, MSG_EVENT, 0, tlv,
-                                   (uint8_t)(2 + ev.len));
+                                   (uint8_t)tn);
             if (send_wait(s_gw_mac, buf, len)) {
                 s_ct.ev_sent++;
             } else {

@@ -189,22 +189,25 @@ static void checkpoint_time(void)
         return;
     }
     gw_nvs_set_u32("epoch_s", (uint32_t)time(NULL));
-    gw_nvs_set_u32("epoch_up", gw_now_ms() / 1000);
+    /* epoch_up (uptime at checkpoint) dropped: restore no longer uses it
+     * — the u32 comparison misfired across boots (issue 019/DN004). */
 }
 
 static void restore_time(void)
 {
-    uint32_t es = 0, eu = 0;
-    bool have_es = nvs_get_u32(s_nvs, "epoch_s", &es) == ESP_OK;
-    bool have_eu = nvs_get_u32(s_nvs, "epoch_up", &eu) == ESP_OK;
-    if (!have_es || !have_eu || es == 0) {
+    uint32_t es = 0;
+    if (nvs_get_u32(s_nvs, "epoch_s", &es) != ESP_OK || es == 0) {
         return;
     }
-    uint32_t elapsed_s = gw_now_ms() / 1000 - eu;
-    gw_time_set_unix((uint64_t)es + elapsed_s, 0);
+    /* DN004: restore from the checkpoint epoch alone. The old
+     * "epoch + elapsed" reconstruction compared u32 uptimes across boots
+     * and underflowed into a garbage (year-2162-grade) clock until MQTT
+     * time landed — any node anchoring in that window inherited it.
+     * A stale-by-minutes anchor is safe: MQTT time corrects on connect. */
+    gw_time_set_unix((uint64_t)es, 0);
     s_time_src = "nvs";
-    TLOG("time restored from NVS checkpoint (+%lu s)\n",
-         (unsigned long)elapsed_s);
+    TLOG("time restored from NVS epoch_s=%lu (elapsed ignored)\n",
+         (unsigned long)es);
 }
 
 /* ---- WiFi events ---- */

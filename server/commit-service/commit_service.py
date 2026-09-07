@@ -28,6 +28,7 @@ import os
 import signal
 import sys
 import time
+import urllib.request
 
 import paho.mqtt.client as mqtt
 
@@ -46,6 +47,23 @@ MQTT_PASS = os.environ.get("MQTT_PASS") or None
 
 HEALTH_PERIOD_S = 30
 TIME_PERIOD_S = 10
+
+# Optional push channel (issue 021): set NTFY_URL (e.g. https://ntfy.sh/
+# <unguessable-topic>) to get phone/desktop push on node-gone / gateway
+# LWT alarms. Opt-in, no secrets: an ntfy topic IS the credential.
+NTFY_URL = os.environ.get("NTFY_URL") or None
+
+
+def notify_push(text):
+    if not NTFY_URL:
+        return
+    try:
+        urllib.request.urlopen(
+            urllib.request.Request(NTFY_URL, data=text.encode()),
+            timeout=10)
+        log(f"push sent: {text[:80]}")
+    except Exception as exc:  # push is best-effort; never block the loop
+        log(f"!! push failed: {exc}")
 
 running = True
 
@@ -181,6 +199,45 @@ class Commit:
         line = {"kind": "gw_ambient", **t}
         self._append_line(line)
 
+    # ---- alarms (issue 021) ----
+
+    def handle_node_status(self, node_type, node_id, payload):
+        """Retained node online/offline status (GW publishes on unreach
+        raise/clear). offline -> retained alarm + push; online -> clear."""
+        try:
+            t = json.loads(payload)
+        except ValueError:
+            log(f"!! bad JSON on node status {node_type}/{node_id}")
+            return
+        online = bool(t.get("online"))
+        if online:
+            alarm = {"kind": "node_back", "node_type": node_type,
+                     "node_id": node_id,
+                     "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                         time.gmtime())}
+            log(f"ALARM CLEARED: node {node_type}/{node_id} back online")
+        else:
+            alarm = {"kind": "node_gone", "node_type": node_type,
+                     "node_id": node_id, **{k: t[k] for k in t
+                                            if k != "online"},
+                     "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                         time.gmtime())}
+            log(f"!! ALARM: node {node_type}/{node_id} GONE "
+                f"(silent {alarm.get('silent_s', '?')}s, "
+                f"boot_session={alarm.get('boot_session', '?')})")
+        body = json.dumps(alarm)
+        self.client.publish("bracino/alarm", body, qos=1, retain=True)
+        notify_push(body)
+
+    def handle_gw_lwt(self):
+        """GW LWT arrives as an empty payload on bracino/gateway/status."""
+        alarm = {"kind": "gateway_gone",
+                 "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+        log("!! ALARM: gateway LWT — bracino/gateway is DOWN")
+        body = json.dumps(alarm)
+        self.client.publish("bracino/alarm", body, qos=1, retain=True)
+        notify_push(body)
+
     # ---- periodic publications ----
 
     def publish_health(self):
@@ -210,16 +267,23 @@ class Commit:
         client.subscribe([
             ("bracino/node/+/+/telemetry", 0),
             ("bracino/node/+/+/event", 1),
+            ("bracino/node/+/+/status", 1),
+            ("bracino/gateway/status", 1),
             ("bracino/gateway/telemetry", 0),
         ])
         self.last_commit_wall = None  # gap: commit age restarts
 
     def on_message(self, client, _u, m):
-        parts = m.topic.split("/")
+        if m.topic == "bracino/gateway/status":
+            if m.payload == b"":  # LWT: broker-side, no JSON
+                self.handle_gw_lwt()
+                return
+            return  # retained GW state — informational, not alarmed
         if m.topic == "bracino/gateway/telemetry":
             self.handle_gw_ambient(m.payload)
             return
         # bracino/node/<t>/<id>/<leaf>
+        parts = m.topic.split("/")
         if len(parts) != 5 or parts[1] != "node":
             return
         try:
@@ -230,6 +294,8 @@ class Commit:
             self.handle_telemetry(node_type, node_id, m.payload)
         elif parts[4] == "event":
             self.handle_event(node_type, node_id, m.payload)
+        elif parts[4] == "status":
+            self.handle_node_status(node_type, node_id, m.payload)
 
     def run(self):
         c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,

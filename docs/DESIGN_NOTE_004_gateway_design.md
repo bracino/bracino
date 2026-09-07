@@ -249,7 +249,19 @@ rebooted sends `HELLO` on boot (DN003), the `HELLO_ACK` refreshes the
 anchor before any telemetry flows, and a node whose `HELLO`/`HELLO_ACK`
 exchange failed goes to buffering rather than transmitting (DN003). The
 path is handled defensively anyway, and it **entangles nothing**: the
-drain strategy is untouched — the node never learns of the incident
+drain strategy is untouched — the node never learns of the incident.
+
+**Gateway reboot clock restore (settled 2026-09-07, issue 015/019):**
+the gateway checkpoints its current `epoch_s` to NVS while healthy and
+restores from that epoch **alone** on reboot. It does NOT add a stored
+uptime delta: `gw_now_ms()` is an uptime-relative counter, and comparing
+u32 uptimates across boots underflowed into a garbage clock (until MQTT
+time landed) that poisoned any node anchoring during the window
+(05 Sep field anomaly). A restore that is stale by minutes is safe —
+MQTT time corrects it on first broker connect, before any node that
+matters re-anchors. EVENT frames carry a node-side `capture_ms`
+(DN003 TLV_EVENT_CAPTURE_MS) precisely so drained events keep true
+event-time even when send pacing scrambles their JSONL position.
 beyond receiving a sync, and the held frame re-enters the publish path
 on the node's existing retransmit timer (live depth-1 batches retransmit
 after their 2 s timeout; drain frames likewise, anchor fresh by then).

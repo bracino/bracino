@@ -43,6 +43,23 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | MQTT topic + payload schema | **Live** — DN004 implemented; auth'd mosquitto on t520, telemetry/events/health/LWT flowing (015 stage B verified 2026-09-05/06) |
 | ESP-NOW payload schema | **Settled and evidenced** — [DESIGN_NOTE_003](DESIGN_NOTE_003_espnow_node_schema.md). Implemented in `node-bbu` (011 closed) behind `comms_enabled`; bench harness 013 closed |
 | Commit service (MQTT→Influx + watermarks) | **Stage B live on t520** — DN005 skeleton in `server/commit-service/`: JSONL source of truth (fsync-gated acks), commit watermarks, health topic. Stage C (Influx projection + 30-day rotation) open |
+
+## Session 2026-09-07 (flash manifest pending)
+
+- **019 opened**: 05 Sep "leap" forensics → node chip-freeze (~10h54m of
+  real time lost, timer included; mains-blip trigger on a 20 µF rail).
+  Explanation human-accepted; UPS + bulk-cap deferred to next HW rev.
+- **GW fix + status**: `restore_time()` now restores from `epoch_s`
+  alone (DN004 amended); GW publishes retained node online/offline
+  status on unreach raise/clear.
+- **020**: EVENT carries `TLV_EVENT_CAPTURE_MS` (offer-time stamp);
+  event queue 8→24; DN003 amended. Rides the node flash.
+- **021**: commit-service subscribes node/gateway status → retained
+  `bracino/alarm` + optional `NTFY_URL` push. Needs t520 rebuild.
+- **Pending field/bench ops:** GW flash (restore_time + status), node
+  flash `bdf4a44`-line + `min_tpo_tpu_delta_c`→1.5 + comms ON (field
+  default; NVS-persisted so off stays off), tel=15; commit-service
+  rebuild on t520. Flash targets: rebuild both trees post-commit.
 | Relay drive (5 V module vs GPIO10) | **OK on protoboard** — Q1 2N3904, high = ON. Coil toggles and holds; dummy AC load validated (2026-08-25) |
 | CT / current sense | **Dropped from the circuit (2026-09-01)** — [DESIGN_NOTE_001](DESIGN_NOTE_001_ct_binary_only.md) rev 2. Bench was boolean-only and reliable (tables below); plant makes it moot: the contact closes a 230 VAC contactor coil (ABB ECB24-40), pump current never crosses node wiring. A0 ignored by firmware (`CT_FITTED 0`), telemetry `ct_state=NOT_FITTED`, no-CT warning suppressed. Snubber also removed (plant-proven). Run-confirmation returns via the phase-2 caldaia monitor node |
 | NTCs (A1–A3) | **°C in firmware** (β=3950). Ice ~0.4 °C (770 mV); boil ~100 °C (3083 mV) was FAULT on the old 95 °C cap — conversion now −5–110 °C. Open/short = FAULT |

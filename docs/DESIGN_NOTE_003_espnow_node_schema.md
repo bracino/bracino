@@ -852,6 +852,20 @@ assigned, lives in `espnow_schema.h`.
 The gateway maps event ids to MQTT event-topic payloads (DN004); the
 mapping is a gateway concern, the registry here is the contract.
 
+**Wire format (amended 2026-09-07, issue 020):** the EVENT payload is
+the event TLV followed by an optional `TLV_EVENT_CAPTURE_MS` (`u32 LE`):
+the node's clock_ms **at offer time** — when the event happened, not
+when it was transmitted. Without it, events that queue across a comms
+disabled-period drain can only be positioned by their *send pacing*
+during the drain burst, which says nothing about event chronology
+(05 Sep field record: 7 events at machine-uniform 19-line intervals,
+tempos set by the drain, not by the faults). Events queue in their own
+non-decimatable FIFO (`EVENT_QUEUE_LEN`); depth 8→24 — a probe swap
+burst raises/clears both probes at once and depth 8 dropped the TPU
+pair. Gateways convert `capture_ms` to wall time with the node's
+existing anchor arithmetic; old nodes without the TLV remain valid
+(capture_ms absent = pacing-positioned, best effort).
+
 ## Future extension: multi-hop relay
 
 Not needed today (all nodes so far are in direct range of a gateway), but
