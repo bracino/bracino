@@ -2,6 +2,10 @@
 
 Guidance for humans and coding agents in this repository.
 
+# Agent Guidelines
+- **Language Lock**: You must think, reason, log, write code comments, and output final responses strictly in English. 
+- Under no circumstances should you transition to or output Chinese characters, even if the primary GLM-5.3-Flash model drifts.
+
 ## What this is
 
 **Bracino** replaces a failed Paradigma MES-BBU controller for a central heating plant (7-unit condo, Tuscany).
@@ -67,7 +71,9 @@ A second local-only file, `session-kickoff.md.bak`, is the previous-session copy
 3. After the live file (or, if that was empty, the backup) has been read/presented (or the user dismisses it), **copy the non-empty source onto `session-kickoff.md.bak`** (overwrite the previous backup). Then **zero `session-kickoff.md` without deleting it** — truncate to empty (or whitespace-only), leave the path in place so the user can keep using it as a bridge pad. Do **not** empty the `.bak`.
 4. Do **not** commit `session-kickoff.md` or `session-kickoff.md.bak`. Do not treat them as durable docs; promote anything lasting into `issues/`, `docs/STATUS.md`, `docs/ROADMAP.md`, or this file.
 
-Humans may freely overwrite the live file mid-session to stage the next bridge. Overwriting the live file does not update the backup; the backup is only refreshed by the agent step above, so a mid-session munge of the live pad still has the last ingested copy.
+**Session end (agents):**
+
+Write the **current session status** onto the live pad (`session-kickoff.md`) — flash manifests, pending ops, verify checklists. The `.bak` is **not** touched at session end; it is only written at session start (step 3 above), as the backup of what was just ingested. In short: end-of-session writes go to the live pad only; start-of-session copies live → `.bak` then zeroes live. Humans may freely overwrite the live file mid-session to stage the next bridge; the backup is only refreshed by the agent start-of-session step, so a mid-session munge of the live pad still has the last ingested copy in the `.bak`.
 
 ## Issues notebook (`issues/`)
 
