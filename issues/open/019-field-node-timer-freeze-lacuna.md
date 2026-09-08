@@ -57,6 +57,23 @@ Root-cause chain, all forensically established on the JSONL record:
 - The probe swap (real midnight, per human memory — vindicated) sits in
   the pre-freeze stretch; the door-open AMB dip is there too.
 
+## Corroboration: controlled decimation run (2026-09-06/07)
+
+To rule out the FIFO decimation/drain path itself (the original
+suspicion from the notes) the human ran a controlled experiment:
+comms off ~20:42Z, `tel=5`, reboot at 2026-09-06T20:45:00Z (phone
+timestamp ±2 s), comms back on ~8 h later — spanning ~3 decimation
+cycles with no operator activity in between. Result (plots + record:
+`ephemera/telemetry_bbu-decim-exp.jsonl`, `bbu-decim-exp.png`,
+`decim-exp-full.png`): the clear nighttime draw-down pattern with
+occasional boiler firing, timestamps lining up with the 20:45Z reboot
+anchor across all decimation passes. **Decimation/drain is exonerated**
+as the cause of the 05 Sep lacuna; combined with the forensic chain
+above, the freeze narrative stands as the single explanation. The
+several fault events clustered in the anomalous range of the 05 Sep
+record are read as consequences of the freeze window, not independent
+faults.
+
 ## Deferrals (human decisions 2026-09-07)
 
 - **UPS on the 12 V rail** — root-cause fix for blips; next hardware
