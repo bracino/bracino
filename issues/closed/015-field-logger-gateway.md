@@ -1,6 +1,6 @@
 # 015 — field logger gateway (next node on the bench)
 
-- **Status:** open — design pass SETTLED 2026-09-04 (below); implementation next
+- **Status:** closed 2026-09-08 — shipped, field-verified (see Fix/Verify below)
 - **Type:** design / task
 - **Opened:** 2026-09-03
 - **Refs:** DESIGN_NOTE_003 (wire law), DESIGN_NOTE_004 (gateway + MQTT contract, addenda), 012 (closed — node on the wall), docs/gotchas.md (RF channel notes)
@@ -141,29 +141,40 @@ firmware.
 
 ## Expected
 
-- [ ] Requirements settled into a short design note or addendum here:
+- [x] Requirements settled into a short design note or addendum here:
       what "durable" means on the logger (flash-backed queue vs SD vs
       straight-through to a serial/MQTT link), retention, and how
       install-day history is drained (012's capture-while-disabled
       made the node-side side trivial — this is the receive side)
-- [ ] **Ack only after durable write** (agreed): a BATCH_ACK the node
+      → settled 2026-09-04/05 in "DESIGN SETTLED" below + DN004/005
+- [x] **Ack only after durable write** (agreed): a BATCH_ACK the node
       trusts must mean the sample survives a logger power cut
-- [ ] Maintenance **SoftAP + GPIO2 status LED** per DN004 addenda
+      → ack-on-commit-watermark, gated on fsync'd JSONL; drills 1–3
+      in 013 (zero loss, zero dup after acker/broker/WiFi kills)
+- [x] Maintenance **SoftAP + GPIO2 status LED** per DN004 addenda
       (field-serviceable without a laptop)
-- [ ] Drains install-day history from the node FIFO on first anchor
+      → shipped; human confirms LED patterns behave as designed
+- [x] Drains install-day history from the node FIFO on first anchor
       (stop-and-wait batch protocol already proven: 3928 samples /
       ~42 s with watermarks monotonic)
-- [ ] RF: channel **off the house AP's channel** — ch 6 was unusable at
+      → confirmed in the field record (install-day history present in
+      JSONL, clock freeze and all — see 019)
+- [x] RF: channel **off the house AP's channel** — ch 6 was unusable at
       bench range (occlusion); 1/3/11 bind reliably. Re-survey at
       install; the node's channel comes from the gateway's HELLO_ACK
-- [ ] Pump **charge-stop cycle observation** on the plant — the 012
+      → human verdict 2026-09-08: ch 6 unusable (crowding), 1 and 11
+      bind well; channel is STA-derived so no hardcoding concern
+- [x] Pump **charge-stop cycle observation** on the plant — the 012
       deferral lands here: once the logger drains history, a full
       cycle (start / stay-running / charge-stop) is verifiable from
       telemetry
-- [ ] Where firmware lives: this logger is the first occupant of
+      → ~a dozen full charge/stop cycles in the 2.5-day record
+      (Sep-6 → Sep-8); 016 adjudication can proceed
+- [x] Where firmware lives: this logger is the first occupant of
       `firmware/gateway/` or a stepping-stone sibling — decide before
       writing code (ROADMAP: don't grow `firmware/gateway/` proper
       until logger lessons land)
+      → `firmware/gateway/`, decided and shipped
 
 ## Open questions
 
@@ -183,4 +194,25 @@ second device goes near the breaker box.
 
 ## Fix
 
+Field logger gateway shipped end-to-end: `firmware/gateway/` (ESP-NOW
+master, NVS-backed hold queue, fsync-gated BATCH_ACK, maintenance
+SoftAP + GPIO2 LED, restore_time from NVS epoch) + t520 stage-B stack
+(mosquitto auth'd, commit-service writing /var/lib/bracino/commit JSONL
+with 30-day rotation, watermark + health topics, daily NAS mirror).
+Deployed at the plant 2026-09-05; continuous multi-day capture since.
+
 ## Verify
+
+- [x] Install-day history drained on first anchor (present in JSONL).
+- [x] Multi-day continuous capture: 2.5-day record Sep-6 → Sep-8 shows
+      solar charge cycles, nighttime ACS stairstep, AMB door-open
+      sensitivity, ~a dozen pump charge/stop cycles.
+- [x] LED root-cause pattern observed matching DN004 addenda.
+- [x] RF: 1/11 reliable at plant; ch 6 ruled out (human verdict).
+- [x] Ack chain survives GW power cut (node buffers; DN003 semantics
+      held across the 019 freeze window and daily GW cycles).
+- [x] t520 chain health green (issue 021 carries the residual drills:
+      LWT, node-gone end-to-end).
+
+Closed 2026-09-08. Residual supervision-chain drills live in 021;
+Influx projection (stage C) tracked via server/README + 008.
