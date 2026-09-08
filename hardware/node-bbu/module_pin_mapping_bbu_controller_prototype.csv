@@ -1,0 +1,72 @@
+"# Physical MODULE pin mapping, viewed from above, counted CCW, bbu_controller prototype",,,,,,
+"# v0.03, 09 Aug 2026",,,,,,
+,,,,,,
+seq,Module,left,right,label,function(s),notes
+1,ESP32-C3-ZERO,1,,5V,power in,~400mA total max draw
+2,ESP32-C3-ZERO,2,,GND,power in,
+3,ESP32-C3-ZERO,3,,3.3V,power out,150mA typ. 
+4,ESP32-C3-ZERO,4,,GPIO_0,"SPI, I2C, ADC, I2S, TWAI, PWM, UART1",
+5,ESP32-C3-ZERO,5,,GPIO_1,"SPI, I2C, ADC, I2S, TWAI, PWM, UART1",
+6,ESP32-C3-ZERO,6,,GPIO_2,"SPI, I2C, ADC, I2S, TWAI, PWM, UART1","Strapping pin, potentially glitchy if not HIGH at reset, use external pullup if used for GPIO"
+7,ESP32-C3-ZERO,7,,GPIO_3,"SPI, I2C, ADC, I2S, TWAI, PWM, UART1",
+8,ESP32-C3-ZERO,8,,GPIO_4,"SPI, I2C, ADC, I2S, TWAI, PWM, UART1",
+9,12V,9,,GPIO_5,"SPI, I2C, I2S, TWAI, PWM, UART1",
+10,ESP32-C3-ZERO,,18,GPIO_21,UART_0_TX,"Avoid for GPIO use, ROM bootloader prints its boot log over UART0 by default"
+11,ESP32-C3-ZERO,,17,GPIO_20,UART_0_RX,"Avoid for GPIO use, ROM bootloader prints its boot log over UART0 by default"
+12,ESP32-C3-ZERO,,16,GPIO_19,USB_DP,"Avoid for GPIO use, physical USB-C connector's D+/D− lines"
+13,ESP32-C3-ZERO,,15,GPIO_18,USB_DM,"Avoid for GPIO use, physical USB-C connector's D+/D− lines"
+14,ESP32-C3-ZERO,,14,GPIO_10,"SPI, I2C, I2S, TWAI, PWM, UART1","OK to use, also connected to on-board WG2812 RGB LED"
+15,ESP32-C3-ZERO,,13,GPIO_9,"SPI, I2C, I2S, TWAI, PWM, UART1","Strapping pin, endowed with internal passive pullup, must be held low for serial bootloader, tied to “BOOT” button. OK to use with input that won’t be transiently low at reset."
+16,ESP32-C3-ZERO,,12,GPIO_8,"SPI, I2C, I2S, TWAI, PWM, UART1","Strapping pin, but ‘don’t care’ about high/low/float at SPI boot."
+17,ESP32-C3-ZERO,,11,GPIO_7,"SPI, I2C, I2S, TWAI, PWM, UART1",
+18,ESP32-C3-ZERO,,10,GPIO_6,"SPI, I2C, I2S, TWAI, PWM, UART1",
+19,ADS1115,1,,VDD,power in,2.0-5.5V. Match MCU logic level. 1uF cap on board
+20,ADS1115,2,,GND,power in,
+21,ADS1115,3,,SCL,I2C bus clock,pulled high on board w/ 10k
+22,ADS1115,4,,SDA,i2C bus addr/data,pulled high on board w/ 10k
+23,ADS1115,5,,ADDR,NC,pulled low w/ 10K on board
+24,ADS1115,6,,ALRT,NC,pulled high w/ 10K on board
+25,ADS1115,7,,A0,"Analog input 1, ",0-VDD range
+26,ADS1115,8,,A1,"Analog input 2, ",0-VDD range
+27,ADS1115,9,,A2,"Analog input 3, ",0-VDD range
+28,ADS1115,10,,A3,"Analog input 4, ",0-VDD range
+29,TFT_1.8_ST7735S,1,,VCC,power in,5V/3.3V power input
+30,TFT_1.8_ST7735S,2,,GND,power in,Ground
+31,TFT_1.8_ST7735S,3,,CS,chip select TFT,"LCD chip select signal, low level enable "
+32,TFT_1.8_ST7735S,4,,RESET,display reset,"LCD reset signal  low level reset, use external pullup"
+33,TFT_1.8_ST7735S,5,,A0,,"LCD register / data selection signal. high level: register, low level: data "
+34,TFT_1.8_ST7735S,6,,SDA,,SPI bus write data signal
+35,TFT_1.8_ST7735S,7,,SCK,,SPI bus clock signal
+36,TFT_1.8_ST7735S,8,,LED,,"Backlight control, high level lighting, if not controlled, connect 3.3V always bright  "
+37,TFT_1.8_ST7735S,,12,SD_CS,,NC unless using SD card function
+38,TFT_1.8_ST7735S,,11,SD_MOSI,,NC unless using SD card function
+39,TFT_1.8_ST7735S,,10,SD_MISO,,NC unless using SD card function
+40,TFT_1.8_ST7735S,,9,SD_SCK,,NC unless using SD card function
+41,ENC_W_SW,1,,A,quad_a,"output data, use internal MCU pullups"
+42,ENC_W_SW,2,,COM,common,connected to GND on board
+43,ENC_W_SW,3,,B,quad_b,"output data, use internal MCU pullups"
+44,ENC_W_SW,,6,SW,switch,"momentary contact to ground, use internal MCU pullup"
+45,ENC_W_SW,,5,GND,Ground,power in
+46,ENC_W_SW,,4,VCC,power in,connect to MCU logic level
+47,RELAY_JQC-3FE-S-Z,1,,NO,Normally open relay side,220VAC ‘supply’. Note that a safety slot and potting needed to properly isolate pins and traces btw this pin and COM
+48,RELAY_JQC-3FE-S-Z,2,,COM,,220VAC ‘load’. Note that a safety slot and potting needed to properly isolate pins and traces btw this pin and NO
+49,RELAY_JQC-3FE-S-Z,3,,NC,Normally closed relay side,Not connected. Verify during wiring that no AC appears on this pin
+50,RELAY_JQC-3FE-S-Z,,6,IN,activate relay,Low level trigger
+51,RELAY_JQC-3FE-S-Z,,5,GND,power in,
+52,RELAY_JQC-3FE-S-Z,,4,VCC,power in,5V
+53,SNUBBER,1,,SNUB_1,supply/load,Note that these pins are connected to 220VAC and need to be properly isolated
+54,SNUBBER,2,,SNUB_2,supply/load,Note that these pins are connected to 220VAC and need to be properly isolated
+55,BUCK,,4,EN,,Leave floating if no logic applied
+56,BUCK,,3,IN,power in,4-18V DC in
+57,BUCK,,2,GND,power in,
+58,BUCK,,1,VO,Voltage out,adjustable Vin-.5 -> 2.0; set for 5V
+59,ZMCT103C,,,VCC,power in,
+60,ZMCT103C,,,OUT,1000:1 conditioned current->voltage ,"on board burden resistor, op amp signal conditioning, adjustable sensitivity"
+61,ZMCT103C,,,GND,power in,
+62,ZMCT103C,,,GND,power in,
+,,,,,,
+,,,,,,
+REFS:,,,,,,
+ESP32-C3-ZERO,https://docs.waveshare.com/ESP32-C3-Zero,,,,,
+ADS1115,https://www.perceptive-ic.com/news-detailed/How-to-use-ADS1115-16-bit-ADC-module-with-ESP32,,,,,
+TFT_1.8_ST7735S,https://www.lcdwiki.com/1.8inch_SPI_Module_ST7735S_SKU:MSP1803,,,,,
