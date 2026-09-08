@@ -1,0 +1,9 @@
+# Gateway (ESP32-WROOM, 4MB flash — esptool flash_id verified 2026-09-08).
+# Head matches the stock single-app layouts exactly (nvs@0x9000, phy@0xf000,
+# factory@0x10000) so a pt+app rewrite preserves NVS. factory grown from the
+# stock singleapp 1M / singleapp_large 1500K to 3M: the 0e702ce bin was at
+# 97% of 1M and this firmware keeps growing. Blank offsets = auto placement.
+# Name,   Type, SubType, Offset,  Size, Flags
+nvs,      data, nvs,     ,        0x6000,
+phy_init, data, phy,     ,        0x1000,
+factory,  app,  factory, ,        3M,

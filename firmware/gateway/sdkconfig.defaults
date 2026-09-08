@@ -1,6 +1,13 @@
 # Gateway: ESP32-WROOM dev module (UART0 console @115200)
 CONFIG_IDF_TARGET="esp32"
 
+# 2026-09-08: real chip is 4MB (esptool flash_id, ESP32-D0WD-V3); the 2MB
+# was a project-creation default. Stock single-app layout caps the app at
+# 1MB and the bin was at 97%. Large-app keeps nvs@0x9000/phy@0xf000 so
+# NVS survives the one-time pt+app rewrite.
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y
+
 # Bench/field pass 1: keep TWDT log-only (default). No panic-reboot over a
 # transient on a wall-mounted device (node-bbu saga, STATUS 2026-09-03).
 
