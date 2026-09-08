@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <export version="E">
   <design>
-    <source>/home/elliot/projects/bracino/hardware/bbu-controller/bbu_controller_prototype_kicad/bbu_controller_prototype_kicad.kicad_sch</source>
-    <date>2026-09-02T21:45:30</date>
+    <source>/home/elliot/projects/bracino/hardware/node-bbu/node-bbu.kicad_sch</source>
+    <date>2026-09-08T14:30:31</date>
     <tool>Eeschema 10.0.3</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
         <title>Bracino BBU controller prototype</title>
         <company/>
         <rev>v0.09</rev>
-        <date>2026-08-15</date>
-        <source>bbu_controller_prototype_kicad.kicad_sch</source>
+        <date>2026-09-08</date>
+        <source>node-bbu.kicad_sch</source>
         <comment number="1" value=""/>
         <comment number="2" value=""/>
         <comment number="3" value=""/>
@@ -28,13 +28,19 @@
       <value>10uF</value>
       <description>capacitor, small US symbol</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">capacitor, small US symbol</field>
       </fields>
       <libsource lib="Device" part="C_Small_US" description="capacitor, small US symbol"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="cap capacitor"/>
       <property name="ki_fp_filters" value="C_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -52,13 +58,19 @@
       <value>10uF</value>
       <description>capacitor, small US symbol</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">capacitor, small US symbol</field>
       </fields>
       <libsource lib="Device" part="C_Small_US" description="capacitor, small US symbol"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="cap capacitor"/>
       <property name="ki_fp_filters" value="C_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -76,13 +88,19 @@
       <value>10uF</value>
       <description>capacitor, small US symbol</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">capacitor, small US symbol</field>
       </fields>
       <libsource lib="Device" part="C_Small_US" description="capacitor, small US symbol"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="cap capacitor"/>
       <property name="ki_fp_filters" value="C_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -100,13 +118,19 @@
       <value>10uF</value>
       <description>capacitor, small US symbol</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">capacitor, small US symbol</field>
       </fields>
       <libsource lib="Device" part="C_Small_US" description="capacitor, small US symbol"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="cap capacitor"/>
       <property name="ki_fp_filters" value="C_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -124,13 +148,19 @@
       <value>22uF 50V</value>
       <description>Polarized capacitor</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Polarized capacitor</field>
       </fields>
       <libsource lib="Device" part="C_Polarized" description="Polarized capacitor"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="cap capacitor"/>
       <property name="ki_fp_filters" value="CP_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -148,13 +178,19 @@
       <value>100uF 16V</value>
       <description>Polarized capacitor</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Polarized capacitor</field>
       </fields>
       <libsource lib="Device" part="C_Polarized" description="Polarized capacitor"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="cap capacitor"/>
       <property name="ki_fp_filters" value="CP_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -172,13 +208,19 @@
       <value>100 nF</value>
       <description>capacitor, small US symbol</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">capacitor, small US symbol</field>
       </fields>
       <libsource lib="Device" part="C_Small_US" description="capacitor, small US symbol"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="cap capacitor"/>
       <property name="ki_fp_filters" value="C_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -196,13 +238,19 @@
       <value>100 nF</value>
       <description>capacitor, small US symbol</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">capacitor, small US symbol</field>
       </fields>
       <libsource lib="Device" part="C_Small_US" description="capacitor, small US symbol"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="cap capacitor"/>
       <property name="ki_fp_filters" value="C_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -221,14 +269,20 @@
       <description>Light emitting diode</description>
       <fields>
         <field name="Sim.Pins">1=K 2=A</field>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Light emitting diode</field>
       </fields>
       <libsource lib="Device" part="LED" description="Light emitting diode"/>
       <property name="Sim.Pins" value="1=K 2=A"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="LED diode"/>
       <property name="ki_fp_filters" value="LED* LED_SMD:* LED_THT:*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -247,14 +301,20 @@
       <description>Light emitting diode</description>
       <fields>
         <field name="Sim.Pins">1=K 2=A</field>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Light emitting diode</field>
       </fields>
       <libsource lib="Device" part="LED" description="Light emitting diode"/>
       <property name="Sim.Pins" value="1=K 2=A"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="LED diode"/>
       <property name="ki_fp_filters" value="LED* LED_SMD:* LED_THT:*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -272,13 +332,19 @@
       <value>1N5819</value>
       <description>Schottky diode</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Schottky diode</field>
       </fields>
       <libsource lib="Device" part="D_Schottky" description="Schottky diode"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="diode Schottky"/>
       <property name="ki_fp_filters" value="TO-???* *_Diode_* *SingleDiode* D_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -296,13 +362,21 @@
       <value>PPTC 60V 0.4A</value>
       <description>Resettable fuse, polymeric positive temperature coefficient</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Resettable fuse, polymeric positive temperature coefficient</field>
       </fields>
       <libsource lib="Device" part="Polyfuse" description="Resettable fuse, polymeric positive temperature coefficient"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
       <property name="ki_keywords" value="resettable fuse PTC PPTC polyfuse polyswitch"/>
       <property name="ki_fp_filters" value="*polyfuse* *PTC*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -320,13 +394,19 @@
       <value>TERMINAL_BLK</value>
       <description>Generic connector, single row, 01x02, script generated</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Generic connector, single row, 01x02, script generated</field>
       </fields>
       <libsource lib="Connector" part="Conn_01x02_Socket" description="Generic connector, single row, 01x02, script generated"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="connector"/>
       <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -344,13 +424,19 @@
       <value>Conn_01x09_Pin</value>
       <description>Generic connector, single row, 01x09, script generated, pin header for UI cable</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Generic connector, single row, 01x09, script generated, pin header for UI cable</field>
       </fields>
       <libsource lib="Connector" part="Conn_01x09_Pin" description="Generic connector, single row, 01x09, script generated"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="connector"/>
       <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -375,13 +461,19 @@
       <value>Conn_01x02</value>
       <description>Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
       </fields>
       <libsource lib="Connector_Generic" part="Conn_01x02" description="Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="connector"/>
       <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -399,13 +491,19 @@
       <value>Conn_01x02</value>
       <description>Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
       </fields>
       <libsource lib="Connector_Generic" part="Conn_01x02" description="Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="connector"/>
       <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -423,13 +521,19 @@
       <value>Conn_01x09_Pin</value>
       <description>Generic connector, single row, 01x09, script generated, pin header for UI cable</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Generic connector, single row, 01x09, script generated, pin header for UI cable</field>
       </fields>
       <libsource lib="Connector" part="Conn_01x09_Pin" description="Generic connector, single row, 01x09, script generated"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="connector"/>
       <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -454,13 +558,19 @@
       <value>Conn_01x02</value>
       <description>Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</field>
       </fields>
       <libsource lib="Connector_Generic" part="Conn_01x02" description="Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="connector"/>
       <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -478,13 +588,19 @@
       <value>Conn_01x02_Pin</value>
       <description>Generic connector, single row, 01x02, script generated</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Generic connector, single row, 01x02, script generated</field>
       </fields>
       <libsource lib="Connector" part="Conn_01x02_Pin" description="Generic connector, single row, 01x02, script generated"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="connector"/>
       <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -502,13 +618,19 @@
       <value>TERMINAL_BLK</value>
       <description>Generic connector, single row, 01x02, script generated</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Generic connector, single row, 01x02, script generated</field>
       </fields>
       <libsource lib="Connector" part="Conn_01x02_Socket" description="Generic connector, single row, 01x02, script generated"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="connector"/>
       <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -526,13 +648,19 @@
       <value>Conn_01x02_Socket</value>
       <description>Generic connector, single row, 01x02, script generated</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Generic connector, single row, 01x02, script generated</field>
       </fields>
       <libsource lib="Connector" part="Conn_01x02_Socket" description="Generic connector, single row, 01x02, script generated"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="connector"/>
       <property name="ki_fp_filters" value="Connector*:*_1x??_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -549,13 +677,21 @@
     <comp ref="M1">
       <value>Snubber_module_220VAC</value>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
       <libsource lib="01_my_custom_library" part="SNUBBER_MODULE" description=""/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>0326d91a-ec12-47b3-bf6b-0aced004a83d</tstamps>
       <units>
@@ -568,15 +704,21 @@
       </units>
     </comp>
     <comp ref="M2">
-      <value>~</value>
+      <value>RELAY MODULE 5V SWITCH LOW</value>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
       <libsource lib="01_my_custom_library" part="RELAY_MODULE" description=""/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>896469cc-ee06-4b8a-b278-44e418a064e7</tstamps>
       <units>
@@ -593,15 +735,21 @@
       </units>
     </comp>
     <comp ref="M3">
-      <value>~</value>
+      <value>TFT 1.8"</value>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
       <libsource lib="01_my_custom_library" part="1.8{dblquote}_TFT_MODULE" description=""/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>341cde8e-7546-429f-a2da-463f0b55d00f</tstamps>
       <units>
@@ -622,13 +770,21 @@
     <comp ref="M4">
       <value>~</value>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
       <libsource lib="01_my_custom_library" part="ZMCT_COIL_MODULE" description=""/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>43972617-77f0-4c7e-b78b-1f4c4d3fa9a5</tstamps>
       <units>
@@ -645,13 +801,19 @@
     <comp ref="M5">
       <value>ROTARY_ENC_W/SW_MODULE</value>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
       <libsource lib="01_my_custom_library" part="ROTARY_ENC_W/SW_MODULE" description=""/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>0c263772-6061-4924-96c1-68f58c99c96a</tstamps>
       <units>
@@ -668,15 +830,21 @@
       </units>
     </comp>
     <comp ref="M6">
-      <value>~</value>
+      <value>4ch ADC</value>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
       <libsource lib="01_my_custom_library" part="ADC_4CH_MODULE" description=""/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>5b8cf630-3e1c-4733-91c4-2db8528b7239</tstamps>
       <units>
@@ -697,15 +865,21 @@
       </units>
     </comp>
     <comp ref="M7">
-      <value>~</value>
+      <value>ESP32-C3-ZERO_MODULE</value>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
       <libsource lib="01_my_custom_library" part="ESP32-C3_ZERO_MODULE" description=""/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>7e50b24f-83b3-4949-a747-3e59d6fa5f72</tstamps>
       <units>
@@ -734,15 +908,21 @@
       </units>
     </comp>
     <comp ref="M8">
-      <value>~</value>
+      <value>5V BUCK</value>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description"/>
       </fields>
       <libsource lib="01_my_custom_library" part="BUCK_6-24V_to_5V_MODULE" description=""/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>8e1949a7-d3ab-486b-92eb-a8ab7e02aad9</tstamps>
       <units>
@@ -764,6 +944,9 @@
       <fields>
         <field name="Sim.Device">NPN</field>
         <field name="Sim.Pins">1=E 2=B 3=C</field>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint">Package_TO_SOT_THT:TO-92_Inline</field>
         <field name="Datasheet">https://www.onsemi.com/pub/Collateral/2N3903-D.PDF</field>
         <field name="Description">0.2A Ic, 40V Vce, Small Signal NPN Transistor, TO-92</field>
@@ -771,8 +954,11 @@
       <libsource lib="Transistor_BJT" part="2N3904" description="0.2A Ic, 40V Vce, Small Signal NPN Transistor, TO-92"/>
       <property name="Sim.Device" value="NPN"/>
       <property name="Sim.Pins" value="1=E 2=B 3=C"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="NPN Transistor"/>
       <property name="ki_fp_filters" value="TO?92*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -791,13 +977,19 @@
       <value>2K</value>
       <description>Resistor</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Resistor</field>
       </fields>
       <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="R res resistor"/>
       <property name="ki_fp_filters" value="R_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -815,13 +1007,19 @@
       <value>4.7K</value>
       <description>Resistor</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Resistor</field>
       </fields>
       <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="R res resistor"/>
       <property name="ki_fp_filters" value="R_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -840,13 +1038,19 @@
       <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
       <description>Resistor</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
         <field name="Datasheet"/>
         <field name="Description">Resistor</field>
       </fields>
       <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="R res resistor"/>
       <property name="ki_fp_filters" value="R_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -865,13 +1069,19 @@
       <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
       <description>Resistor</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
         <field name="Datasheet"/>
         <field name="Description">Resistor</field>
       </fields>
       <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="R res resistor"/>
       <property name="ki_fp_filters" value="R_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -890,13 +1100,19 @@
       <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
       <description>Resistor</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
         <field name="Datasheet"/>
         <field name="Description">Resistor</field>
       </fields>
       <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="R res resistor"/>
       <property name="ki_fp_filters" value="R_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -915,13 +1131,19 @@
       <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
       <description>Resistor</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
         <field name="Datasheet"/>
         <field name="Description">Resistor</field>
       </fields>
       <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="R res resistor"/>
       <property name="ki_fp_filters" value="R_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -940,13 +1162,19 @@
       <footprint>Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</footprint>
       <description>Resistor</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint">Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal</field>
         <field name="Datasheet"/>
         <field name="Description">Resistor</field>
       </fields>
       <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="R res resistor"/>
       <property name="ki_fp_filters" value="R_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -964,13 +1192,19 @@
       <value>NTC 10K</value>
       <description>Temperature dependent resistor, negative temperature coefficient</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Temperature dependent resistor, negative temperature coefficient</field>
       </fields>
       <libsource lib="Device" part="Thermistor_NTC" description="Temperature dependent resistor, negative temperature coefficient"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="thermistor NTC resistor sensor RTD"/>
       <property name="ki_fp_filters" value="R_* RV_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -988,13 +1222,19 @@
       <value>NTC 10K</value>
       <description>Temperature dependent resistor, negative temperature coefficient</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Temperature dependent resistor, negative temperature coefficient</field>
       </fields>
       <libsource lib="Device" part="Thermistor_NTC" description="Temperature dependent resistor, negative temperature coefficient"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="thermistor NTC resistor sensor RTD"/>
       <property name="ki_fp_filters" value="R_* RV_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -1012,13 +1252,19 @@
       <value>NTC 10K</value>
       <description>Temperature dependent resistor, negative temperature coefficient</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">Temperature dependent resistor, negative temperature coefficient</field>
       </fields>
       <libsource lib="Device" part="Thermistor_NTC" description="Temperature dependent resistor, negative temperature coefficient"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="thermistor NTC resistor sensor RTD"/>
       <property name="ki_fp_filters" value="R_* RV_*"/>
       <sheetpath names="/" tstamps="/"/>
@@ -1036,13 +1282,19 @@
       <value>5V_VO</value>
       <description>test point</description>
       <fields>
+        <field name="Sim.Library"/>
+        <field name="Sim.Name"/>
+        <field name="Sim.Params"/>
         <field name="Footprint"/>
         <field name="Datasheet"/>
         <field name="Description">test point</field>
       </fields>
       <libsource lib="Connector" part="TestPoint" description="test point"/>
+      <property name="Sim.Library" value=""/>
+      <property name="Sim.Name" value=""/>
+      <property name="Sim.Params" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="bbu_controller_prototype_kicad.kicad_sch"/>
+      <property name="Sheetfile" value="node-bbu.kicad_sch"/>
       <property name="ki_keywords" value="test point tp"/>
       <property name="ki_fp_filters" value="Pin* Test*"/>
       <sheetpath names="/" tstamps="/"/>
