@@ -4,7 +4,8 @@ Guidance for humans and coding agents in this repository.
 
 # Agent Guidelines
 - **Language Lock**: You must think, reason, log, write code comments, and output final responses strictly in English. 
-- Under no circumstances should you transition to or output Chinese characters, even if the primary GLM-5.3-Flash model drifts.
+- Under no circumstances should you transition to or output Chinese characters or other foreign language, even if the primary model drifts.
+- For complicated undertakings (e.g. using brave-search mcp) consult ~/.pi/agent/skills to see whether there are time-saving pointers.
 
 ## What this is
 
@@ -14,7 +15,7 @@ Guidance for humans and coding agents in this repository.
 
 - `firmware/node-bbu` — autonomous BBU (thermal storage) pump control node
 - `firmware/gateway` — ESP-NOW ↔ WiFi/MQTT gateway
-- `server/` — Mosquitto, Node-RED, InfluxDB, Grafana (LAN, compose-from-git)
+- `server/` — Mosquitto, commit-service, InfluxDB, Grafana (LAN, compose-from-git)
 - `hardware/bbu-controller` — PCB when off protoboard
 
 Human entry: [`README.md`](README.md). Capability: [`docs/STATUS.md`](docs/STATUS.md). Plan: [`docs/ROADMAP.md`](docs/ROADMAP.md). Kickoff scrap (historical, may be stale): [`docs/project_slug.md`](docs/project_slug.md) — do not treat as living truth.
@@ -30,9 +31,10 @@ bracino/
   firmware/node-bbu/
   firmware/gateway/
   hardware/bbu-controller/
-  server/{docker-compose later, mosquitto, nodered, grafana, influx-init}/
+  server/{docker-compose, mosquitto, commit-service, influx-init, grafana}/
   docs/                 # STATUS, ROADMAP, schemas; historical project_slug.md
   issues/{open,closed,fixtures}/
+  tools/                # committed bench/forensics aids (JSONL plotter, …)
   ephemera/             # gitignored scratch (create locally as needed)
   AGENTS.md
   README.md
@@ -49,7 +51,7 @@ bracino/
 |--------|--------|
 | Firmware | C, ESP-IDF |
 | Broker | Mosquitto (retained + LWT) |
-| Logic / light UI | Node-RED (non-safety-critical only) |
+| Logic / light UI | python script committer-acker-notifier |
 | History | InfluxDB + Grafana |
 | Deploy | `git clone && docker compose up` on LAN |
 
@@ -111,8 +113,7 @@ Full rules: [`issues/README.md`](issues/README.md).
 
 ### Server
 
-- Mosquitto, Node-RED flows (no embedded secrets), Grafana provisioning → git.
-- Node-RED: schedules/thresholds/coordination — **not** offline pump interlocks.
+- Mosquitto, committer-acker-notifier script, InFlux → git.
 
 ### Docs
 

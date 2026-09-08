@@ -42,9 +42,10 @@ bracino/
   hardware/
     bbu-controller/      # PCB when ready
   server/                # docker compose + service config
-    mosquitto/ nodered/ grafana/ influx-init/
+    mosquitto/ commit-service/ grafana/ influx-init/
   docs/                  # STATUS, ROADMAP, schemas; historical slug
   issues/                # open/ closed/ fixtures/ lab notebook
+  tools/                 # bench/forensics aids (telemetry plotter, …)
   AGENTS.md
   LICENSE
 ```
