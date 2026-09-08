@@ -16,11 +16,14 @@ list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../shared")
 # b36a268-m while the header said 69e43a8). Header is now a declared
 # OUTPUT + ALL target, and consuming sources carry OBJECT_DEPENDS.
 set(BRACINO_BUILD_ID_HDR "${CMAKE_BINARY_DIR}/bracino_build_id.h")
-add_custom_command(
-    OUTPUT "${BRACINO_BUILD_ID_HDR}"
+# ALL custom target: always runs (stamp must be per-build). The header is
+# a BYPRODUCT so OBJECT_DEPENDS in main/ sees a real producing edge and
+# compiles only after it is fresh. The script's cmp-gated write keeps
+# unchanged trees from recompiling.
+add_custom_target(bracino_build_id ALL
     COMMAND bash ${CMAKE_CURRENT_LIST_DIR}/gen_build_id.sh ${CMAKE_BINARY_DIR}
+    BYPRODUCTS "${BRACINO_BUILD_ID_HDR}"
     COMMENT "bracino: refresh build id (git hash + UTC stamp)"
     VERBATIM)
-add_custom_target(bracino_build_id ALL DEPENDS "${BRACINO_BUILD_ID_HDR}")
 
 project(gateway)
