@@ -27,8 +27,10 @@ import json
 import os
 import signal
 import sys
+import threading
 import time
 import urllib.request
+from datetime import datetime
 
 import paho.mqtt.client as mqtt
 
@@ -52,6 +54,25 @@ TIME_PERIOD_S = 10
 # <unguessable-topic>) to get phone/desktop push on node-gone / gateway
 # LWT alarms. Opt-in, no secrets: an ntfy topic IS the credential.
 NTFY_URL = os.environ.get("NTFY_URL") or None
+
+# ---- stage C: Influx projection (server/README) ----
+#
+# INFLUX_TOKEN set  -> tailer thread projects the JSONL into Influx.
+# INFLUX_TOKEN unset-> behavior identical to pre-stage-C (topic absent).
+#
+# The JSONL stays the source of truth and the ack path. The tailer is a
+# pure projection: its failures never touch watermarks, acks, alarms or
+# the MQTT loop. Timestamps are derived from each record's own gw/node
+# stamp, so a re-tail (rotation, crash between write and offset save)
+# overwrites identical points — idempotent by construction.
+INFLUX_URL = os.environ.get("INFLUX_URL")
+INFLUX_TOKEN = os.environ.get("INFLUX_TOKEN")
+INFLUX_ORG = os.environ.get("INFLUX_ORG", "bracino")
+INFLUX_BUCKET = os.environ.get("INFLUX_BUCKET", "bracino")
+INFLUX_TAIL_STATE = os.path.join(DATA_DIR, "influx_tail.json")
+INFLUX_BATCH = 500          # max lines per POST
+INFLUX_READ_CAP = 4_000_000  # max bytes pulled per cycle (backfill pacing)
+INFLUX_HEALTH_S = 30
 
 
 def notify_push(text):
@@ -84,6 +105,197 @@ signal.signal(signal.SIGTERM, _stop)
 def wrap_le(a, b):
     """True if a <= b in 32-bit wraparound order (node_clock_ms domain)."""
     return ((b - a) & 0xFFFFFFFF) < 0x80000000
+
+
+class InfluxTailer(threading.Thread):
+    """Projects the JSONL into InfluxDB (stage C). Own thread; the MQTT
+    loop and ack path run untouched. Writes are idempotent: timestamps
+    come from the records themselves, so any overlap re-writes identical
+    points. On write failure the offset is NOT advanced — we retry with
+    backoff and JSONL backpressure is absorbed by the file, not memory."""
+
+    def __init__(self, svc):
+        super().__init__(daemon=True, name="influx-tailer")
+        self.svc = svc
+        self.url = (f"{INFLUX_URL}/api/v2/write?org={INFLUX_ORG}"
+                    f"&bucket={INFLUX_BUCKET}&precision=ns")
+        self.ok = None            # None = never wrote / nothing yet
+        self.last_ok_wall = None  # monotonic of last successful POST
+        self.lines_written = 0
+        self.last_health = 0.0
+
+    # -- state --
+
+    def _load_offset(self):
+        try:
+            with open(INFLUX_TAIL_STATE, encoding="utf-8") as f:
+                return int(json.load(f).get("offset", 0))
+        except (OSError, ValueError, AttributeError):
+            return 0
+
+    def _save_offset(self, off):
+        tmp = INFLUX_TAIL_STATE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump({"offset": off}, f)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, INFLUX_TAIL_STATE)
+
+    # -- conversion --
+
+    @staticmethod
+    def _esc_tag(v):
+        return (str(v).replace("\\", "\\\\").replace(" ", "\\ ")
+                .replace(",", "\\,").replace("=", "\\="))
+
+    @staticmethod
+    def _esc_str(v):
+        return '"' + str(v).replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+    @staticmethod
+    def _iso_ns(s):
+        if not s:
+            return None
+        try:
+            dt = datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=datetime.timezone.utc)
+            return int(dt.timestamp() * 1_000_000_000)
+        except ValueError:
+            return None
+
+    def to_lp(self, o):
+        """One JSONL record -> one line-protocol line (or None to skip)."""
+        kind = o.get("kind")
+        tags, fields = [], []
+        if kind == "telemetry":
+            for k in ("node_type", "node_id", "boot_session", "mode"):
+                if o.get(k) is not None:
+                    tags.append(f"{k}={self._esc_tag(o[k])}")
+            for k in ("t_tpo", "t_tpu", "t_amb"):
+                if isinstance(o.get(k), (int, float)):
+                    fields.append(f"{k}={o[k]}")
+            if o.get("ct_state") is not None:
+                fields.append(f"ct_state={self._esc_str(o['ct_state'])}")
+            for k in ("relay_state", "fault_flags", "capture_ms"):
+                if isinstance(o.get(k), (int, float)):
+                    fields.append(f"{k}={int(o[k])}i")
+            ts = self._iso_ns(o.get("node_ts"))
+            meas = "telemetry"
+        elif kind == "event":
+            for k in ("node_type", "node_id", "event"):
+                if o.get(k) is not None:
+                    tags.append(f"{k}={self._esc_tag(o[k])}")
+            if o.get("fault_id") is not None:
+                tags.append(f"fault_id={self._esc_tag(o['fault_id'])}")
+                fields.append(f"fault_id={int(o['fault_id'])}i")
+            else:
+                fields.append("seen=1i")
+            ts = self._iso_ns(o.get("gw_ts") or o.get("ts"))
+            meas = "event"
+        elif kind == "gw_ambient":
+            tags.append("source=gw")
+            if isinstance(o.get("t_amb"), (int, float)):
+                fields.append(f"t_amb={o['t_amb']}")
+            if o.get("fault") is not None:
+                fields.append(f"fault={self._esc_str(o['fault'])}")
+            ts = self._iso_ns(o.get("gw_ts") or o.get("ts"))
+            meas = "gw_ambient"
+        else:
+            return None  # unknown future kind: advance past it, unchanged
+        if not fields or ts is None:
+            return None
+        return f"{meas}{(',' + ','.join(tags)) if tags else ''} " \
+               f"{','.join(fields)} {ts}"
+
+    # -- io --
+
+    def _collect(self, off):
+        """Parse new complete lines from the JSONL. Returns (lines, newoff).
+        Only advances past the last complete newline (a partially-written
+        line stays for the next cycle)."""
+        try:
+            size = os.path.getsize(JSONL_PATH)
+        except OSError:
+            return [], off
+        if size < off:  # rotated/truncated: start over (idempotent)
+            log("influx: jsonl rotated/truncated — re-tailing from 0")
+            off = 0
+        with open(JSONL_PATH, encoding="utf-8", errors="replace") as f:
+            f.seek(off)
+            data = f.read(INFLUX_READ_CAP)
+        nl = data.rfind("\n")
+        if nl < 0:
+            return [], off
+        batch = []
+        for ln in data[:nl].split("\n"):
+            ln = ln.strip()
+            if not ln:
+                continue
+            try:
+                o = json.loads(ln)
+            except ValueError:
+                continue
+            lp = self.to_lp(o)
+            if lp:
+                batch.append(lp)
+        return batch, off + nl + 1
+
+    def _post(self, body):
+        req = urllib.request.Request(
+            self.url, data=body.encode("utf-8"), method="POST",
+            headers={"Authorization": f"Token {INFLUX_TOKEN}",
+                     "Content-Type": "text/plain; charset=utf-8"})
+        urllib.request.urlopen(req, timeout=15).read()
+
+    def _publish_health(self):
+        age = (round(time.monotonic() - self.last_ok_wall, 1)
+               if self.last_ok_wall is not None else None)
+        self.svc.client.publish(
+            "bracino/backend/influx",
+            json.dumps({"ok": bool(self.ok), "last_write_age_s": age,
+                        "lines": self.lines_written}),
+            qos=1, retain=True)
+
+    def run(self):
+        log(f"influx tailer: {INFLUX_URL} org={INFLUX_ORG} "
+            f"bucket={INFLUX_BUCKET}")
+        off = self._load_offset()
+        backoff = 1.0
+        while running:
+            try:
+                batch, newoff = self._collect(off)
+            except OSError as exc:
+                log(f"!! influx read failed: {exc}")
+                time.sleep(5)
+                continue
+            if not batch:
+                if time.monotonic() - self.last_health >= INFLUX_HEALTH_S:
+                    self._publish_health()
+                    self.last_health = time.monotonic()
+                time.sleep(1)
+                continue
+            try:
+                self._post("\n".join(batch))
+            except Exception as exc:
+                if self.ok is not False:
+                    log(f"!! influx write failed ({len(batch)} lines): "
+                        f"{exc} — retrying, ack path unaffected")
+                self.ok = False
+                time.sleep(backoff)
+                backoff = min(backoff * 2, 60)
+                continue
+            if self.ok is not True:
+                log(f"influx write ok: {len(batch)} lines")
+            self.ok = True
+            backoff = 1.0
+            self.last_ok_wall = time.monotonic()
+            self.lines_written += len(batch)
+            off = newoff
+            self._save_offset(off)
+            if time.monotonic() - self.last_health >= INFLUX_HEALTH_S:
+                self._publish_health()
+                self.last_health = time.monotonic()
 
 
 class Commit:
@@ -307,6 +519,11 @@ class Commit:
         self.client = c
         c.connect(MQTT_HOST, MQTT_PORT, keepalive=30)
         c.loop_start()
+
+        if INFLUX_TOKEN and INFLUX_URL:
+            InfluxTailer(self).start()
+        else:
+            log("influx tailer disabled (INFLUX_TOKEN/INFLUX_URL unset)")
 
         last_health = last_time = 0.0
         while running:

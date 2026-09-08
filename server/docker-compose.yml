@@ -36,6 +36,12 @@ services:
       MQTT_PORT: "1883"
       MQTT_USER: ${MQTT_USER}
       MQTT_PASS: ${MQTT_PASS}
+      # Stage C projection (server/README): enabled iff INFLUX_TOKEN is
+      # set in .env; unset = pre-stage-C behavior, no influx code runs.
+      INFLUX_URL: http://influxdb:8086
+      INFLUX_ORG: bracino
+      INFLUX_BUCKET: bracino
+      INFLUX_TOKEN: ${INFLUX_TOKEN:-}
     volumes:
       - /var/lib/bracino/commit:/app/data
 

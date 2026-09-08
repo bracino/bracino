@@ -92,13 +92,42 @@ mosquitto_pub -h localhost -t 'bracino/test' -m ping -u bracino -P "$MQTT_PASS"
 
 Flash from the dev VM (`idf.py -p /dev/ttyACM1 flash monitor`), long-press GPIO27 → join `bracino-gateway01`/`bracinoAdmin` → `http://192.168.5.1/prov`: house WiFi, broker `192.168.1.215:1883`, **MQTT user `bracino` + password**. Serial fallback: `u <user> [pass]` (or `u -` to clear). Status page shows the user, never the password.
 
-## Stage C (influx), not yet deployed
+## Stage C (influx), deployed 2026-09-08
+
+InfluxDB runs behind `--profile influx`; the **tailer** in commit-service
+projects the JSONL into it. Facts:
+
+- **Ack path untouched:** the tailer is a daemon thread that reads the
+  JSONL and POSTs line protocol to `INFLUX_URL`. Its failures never
+  touch watermarks, acks, alarms or the MQTT loop. JSONL stays the
+  source of truth; the projection is rebuildable by deleting
+  `/var/lib/bracino/commit/influx_tail.json` and restarting (re-tail is
+  idempotent — timestamps come from each record's own stamp, so overlap
+  overwrites identical points).
+- **Gating:** set `INFLUX_TOKEN` in `server/.env` to enable; unset =
+  pre-stage-C behavior. `INFLUX_URL` defaults to `http://influxdb:8086`
+  (compose DNS); org/bucket default to `bracino`.
+- **First run backfills** the whole JSONL (~16k points ≈ 4.7 MB —
+  seconds). Bench traffic lands too; boot_session tags separate the
+  streams (see 015 record-hygiene note; AMB discount rule in 022).
+- **Measurements:** `telemetry` (tags node_type/node_id/boot_session/
+  mode; fields t_tpo, t_tpu, t_amb, ct_state, relay_state,
+  fault_flags, capture_ms), `event` (tags node_type/node_id/event/
+  fault_id), `gw_ambient` (fields t_amb, fault).
+- **Health:** `bracino/backend/influx` {ok, last_write_age_s, lines}
+  retained, 30 s — commit-path health stays on `bracino/gateway/health`
+  and never depends on Influx.
+- Note: the GW's ext-ambient channel read −31 °C (misranged) until
+  2026-09-06 ~14:49Z; `gw_ambient` before that stamp is junk (see
+  issue 022 discussion).
 
 ```bash
-docker compose --profile influx up -d      # + INFLUX_TOKEN/INFLUX_PASSWORD in .env
+docker compose --profile influx up -d      # one-time influx deploy (done)
+cd ~/bracino/server && git pull && docker compose build commit \
+  && docker compose up -d commit           # enable the tailer
 ```
 
-Commit service gains `INFLUX_URL`/`INFLUX_TOKEN`-gated line-protocol tailing (JSONL remains the ack path). Grafana stays on the desktop, pointed at `http://192.168.1.215:8086`.
+Grafana stays on the desktop, pointed at `http://192.168.1.215:8086`.
 
 ### Gotchas seen in stage B
 
