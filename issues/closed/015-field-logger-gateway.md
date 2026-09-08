@@ -216,3 +216,25 @@ Deployed at the plant 2026-09-05; continuous multi-day capture since.
 
 Closed 2026-09-08. Residual supervision-chain drills live in 021;
 Influx projection (stage C) tracked via server/README + 008.
+
+## Record hygiene note (2026-09-08)
+
+The captured JSONL is NOT a single continuous plant record — bench
+traffic is interleaved with it:
+
+- Bench bring-up sessions land under random `boot_session` tags **92**
+  and **170** (node_id also 1): `mode: MANUAL`, relay off, room-
+temperature probes (TPO/TPU ~26–28 °C), fresh boots (capture_ms ≈ 0
+at stream start). Fault-injection events from those drills are in the
+event stream too — notably `FAULT_RAISED fault_id=2` at
+gw_ts 2026-09-06T16:23:30Z plus rapid F0 raise/clear chatter. The F2
+was never cleared in-record; it is a bench drill artifact, NOT a plant
+fault.
+- Any plot that connects samples across `boot_session` changes paints
+  vertical lies where the streams interleave (seen 2026-09-08 on the
+  Sep-6 18:00 region).
+- AMB readings read ~1–1.5 °C LOW for the first ~10–15 min after any
+  node reboot (cold board → ESP32 self-heating recovery). Post-reboot
+  AMB steps are instant + monotonic recovery; real door-open dips are
+  prolonged. Discount the first quarter hour after a tag change when
+  analyzing AMB.
