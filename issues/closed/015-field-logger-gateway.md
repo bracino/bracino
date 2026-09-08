@@ -233,8 +233,7 @@ fault.
 - Any plot that connects samples across `boot_session` changes paints
   vertical lies where the streams interleave (seen 2026-09-08 on the
   Sep-6 18:00 region).
-- AMB readings read ~1–1.5 °C LOW for the first ~10–15 min after any
-  node reboot (cold board → ESP32 self-heating recovery). Post-reboot
-  AMB steps are instant + monotonic recovery; real door-open dips are
-  prolonged. Discount the first quarter hour after a tag change when
-  analyzing AMB.
+- AMB readings dip at boot-session boundaries — CORRECTED 2026-09-08:
+  those were room-entry (door) events, not a sensor artifact; every
+  "post-boot" reboot was human-attended (022 closed). What remains at
+  boot: a ~0.3 °C, <1 min TPO/TPU warm-up transient — negligible.

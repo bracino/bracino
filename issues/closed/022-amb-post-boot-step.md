@@ -1,6 +1,7 @@
 # 022 — AMB step-down at node reboot (mechanism unknown)
 
-- **Status:** open — phenomenon established on data; mechanism unresolved
+- **Status:** closed 2026-09-08 — dissolved by human timeline
+  reconstruction (see Resolution); no bench tests needed
 - **Type:** forensics / sensor behavior
 - **Opened:** 2026-09-08
 - **Refs:** 019 (power events), 015 record-hygiene note, DN00x AMB channel
@@ -70,3 +71,34 @@ wiring/electronics (hypothesis 3).
 
 Discount AMB for ~10–15 min after any boot-session change (see 015
 record-hygiene note). Plotter now marks boot-session starts.
+
+## Resolution (2026-09-08, human)
+
+The boot-session markers (plotter) let the human reconstruct the
+morning-of-Sep-8 timeline precisely, and it dissolves the mystery:
+
+- **Every reboot was human-attended.** ~07:30 Rome: first visit with
+  the phone (saw wrong FW ID, came back). ~08:30: laptop visit. ~08:45:
+  phone + laptop, flash attempts, eventual settle. The "unattended
+  05:27Z blip" theory was wrong — the 6.3-min dark gap at 07:27 Rome
+  was the human's first power-cycle. No power event is required to
+  explain any of it.
+- **The AMB steps were room entries.** Door open on every visit; AMB
+  drops confirmed repeatedly on entries *without* any reboot. The
+  apparent "step scales with dark time" pattern was actually visit-
+  duration correlation. (Sep-7's ≤0.8 °C/6-min ceiling simply reflects
+  a day with no room entries.)
+- **The only real post-boot artifact:** a ~0.3 °C transient in TPO/TPU
+  right after boot, gone within ~1 min (snap-20260908-185641 /
+  clipboard_2026-09-08_185641.png) — accepted as front-end/board
+  warm-up, too small to matter.
+- **The reboot-cluster size** (more reboots than the human expected
+  from ~3 flash attempts) noted but not investigated — node stable for
+  3 days since, and the effort/benefit is poor. If a recurrence ever
+  coincides with *no* human presence, revisit via the 019 bench-sag
+  work.
+- Bench sweep: cancelled (human decision).
+
+Net: no unexplained phenomenon remains. The GW-AMB overlay was added
+to the plotter for future correlation work (gw_ambient pre-
+2026-09-06T14:49Z is junk — misranged channel, masked in plots).
