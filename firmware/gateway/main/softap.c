@@ -222,6 +222,10 @@ static esp_err_t h_prov(httpd_req_t *req)
     snprintf(bp, sizeof(bp), "%lu",
              (unsigned long)gw_nvs_get_u32("bport", 1883));
     snprintf(body, sizeof(body), PROV_FORM, ssid_e, bh_e, bp, mu_e);
+    size_t len = strlen(body);
+    snprintf(body + len, sizeof(body) - len,
+             "<p>firmware %s (build %s)</p>",
+             BRACINO_BUILD_NAME, BRACINO_BUILD);
     http_send(req, PAGE_HEAD, body, PAGE_TAIL);
     return ESP_OK;
 }
