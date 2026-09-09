@@ -126,11 +126,13 @@ def main():
     df["time"] = pd.to_datetime(df["time"], utc=True, errors="coerce").dt.tz_convert(tz)
     df = df.dropna(subset=["time"]).sort_values("time").reset_index(drop=True)
 
-    if args.start:
-        df = df[df["time"] >= pd.Timestamp(args.start, tz="UTC").tz_convert(tz)]
+    lo = pd.Timestamp(args.start, tz="UTC").tz_convert(tz) if args.start else None
+    hi = pd.Timestamp(args.end, tz="UTC").tz_convert(tz) if args.end else None
+    if lo is not None:
+        df = df[df["time"] >= lo]
         df = df.reset_index(drop=True)
-    if args.end:
-        df = df[df["time"] <= pd.Timestamp(args.end, tz="UTC").tz_convert(tz)]
+    if hi is not None:
+        df = df[df["time"] <= hi]
         df = df.reset_index(drop=True)
     if df.empty:
         raise SystemExit("empty after window filter")
@@ -154,6 +156,13 @@ def main():
         gw_df["t_amb"] = pd.to_numeric(gw_df["t_amb"], errors="coerce")
         gw_df = gw_df.dropna(subset=["time", "t_amb"])
         gw_df = gw_df[gw_df["fault"].isna() & (gw_df["t_amb"] > -10)]
+        # window-filter gw too: unfiltered, it dragged the shared x-axis
+        # outside the requested --start/--end (seen 2026-09-09)
+        if lo is not None:
+            gw_df = gw_df[gw_df["time"] >= lo]
+        if hi is not None:
+            gw_df = gw_df[gw_df["time"] <= hi]
+        gw_df = gw_df.reset_index(drop=True)
 
     # ---- summary to stdout ----
     raw_steps = df["time"].diff().dt.total_seconds()
@@ -183,15 +192,24 @@ def main():
         2, 1, figsize=(fw, fh), sharex=True,
         gridspec_kw={"height_ratios": [2.2, 1.0], "hspace": 0.08})
 
-    # relay shading on both panels
+    # relay: light-gray edge lines at every pump-on/off transition plus
+    # shading between each on/off pair (both panels)
     on = (df["relay"] == 1)  # Series, keeps index
     t = df["time"]
-    starts = on & ~on.shift(fill_value=False)
-    for _, row in df.loc[starts].iterrows():
-        nxt = df.loc[df["time"] > row["time"], "time"]
-        end_t = nxt.iloc[0] if len(nxt) else t.iloc[-1]
-        for ax in (ax1, ax2):
-            ax.axvspan(row["time"], end_t, alpha=0.18, color="tab:orange")
+    rise = on & ~on.shift(fill_value=False)
+    fall = ~on & on.shift(fill_value=False)
+    rise_ts = t[rise].tolist()
+    fall_ts = t[fall].tolist()
+    spans = []
+    for rt in rise_ts:
+        end = next((ft for ft in fall_ts if ft > rt), t.iloc[-1])
+        spans.append((rt, end))
+    for ax in (ax1, ax2):
+        for tt in rise_ts + fall_ts:
+            ax.axvline(tt, color="lightgray", lw=0.8, zorder=0)
+        for rt, end in spans:
+            ax.axvspan(rt, end, color="lightgray", alpha=0.45,
+                       lw=0, zorder=0)
 
     ax1.plot(df["time"], df["t_tpo"], lw=1.6, label="TPO", color="tab:red")
     ax1.plot(df["time"], df["t_tpu"], lw=1.6, label="TPU", color="tab:blue")

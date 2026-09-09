@@ -59,6 +59,14 @@ schema-width change, no GW parse change, no ESP-NOW payload growth.
   the existing recipe.
 - Semantics of the setter: writes the NVS counter for the NEXT boot
   (running boot keeps its id); document in the runbook + DN003.
+- **Belt-and-braces (human, 2026-09-09):** in the erase case the tech
+  can take the GW down until the boot id is verified on the TFT —
+  otherwise a node with comms already enabled would report boot_id=1
+  for the seconds-to-minutes before reseed+reboot lands. Note the
+  default after erase is comms OFF (NVS-persisted `comms_enable`
+  reads 0), so the normal recipe already gates this: reseed → verify
+  on TFT → comms ON last. GW-down (or leaving node comms off longer)
+  is for uncertain states; cost is a data gap for the duration.
 
 ### Known caveat: NVS erase
 

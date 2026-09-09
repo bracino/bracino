@@ -10,7 +10,8 @@ this directory is the canonical home once a tool graduates.
 
 Renders the commit-service JSONL (`kind: telemetry` / `event` /
 `gw_ambient`) to PNG or an interactive window: TPO/TPU panel + AMB
-panel (node probe + GW probe overlay), relay shading, event markers
+panel (node probe + GW probe overlay), pump on/off edge lines with gray
+shading between (relay_state), event markers
 (fault raise/clear), boot-session start markers (one per distinct
 `boot_session` tag), and automatic line-breaks at time gaps AND
 boot-session changes — interleaved streams (bench drills share
