@@ -1,8 +1,9 @@
 # 016 — Pump never shutoff in the field: hysteresis was centered, stop threshold sat above the boiler's own limit
 
-- **Status:** open
+- **Status:** closed
 - **Type:** bug (control law)
 - **Opened:** 2026-09-04
+- **Closed:** 2026-09-09 (field-verified from the logger record; human satisfied)
 - **Refs:** `firmware/node-bbu/main/control.c`, `params.c`, `docs/DESIGN_NOTE_002_bbu_control_loop.md`, `closed/009`, 012 (field install)
 
 ## Context
@@ -26,7 +27,8 @@ pump circulates tank water through the idle jacket, TPO moves *away* from
 threshold mid-cycle. The dT condition collapsing doesn't rescue it, because
 the old stop line required `TPO ≥ off_threshold` too.
 
-## Fix (2026-09-04, in tree — not yet flashed)
+## Fix (2026-09-04, in tree; field-flashed before boot 237 Sep 5 —
+    verified 2026-09-09, see Field adjudication)
 
 Control law revised per the human's diagnosis ("hysteresis should only apply
 while the tank is cooling"):
@@ -70,8 +72,36 @@ The bump-fall signature is the same signal as 017's boiler-out warning.
 - [x] Host unit tests pass (`gcc` on `test_control.c`, includes the four
       new 016 cases)
 - [x] `idf.py build` clean (C3)
-- [ ] **Field:** observe a full cycle at the boiler room — pump must stop
-      when TPO reaches the setpoint with dT satisfied; must restart only
-      after TPO falls to setpoint − hysteresis; must NOT cycle-chatter
-      during boiler warm-up
-- [ ] Docs bumped (DN002 done 2026-09-04; STATUS on close)
+- [x] **Field:** observe a full cycle at the boiler room — satisfied by
+      record adjudication (below) plus a human-attended clean cycle
+      2026-09-08 06:17Z on the freshly flashed node
+- [x] Docs bumped (DN002 done 2026-09-04; STATUS refresh still queued —
+      known stale, tracked on the session pad)
+
+## Field adjudication (2026-09-09, from the Sep 5–8 logger record)
+
+Trusted region: boot 92 (Sep 6→8, continuous) + Sep 8 morning boots.
+Discounted: Sep 5 (brownout lacuna, 019) and interleaved bench traffic
+(015 hygiene note). Field params: setpoint 58, hysteresis 4.0 (kept —
+final value TBD via Influx experiments; 4.0 has no user complaints).
+
+- Charged stops at TPO 57.9–58.0 with ΔT 0.7–1.4 (≤1.5): **~6 cycles,
+  all clean**. Restart only at TPO 53.1–54.0 (= setpoint − hysteresis).
+- No chatter: shortest run 5.6 min (min_on 180 s).
+- Daytime solar hold-off: tank solar-climbs 58→73 °C with the pump
+  off, zero relay edges 07:42→00:00; restart only on real cooling.
+- **Jacket-bump residual — observed, bound corrected:** the bump-fall
+  signature occurred 2 of 3 nights (tank first reaching restart level,
+  ~00:00–01:00 UTC). The backstop fires BEFORE the boiler's anti-cycle
+  delay expires; a second backstop stop follows; the third cycle
+  charges fully. So the bound is **≤2 spurious stop/restart pairs**, not
+  1 as predicted. Self-terminating every time; cost ~20 pump-minutes
+  and 4 relay transitions/night. **Sustain-arm NOT built — data does
+  not demand it** (per the 2026-09-09 architecture discussion: every
+  pump-misbehavior degrades to efficiency/wear, never plant damage;
+  sustain-arm would only delay the 017 dead-boiler abort).
+- Sensor-fault fail-safe exercised live (TPU −99.9 → pump stopped,
+  stayed off, resumed on real cooling) — caveated as brownout-region.
+- Re-attribution (human): the 57.8→73.2 °C post-stop TPO spike
+  (2026-09-05 14:50Z) is the **brownout signature**, not pipe heat
+  soak — see 019 addendum. 017 must not warn on these spikes.

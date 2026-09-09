@@ -103,3 +103,14 @@ faults.
 - [ ] If a freeze recurs: serial silent + TFT frozen + telemetry stops
       simultaneously, GW raises node_gone alarm within the liveness
       window.
+
+## Addendum (2026-09-09)
+
+Additional brownout signature identified in the Sep-5 record (016
+adjudication): immediately before/around a brownout window the node's
+probe chain goes wild — TPO glitched to 30.7 °C mid-pump, TPU −99.9
+(open circuit), and post-stop TPO spiked 57.8→73.2 °C within minutes
+and sat static. Treat any such reading cluster as brownout, not as a
+real thermal event and not as a probe failure. What catches the next
+occurrence: the 021 node-gone chain (node-down notification), once
+exercised end-to-end.
