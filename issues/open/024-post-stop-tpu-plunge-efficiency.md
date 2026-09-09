@@ -1,7 +1,12 @@
 # 024 — post-stop TPU plunge: boiler ramp + upper strata left unharvested (efficiency)
 
 - **Status:** open — DEFERRED observation; explicitly no control-algo
-  change now (human, 2026-09-09)
+  change now (human, 2026-09-09; reaffirmed 2026-09-09 after the
+  destratify-extension design discussion: deferred to later in the
+  game. The solar-day caution stands — when TPO and TPU are both well
+  above boiler-driven ranges, keep the pump off, which the current
+  code already does. The guarded design below is on file for when
+  this is picked up.)
 - **Type:** enhancement (efficiency, future)
 - **Opened:** 2026-09-09
 - **Refs:** closed/016 (law + hysteresis experiments TBD), 017 (boiler

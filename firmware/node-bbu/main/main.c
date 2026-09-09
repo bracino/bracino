@@ -802,6 +802,10 @@ static bool hook_param_set(uint8_t id, int32_t v)
     case BBU_PARAM_SAMPLE_PERIOD_S:
         comms_set_sample_period_s((uint32_t)v);
         return true;
+    case BBU_PARAM_BOOT_ID:
+        /* 023: seeds the NEXT boot's boot_session (erase_flash reseed);
+         * range 1..255 already validated by the descriptor table. */
+        return comms_set_boot_id_next((uint8_t)v);
     default:
         return false;
     }
@@ -825,6 +829,9 @@ static bool hook_param_get(uint8_t id, int32_t *v)
         return true;
     case BBU_PARAM_SAMPLE_PERIOD_S:
         *v = (int32_t)comms_sample_period_s();
+        return true;
+    case BBU_PARAM_BOOT_ID:
+        *v = (int32_t)comms_boot_session(); /* CURRENT boot (see schema) */
         return true;
     default:
         return false;

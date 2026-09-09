@@ -20,7 +20,8 @@ extern "C" {
 /* ---- protocol versions ---- */
 #define ESPNOW_PROTO_VER   1u   /* envelope format version */
 #define BBU_SCHEMA_VER     1u   /* BBU telemetry struct version */
-#define BBU_CONFIG_VER     3u   /* BBU parameter descriptor table version */
+#define BBU_CONFIG_VER     4u   /* BBU parameter descriptor table version
+                                 * (v4: +boot_id, issue 023, 2026-09-09) */
 
 /* ESP-NOW application payload ceiling (bench-verify against IDF! DN003). */
 #define ESPNOW_MAX_PAYLOAD 250u
@@ -186,7 +187,13 @@ typedef struct __attribute__((packed)) {
 #define BBU_PARAM_MANUAL_RELAY       9u  /* ENUM, 0/1 (Manual mode)  */
 #define BBU_PARAM_COMMS_ENABLE       10u /* ENUM, 0/1                */
 #define BBU_PARAM_SAMPLE_PERIOD_S    11u /* U32, 5..120, default 15  */
-#define BBU_PARAM_COUNT              11u /* registry space; 10 live  */
+#define BBU_PARAM_BOOT_ID            12u /* U32, 1..255 (issue 023).
+                                         * SET seeds the NEXT boot's
+                                         * boot_session (erase_flash
+                                         * reseed step in the flash
+                                         * runbook); GET returns the
+                                         * CURRENT boot's id. */
+#define BBU_PARAM_COUNT              12u /* registry space; 11 live  */
 
 /* ---- event registry (EVENT payload is ONE TLV: tag = event id) ---- */
 #define EVENT_FAULT_RAISED   0x01u /* value: fault_id u8          */

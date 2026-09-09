@@ -1,6 +1,8 @@
 # 023 — boot_session: random u8 causes collisions; make it an NVS counter
 
-- **Status:** open
+- **Status:** open — implemented in-tree (node comms.c/params.c/main.c,
+  schema id 12, DN003 + runbook notes); awaiting bench drill + field
+  reflash (which doubles as the 021 node-gone test vehicle)
 - **Type:** bug (schema / firmware)
 - **Opened:** 2026-09-09
 - **Refs:** `firmware/node-bbu/main/comms.c` (s_boot_session),

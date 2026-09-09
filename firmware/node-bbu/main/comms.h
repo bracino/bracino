@@ -37,6 +37,14 @@ void comms_init(void);
 
 bool comms_enabled(void);
 
+/* 023: boot_session is a monotonic per-node counter (first boot = 1),
+ * NVS-persisted in the comms namespace. Replaces the old esp_random
+ * tags whose random collisions poisoned record provenance. Wraps at
+ * 255 → 1 (benign at node reboot frequency — see DN003 / issue 023).
+ * Reseed after an erase_flash: comms_set_boot_id_next(N) makes the
+ * NEXT boot report N (running boot keeps its id); exposed as serial
+ * / PARAM_SET param "boot_id" (id 12) — post-erase runbook step. */
+
 /* Enable/disable the comms path. Persists in NVS. Enabling wakes the
  * comms task (radio comes up lazily); disabling stops all transmission. */
 void comms_enable(bool on);
@@ -77,6 +85,8 @@ void comms_bench_hello_burst(uint8_t ch, int count); /* bench: fixed-ch HELLO bu
 bool comms_set_ident(uint8_t node_type, uint8_t node_id); /* NVS-persisted */
 void comms_set_sample_period_s(uint32_t s); /* 5..120, default 15; NVS */
 uint32_t comms_sample_period_s(void);
+bool comms_set_boot_id_next(uint8_t next); /* 023: 1..255; NVS; next boot */
+uint8_t comms_boot_session(void);          /* 023: current boot's id */
 bool comms_ring_resize(uint16_t samples); /* bench: reallocates EMPTY ring */
 uint8_t comms_node_type(void);
 uint8_t comms_node_id(void);

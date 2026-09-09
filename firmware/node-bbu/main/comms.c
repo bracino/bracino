@@ -25,7 +25,6 @@
 #include "esp_mac.h"
 #include "esp_system.h"
 #include "esp_now.h"
-#include "esp_random.h"
 #include "esp_timer.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
@@ -1149,8 +1148,29 @@ void comms_init(void)
 {
     nvs_load();
 
-    s_boot_session = (uint8_t)(esp_random() & 0xFF);
-    if (s_boot_session == 0) {
+    /* 023: boot_session is a monotonic NVS counter (first boot = 1),
+     * not an esp_random tag — random 8-bit tags collided across nodes
+     * AND across this node's own history (tag 92 used twice in the
+     * Sep-2026 record), poisoning record provenance and the backend
+     * dedupe key. Persist BEFORE anything else can fail: a crash right
+     * after boot would otherwise reuse the id. Wrap 255 → 1 is benign
+     * at node reboot frequency (dedupe cursor only compares against
+     * the latest session; see issue 023). Reseed after erase_flash via
+     * param id 12 / comms_set_boot_id_next (flash runbook step). */
+    nvs_handle_t bh;
+    if (nvs_open(COMMS_NS, NVS_READWRITE, &bh) == ESP_OK) {
+        uint8_t last = 0;
+        nvs_get_u8(bh, "bootid", &last);
+        s_boot_session = (uint8_t)(last + 1);
+        if (s_boot_session == 0) {
+            s_boot_session = 1; /* wrapped past 255 */
+        }
+        nvs_set_u8(bh, "bootid", s_boot_session);
+        nvs_commit(bh);
+        nvs_close(bh);
+    } else {
+        /* No NVS at all: degenerate to 1. Comms identity is broken
+         * anyway in that state; do not randomize (023 semantics). */
         s_boot_session = 1;
     }
 
@@ -1336,6 +1356,33 @@ void comms_set_sample_period_s(uint32_t s)
 uint32_t comms_sample_period_s(void)
 {
     return s_sample_period_s;
+}
+
+bool comms_set_boot_id_next(uint8_t next)
+{
+    nvs_handle_t h;
+    if (next == 0) {
+        return false;
+    }
+    if (nvs_open(COMMS_NS, NVS_READWRITE, &h) != ESP_OK) {
+        return false;
+    }
+    /* Store next-1: the boot path loads the last REPORTED id and
+     * increments, so the next boot reports exactly `next`. */
+    esp_err_t e = nvs_set_u8(h, "bootid", (uint8_t)(next - 1));
+    if (e == ESP_OK) {
+        e = nvs_commit(h);
+    }
+    nvs_close(h);
+    if (e == ESP_OK) {
+        TLOG("comms: boot_id seeded — next boot reports %u\n", next);
+    }
+    return e == ESP_OK;
+}
+
+uint8_t comms_boot_session(void)
+{
+    return s_boot_session;
 }
 
 bool comms_ring_resize(uint16_t samples)

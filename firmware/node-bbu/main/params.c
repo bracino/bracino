@@ -40,6 +40,7 @@ static const bbu_param_desc_t s_table[] = {
     { BBU_PARAM_MANUAL_RELAY,        PTYPE_ENUM,    PARAM_FLAG_RW, 0,   1,     1, "manual_relay" },
     { BBU_PARAM_COMMS_ENABLE,        PTYPE_ENUM,    PARAM_FLAG_RW, 0,   1,     1, "comms_enable" },
     { BBU_PARAM_SAMPLE_PERIOD_S,     PTYPE_U32,     PARAM_FLAG_RW, 5,   120,   5, "sample_period_s" },
+    { BBU_PARAM_BOOT_ID,             PTYPE_U32,     PARAM_FLAG_RW, 1,   255,   1, "boot_id" },
 };
 
 const bbu_param_desc_t *params_table(int *count)
@@ -237,6 +238,13 @@ bool params_set(const char *name, const char *value)
     } else if (id_ok && id == BBU_PARAM_SAMPLE_PERIOD_S) {
         if (!params_set_by_id(id, (int32_t)d)) {
             printf("sample_period_s 5..120\n");
+            return false;
+        }
+    } else if (id_ok && id == BBU_PARAM_BOOT_ID) {
+        /* 023: seeds the NEXT boot's boot_session (erase_flash reseed
+         * step in the flash runbook); the running boot keeps its id. */
+        if (!params_set_by_id(id, (int32_t)d)) {
+            printf("boot_id 1..255\n");
             return false;
         }
     } else {

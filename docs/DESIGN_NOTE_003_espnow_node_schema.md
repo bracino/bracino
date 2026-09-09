@@ -543,10 +543,19 @@ typedef struct __attribute__((packed)) {
   TLV — this covers boot, wake, and post-outage re-contact, which is
   exactly when drift matters most. Additionally, ALWAYS_ON nodes receive a
   standalone `TIME_SYNC` at 1×/hour.
-- **`boot_session`** (envelope byte 11): chosen fresh at boot (random or
-  incrementing), changes only on reboot. It lets the gateway/backend
-  correctly stitch telemetry across a mid-outage node reboot instead of
-  misreading the clock jumping backward as bad data.
+- **`boot_session`** (envelope byte 11): a **monotonic per-node NVS
+  counter** (issue 023, 2026-09-09): first boot = 1, every boot
+  increments and persists, wraps 255 → 1. It changes only on reboot
+  and lets the gateway/backend correctly stitch telemetry across a
+  mid-outage node reboot instead of misreading the clock jumping
+  backward as bad data. (Originally an `esp_random` 8-bit tag; random
+  collisions — the same tag used twice by one node within weeks,
+  issue 023 — poisoned record provenance and the backend dedupe key,
+  so the counter replaces it. The wrap is benign: dedupe compares
+  against the latest session only, and records carry wall-clock
+  stamps.) After an `erase_flash`, reseed continuity via param
+  `boot_id` (id 12): `boot_id N` makes the next boot report N —
+  runbook step, typically previous id + 1.
 - Outage-duration estimation and timestamp stitching are gateway/backend
   concerns (DN004); this schema exposes `boot_session` + local clock
   honestly enough for that reconciliation to be possible.
@@ -805,6 +814,14 @@ Mode-switching, threshold changes, manual overrides — all become
 The id is **permanently reserved** (never reassigned, never renumbered);
 no gateway existed when it was revoked, so no consumer ever saw it.
 `config_ver` bumped to 3.
+
+**Registry addition (issue 023, 2026-09-09):** `param_id` 12 `boot_id`
+(U32, 1..255, RW) — SET seeds the **next** boot's `boot_session`
+(erase_flash reseed step in the flash runbook: set previous id + 1);
+GET returns the **current** boot's id. Node-local NVS (comms
+namespace), same class as ids 10/11. `config_ver` bumped to 4; a node
+flashed with the new table re-advertises v4 in `HELLO` and the gateway
+re-fetches the descriptor — no runtime `CONFIG_CHANGED` involved.
 
 **Descriptor lifecycle:** the node advertises `config_ver` in every
 `HELLO`. The gateway caches the descriptor in its registry and re-fetches
