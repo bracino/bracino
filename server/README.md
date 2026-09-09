@@ -129,6 +129,35 @@ cd ~/bracino/server && git pull && docker compose build commit \
 
 Grafana stays on the desktop, pointed at `http://192.168.1.215:8086`.
 
+### Rotation recovery (mv-style rotation)
+
+Deleting, moving, or rotating the JSONL is always safe for the commit
+path (per-line open-append-fsync-close; see commit-service README). For
+the *projection* the rule is: the tailer treats `size < offset` as a
+rotation and re-tails the **new** file from 0 — so a file you `mv` away
+(`telemetry.jsonl.old`) is never ingested. If you rotate by `mv`, merge
+the old content back into the live file **while commit is stopped** and
+force a full re-tail:
+
+```bash
+cd ~/bracino/server && docker compose stop commit
+cd /var/lib/bracino/commit
+cat telemetry.jsonl.old telemetry.jsonl > telemetry.jsonl.merged
+wc -l telemetry.jsonl.old telemetry.jsonl telemetry.jsonl.merged  # counts must add up
+mv telemetry.jsonl.merged telemetry.jsonl
+rm data/influx_tail.json        # force full re-tail; deletion only counts while stopped
+cd ~/bracino/server && docker compose start commit
+```
+
+Re-POST of already-ingested points is harmless — timestamps come from
+the records themselves, so overlap overwrites identical points. Keep
+the stopped window short: unacked node batches are retransmitted and
+JSONL-deduped; only QoS-1 *events* published during the gap are lost
+(clean session), and alarms are retained.
+
+**Verified 2026-09-09:** 4.4 MB rotated `.old` merged, full re-tail
+clean, backfill visible in the :8086 UI matching the plotter output.
+
 ### Gotchas seen in stage B
 
 - **Bind-mount path auto-created as a directory**: if `docker compose up`
