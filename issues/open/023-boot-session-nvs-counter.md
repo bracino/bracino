@@ -22,7 +22,7 @@ Sep-2026 record:
 - The TFT diagnostic page shows `Boot %4u` — currently a random number,
   useless as a boot *count*.
 
-## Proposal (human, 2026-09-09)
+## Proposal (human, 2026-09-09; refined same day — see below)
 
 Make boot_session a **monotonic per-node counter**:
 
@@ -33,31 +33,38 @@ Make boot_session a **monotonic per-node counter**:
 - Dedupe and Influx keying already treat boot_session as an opaque
   number (commit_state JSON, Influx tag) — no server change needed.
 
-### Schema width decision (recommended: u8 → u32)
+### Width: u8 stays (human decision, 2026-09-09)
 
-An NVS counter must not silently wrap at 255. Widen
-`espnow_schema.h boot_session` to **u32** (+3 bytes on the ESP-NOW
-payload) and widen the GW's parse/detect logic (GW uses boot_session
-to detect node reboots — see comms.h comment). JSONL/Influx carry it
-unchanged as a number. Alternative rejected: u8 NVS counter — wraps
-after 255 boots (~1 year at observed reboot frequency), same collision
-class we are fixing.
+The node only reboots on reflash or power outage; 255 reboots is many
+years, and a wrap is benign anyway — the commit-service dedupe cursor
+only compares against the *latest* stored session, and Influx keys on
+record timestamps, so a 2031 boot tag 6 cannot clobber or be deduped
+against 2026's boot 6. The poison in the current scheme is *random
+reuse within weeks* (esp_random), which the counter eliminates. No
+schema-width change, no GW parse change, no ESP-NOW payload growth.
+
+### Continuity across reflashes
+
+- **App-only flash (the common re-flash):** NVS preserved (standard
+  practice, NVS@0x9000 untouched) → counter continues automatically.
+  No action needed.
+- **erase_flash migration (rare, deliberate):** counter lost. Repair
+  via a serial **RW param `boot_id N`** set during the existing
+  post-flash recipe (which already sets params over serial, e.g.
+  min_tpo_tpu_delta_c): set to previous boot id + 1, per the flash
+  manifest. Chosen over the originally suggested build-time header
+  line: a header bakes the value at build time (stale if the image is
+  reflashed later) and drags in generated-header machinery; the serial
+  value is always read from the TFT/manifest at flash time and rides
+  the existing recipe.
+- Semantics of the setter: writes the NVS counter for the NEXT boot
+  (running boot keeps its id); document in the runbook + DN003.
 
 ### Known caveat: NVS erase
 
-A full-flash migration with `erase_flash` resets the counter to 1,
-which can collide with historical records of low boot ids (and the
-commit-service dedupe key is (node, boot_session, capture_ms) — a
-reset counter with fresh low capture_ms could be wrongly deduped
-against ancient records). Mitigations, in order of preference:
-
-1. Field rule in the flash runbooks: **preserve NVS sectors on app
-   flashes** (already the practice, NVS@0x9000 untouched); after any
-   deliberate erase, set the boot counter explicitly (make it an RW
-   param-style value with a serial setter, e.g. `boot_id N`).
-2. Document in DN003: boot_session is a monotonic counter, resets only
-   on NVS erase; data forensics should sanity-check boot-id continuity
-   against node_ts when in doubt.
+Without the reseed step, a post-erase node starts at boot 1, which can
+collide with historical low-id records. Forensics rule of thumb (DN003
+note): sanity-check boot-id continuity against node_ts when in doubt.
 
 ## Fix
 
@@ -66,9 +73,12 @@ reflash batch — no emergency reflash warranted.)
 
 ## Verify
 
-- [ ] Bench: flash, reboot ×3 — boot_session increments 1,2,3; survives
-      soft reset and power cycle; TFT shows the count.
+- [ ] Bench: fresh NVS → boot id 1; reboot ×3 — increments 2,3,4;
+      survives soft reset and power cycle; TFT shows the count.
+- [ ] Bench: erase_flash → boots at 1; serial `boot_id 6` → next boot
+      is 6 (continuity restore path).
 - [ ] GW: node reboot detection still fires on boot_session change.
 - [ ] Server: commit-service dedupe unaffected (spot-check a replayed
       batch produces zero new lines).
-- [ ] DN003 amended (u32, monotonic semantics, erase caveat).
+- [ ] DN003 amended (monotonic counter semantics, setter, erase
+      caveat); flash runbook gains the post-erase `boot_id N` step.
