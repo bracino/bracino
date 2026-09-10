@@ -47,8 +47,6 @@
             "axisWidth": 55
           },
           "decimals": 1,
-          "max": 75,
-          "min": 0,
           "unit": "celsius"
         },
         "overrides": []
@@ -82,7 +80,7 @@
             "type": "influxdb",
             "uid": "bracino-influx"
           },
-          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and (r._field == \"t_tpo\" or r._field == \"t_tpu\"))\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: if r._field == \"t_tpo\" then \"TPO\" else \"TPU\" }))\n  |> group(columns: [\"_field\", \"boot_session\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"boot_session\"])\n  |> yield(name: \"_mean\")",
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and (r._field == \"t_tpo\" or r._field == \"t_tpu\"))\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: if r._field == \"t_tpo\" then \"TPO\" else \"TPU\" }))\n  |> group(columns: [\"_field\", \"boot_session\"])\n  |> filter(fn: (r) => r._value > -30)\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"boot_session\"])\n  |> yield(name: \"_mean\")",
           "refId": "A"
         }
       ],
@@ -183,7 +181,6 @@
             "spanNulls": 300000,
             "axisWidth": 55
           },
-          "min": -5,
           "unit": "celsius"
         },
         "overrides": []
@@ -216,7 +213,7 @@
             "type": "influxdb",
             "uid": "bracino-influx"
           },
-          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"t_amb\")\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"AMB node\" }))\n  |> group(columns: [\"_field\", \"boot_session\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"boot_session\"])\n  |> yield(name: \"_mean\")",
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"t_amb\")\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"AMB node\" }))\n  |> group(columns: [\"_field\", \"boot_session\"])\n  |> filter(fn: (r) => r._value > -30)\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"boot_session\"])\n  |> yield(name: \"_mean\")",
           "refId": "A"
         },
         {
@@ -224,7 +221,7 @@
             "type": "influxdb",
             "uid": "bracino-influx"
           },
-          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"gw_ambient\" and r._field == \"t_amb\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"AMB gw\" }))\n  |> group(columns: [\"_field\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\"])\n  |> yield(name: \"_mean\")",
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"gw_ambient\" and r._field == \"t_amb\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"AMB gw\" }))\n  |> group(columns: [\"_field\"])\n  |> filter(fn: (r) => r._value > -30)\n  |> keep(columns: [\"_time\", \"_value\", \"_field\"])\n  |> yield(name: \"_mean\")",
           "refId": "B"
         }
       ],
