@@ -105,3 +105,27 @@ final value TBD via Influx experiments; 4.0 has no user complaints).
 - Re-attribution (human): the 57.8→73.2 °C post-stop TPO spike
   (2026-09-05 14:50Z) is the **brownout signature**, not pipe heat
   soak — see 019 addendum. 017 must not warn on these spikes.
+
+## Addendum (2026-09-10): the backstop double-stop also fires mid-cycle, not only overnight
+
+Observed in the post-outage morning cycle (boot 213, 2026-09-10; node
+rebooted 05:08 local after the mains outage): the tank coasted down to
+the restart level (54.0) with no heat call, pump restarted 08:27 local,
+then the backstop fired **twice in the same loading cycle** — stop
+08:37 → min_off restart 08:38 (ΔT 1.5), stop 08:53 → restart 08:54
+(ΔT 0.7). The tank was hovering at the restart level with the boiler
+not yet contributing; the boiler picked up ~1 min after the second
+restart and the cycle charged cleanly to the 58.0 setpoint stop (~10:12
+local, ΔT collapsed). Same mechanism as the nightly double-stops
+(backstop fires before the boiler's anti-cycle delay expires), so the
+bound reads better as **≤2 pairs per hover, per loading cycle** — not
+just "per night". Still self-terminating; sustain-arm still not
+demanded by data. Adjudication caveat: the second stop needed internal
+peak_TPO > 54.0 while samples showed max 53.9 — one-tick sampling lag,
+not a law violation.
+
+Chart-reading note from the same cycle (human-attributed): a mid-run
+TPU sag (56.0→51.5 over ~10 min) with relay ON and TPO *climbing* is
+**ACS (DHW) unloading simultaneously at mid-strata** — it cools the
+use line, not the tank top. Do not read it as a relay edge; edges come
+from `relay_state` only.
