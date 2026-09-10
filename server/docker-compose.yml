@@ -63,6 +63,9 @@ services:
       # Needed by the provisioned datasource (server/grafana/provisioning).
       INFLUX_TOKEN: ${INFLUX_TOKEN}
       GF_PATHS_LOGS: /var/lib/grafana/logs
+      # Time-only x-axis ticks: override the hour-interval tick format
+      # globally (multi-day windows otherwise stamp "MM/DD HH:mm" on every tick).
+      GF_DATE_FORMATS_INTERVAL_HOUR: "HH:mm"
     volumes:
       - /mnt/nas-data1/bracino/grafana:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro

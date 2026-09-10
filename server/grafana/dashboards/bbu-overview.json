@@ -43,7 +43,8 @@
             "lineWidth": 1.5,
             "pointSize": 5,
             "showPoints": "never",
-            "spanNulls": 300000
+            "spanNulls": 300000,
+            "axisWidth": 55
           },
           "decimals": 1,
           "max": 75,
@@ -103,7 +104,8 @@
             "fillOpacity": 60,
             "lineWidth": 0,
             "spanNulls": 300000,
-            "axisPlacement": "Hidden"
+            "axisPlacement": "Hidden",
+            "axisWidth": 55
           },
           "mappings": [
             {
@@ -149,7 +151,7 @@
             "type": "influxdb",
             "uid": "bracino-influx"
           },
-          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"relay_state\")\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"Pump relay\" }))\n  |> group(columns: [\"_field\", \"boot_session\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"boot_session\"])\n  |> yield(name: \"_mean\")",
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"relay_state\")\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"boot \" + r.boot_session }))\n  |> group(columns: [\"_field\", \"boot_session\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"boot_session\"])\n  |> yield(name: \"_mean\")",
           "refId": "A"
         }
       ],
@@ -161,7 +163,7 @@
         "type": "influxdb",
         "uid": "bracino-influx"
       },
-      "description": "Gateway-side ambient (boiler room), 30 s cadence. Pre-2026-09-06T14:49Z values of -31.3 are a misranged GW channel, masked by the plotter but visible here.",
+      "description": "Node PCB ambient (telemetry.t_amb) vs gateway ambient (gw_ambient.t_amb), both boiler-room. Node reads a few \u00b0C higher (PCB self-heating) \u2014 expect a roughly constant offset, divergence means trouble. Pre-2026-09-06T14:49Z gw values of -31.3 are the misranged GW channel (see 015/STATUS).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -178,7 +180,8 @@
             "lineWidth": 1.5,
             "pointSize": 5,
             "showPoints": "never",
-            "spanNulls": 300000
+            "spanNulls": 300000,
+            "axisWidth": 55
           },
           "min": -5,
           "unit": "celsius"
@@ -213,11 +216,19 @@
             "type": "influxdb",
             "uid": "bracino-influx"
           },
-          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"gw_ambient\" and r._field == \"t_amb\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"Ambient\" }))\n  |> group(columns: [\"_field\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\"])\n  |> yield(name: \"_mean\")",
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"t_amb\")\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"AMB node\" }))\n  |> group(columns: [\"_field\", \"boot_session\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"boot_session\"])\n  |> yield(name: \"_mean\")",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bracino-influx"
+          },
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"gw_ambient\" and r._field == \"t_amb\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"AMB gw\" }))\n  |> group(columns: [\"_field\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\"])\n  |> yield(name: \"_mean\")",
+          "refId": "B"
         }
       ],
-      "title": "Ambient \u2014 GW (boiler room)",
+      "title": "Ambient \u2014 node vs GW (boiler room)",
       "type": "timeseries"
     }
   ],
