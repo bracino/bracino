@@ -65,7 +65,8 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
 | NTCs (A1–A3) | **°C in firmware** (β=3950). Ice ~0.4 °C (770 mV); boil ~100 °C (3083 mV) was FAULT on the old 95 °C cap — conversion now −5–110 °C. Open/short = FAULT |
 | 12 V / buck vs USB | **Heartbeat OK on external 5 V** (USB unplugged). J7 is a **5 V-only** jumper (buck VO ↔ board +5 V). USB-blocking holder **fabricated** |
 | `server/` docker compose + provisioning | **Running on t520** — `git clone && docker compose up` recovery path (mosquitto + commit; influx behind profile). README has bring-up recipe + bench traps |
-| Grafana dashboards / Node-RED flows | **Not started** (deliberately — stage C) |
+| Grafana dashboards | **Starter live on t520** (2026-09-10) — `bracino-grafana`, port 3000, datasource + `bbu-overview` dashboard provisioned from git (TPO/TPU, relay timeline, GW ambient). Events/annotations + custom panel work in progress |
+| Node-RED flows | **Not started** (deliberately — stage C) |
 | Influx backup/retention policy | **Outlined** (three failure domains: live JSONL + NAS mirror + Influx; rotation stage C), not deployed |
 
 ## Bench — do not overclaim

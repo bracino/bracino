@@ -1,0 +1,155 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Starter Bracino dashboard: tank temps, gateway ambient, pump relay. Record-hygiene reminders: bench traffic shares node_id (distinguish by temp/mode signature); brownout-adjacent sensor glitches are not plant events (issue 019); backstop double-stops are known-benign (issue 016 addendum).",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "influxdb", "uid": "bracino-influx" },
+      "description": "Tank-side NTCs from the node telemetry measurement. Sampled every 15 s; plotted values can lag the internal control law by one tick.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "°C",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineWidth": 1.5,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": 300000
+          },
+          "decimals": 1,
+          "max": 75,
+          "min": 0,
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "legend": { "calcs": ["min", "max", "lastNotNull"], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "bracino-influx" },
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and (r._field == \"t_tpo\" or r._field == \"t_tpu\"))\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"_mean\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Tank temps — TPO / TPU (node 1)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "bracino-influx" },
+      "description": "Pump relay from telemetry samples. Shaded ON spans at coarse zoom smear; check the record's relay_state for edges (plotter/JSONL adjudicates).",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "fillOpacity": 60,
+            "lineWidth": 0,
+            "spanNulls": 300000
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "OFF", "color": "dark-red" },
+                "1": { "text": "ON", "color": "green" }
+              }
+            }
+          ],
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 9 },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" },
+        "mergeValues": true,
+        "showValueLabels": false
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "bracino-influx" },
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"relay_state\")\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)",
+          "refId": "A"
+        }
+      ],
+      "title": "Pump relay (node 1)",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "bracino-influx" },
+      "description": "Gateway-side ambient (boiler room), 30 s cadence. Pre-2026-09-06T14:49Z values of -31.3 are a misranged GW channel, masked by the plotter but visible here.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "°C",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineWidth": 1.5,
+            "pointSize": 5,
+            "showPoints": "never",
+            "spanNulls": 300000
+          },
+          "min": -5,
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 14 },
+      "options": {
+        "legend": { "calcs": ["min", "max", "lastNotNull"], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "bracino-influx" },
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"gw_ambient\" and r._field == \"t_amb\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"_mean\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Ambient — GW (boiler room)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 41,
+  "tags": ["bracino", "starter"],
+  "templating": { "list": [] },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "BBU overview",
+  "uid": "bbu-overview",
+  "version": 1,
+  "weekStart": ""
+}

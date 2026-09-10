@@ -127,7 +127,16 @@ cd ~/bracino/server && git pull && docker compose build commit \
   && docker compose up -d commit           # enable the tailer
 ```
 
-Grafana stays on the desktop, pointed at `http://192.168.1.215:8086`.
+Grafana runs in the stack (profile `grafana`, port 3000, data on
+`/mnt/nas-data1/bracino/grafana`; datasource + starter dashboard
+provisioned from `server/grafana/` — first login is `admin`/`admin`,
+Grafana forces a password change):
+
+```bash
+docker compose --profile grafana up -d      # one-time grafana deploy
+```
+
+The desktop can still browse Influx directly at `http://192.168.1.215:8086`.
 
 ### Rotation recovery (mv-style rotation)
 

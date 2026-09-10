@@ -45,6 +45,29 @@ services:
     volumes:
       - /var/lib/bracino/commit:/app/data
 
+  # Grafana — LAN dashboards over the Influx projection (starter dashboard
+  # provisioned; ROADMAP item). Token from .env; data on nas-data1.
+  # Start: docker compose --profile grafana up -d
+  grafana:
+    profiles: ["grafana"]
+    image: grafana/grafana:13.0.2
+    container_name: bracino-grafana
+    restart: unless-stopped
+    # Data dir bind-mount is owned by uid 1000 on the host (no root chown
+    # wanted); run the container as that uid and keep everything grafana
+    # writes inside the data dir.
+    user: "1000:1000"
+    ports:
+      - "3000:3000"
+    environment:
+      # Needed by the provisioned datasource (server/grafana/provisioning).
+      INFLUX_TOKEN: ${INFLUX_TOKEN}
+      GF_PATHS_LOGS: /var/lib/grafana/logs
+    volumes:
+      - /mnt/nas-data1/bracino/grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+
   # Stage C — off by default. Token lands in .env (INFLUX_TOKEN).
   influxdb:
     profiles: ["influx"]

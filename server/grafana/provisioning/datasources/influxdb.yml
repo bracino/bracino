@@ -1,0 +1,23 @@
+# Bracino Influx datasource — provisioned from git; token arrives via the
+# grafana container env (compose passes ${INFLUX_TOKEN} from server/.env).
+apiVersion: 1
+
+# Re-provision cleanly on schema changes (uid is stable, so history survives).
+deleteDatasources:
+  - name: InfluxDB-Bracino
+    orgId: 1
+
+datasources:
+  - name: InfluxDB-Bracino
+    uid: bracino-influx
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    isDefault: true
+    editable: false
+    jsonData:
+      version: Flux
+      organization: bracino
+      defaultBucket: bracino
+    secureJsonData:
+      token: ${INFLUX_TOKEN}

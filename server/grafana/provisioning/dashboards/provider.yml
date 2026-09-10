@@ -1,0 +1,14 @@
+# Bracino dashboards — loaded from git at container start / refresh.
+apiVersion: 1
+
+providers:
+  - name: bracino
+    orgId: 1
+    folder: Bracino
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

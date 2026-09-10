@@ -55,7 +55,7 @@ Preferred order when something has to wait:
 - [x] MQTT publish path + retained state / LWT (015 stage B verified on t520 2026-09-05/06)
 - [ ] Commit service (DN005): **stage B live on t520** — JSONL source of truth + commit watermarks + health topic. Remaining: stage C Influx projection + JSONL rotation (compress — ~10× on this data) + chain-health notifications
 - [ ] `server/docker-compose.yml` + Mosquitto config (persistence on) in git
-- [ ] Influx write path + one Grafana dashboard (events stream + annotations per DN006)
+- [x] Influx write path + one Grafana dashboard (events stream + annotations per DN006) — **starter dashboard live 2026-09-10** (temps/relay/ambient); events annotations still open
 - [ ] Admin panel (descriptor-driven; DN003 PARAM_SET path)
 - [ ] Data-integrity failure-mode matrix (DN006)
 - [ ] Node-RED optional views (demoted from telemetry path by DN004 commit service)
