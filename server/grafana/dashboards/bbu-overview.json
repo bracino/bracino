@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -19,16 +22,21 @@
   "links": [],
   "panels": [
     {
-      "datasource": { "type": "influxdb", "uid": "bracino-influx" },
-      "description": "Tank-side NTCs from the node telemetry measurement. Sampled every 15 s; plotted values can lag the internal control law by one tick.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "bracino-influx"
+      },
+      "description": "Tank-side NTCs from the node telemetry measurement. Sampled every 15 s; plotted values can lag the internal control law by one tick. Legend colors follow boot_session (series stay split per boot; labels dropped from the frame so the legend reads TPO/TPU).",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "°C",
+            "axisLabel": "\u00b0C",
             "axisPlacement": "auto",
             "drawStyle": "line",
             "fillOpacity": 8,
@@ -44,28 +52,53 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 1,
       "options": {
-        "legend": { "calcs": ["min", "max", "lastNotNull"], "displayMode": "list", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "bracino-influx" },
-          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and (r._field == \"t_tpo\" or r._field == \"t_tpu\"))\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"_mean\")",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bracino-influx"
+          },
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and (r._field == \"t_tpo\" or r._field == \"t_tpu\"))\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: if r._field == \"t_tpo\" then \"TPO\" else \"TPU\" }))\n  |> group(columns: [\"_field\", \"boot_session\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"boot_session\"])\n  |> yield(name: \"_mean\")",
           "refId": "A"
         }
       ],
-      "title": "Tank temps — TPO / TPU (node 1)",
+      "title": "Tank temps \u2014 TPO / TPU (node 1)",
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "bracino-influx" },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "bracino-influx"
+      },
       "description": "Pump relay from telemetry samples. Shaded ON spans at coarse zoom smear; check the record's relay_state for edges (plotter/JSONL adjudicates).",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "fillOpacity": 60,
             "lineWidth": 0,
@@ -75,8 +108,14 @@
             {
               "type": "value",
               "options": {
-                "0": { "text": "OFF", "color": "dark-red" },
-                "1": { "text": "ON", "color": "green" }
+                "0": {
+                  "text": "OFF",
+                  "color": "dark-red"
+                },
+                "1": {
+                  "text": "ON",
+                  "color": "green"
+                }
               }
             }
           ],
@@ -84,17 +123,32 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 9 },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
         "mergeValues": true,
         "showValueLabels": false
       },
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "bracino-influx" },
-          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"relay_state\")\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bracino-influx"
+          },
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"relay_state\")\n  |> filter(fn: (r) => r.node_id == \"1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"Pump relay\" }))\n  |> group(columns: [\"_field\", \"boot_session\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\", \"boot_session\"])\n  |> yield(name: \"_mean\")",
           "refId": "A"
         }
       ],
@@ -102,16 +156,21 @@
       "type": "state-timeline"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "bracino-influx" },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "bracino-influx"
+      },
       "description": "Gateway-side ambient (boiler room), 30 s cadence. Pre-2026-09-06T14:49Z values of -31.3 are a misranged GW channel, masked by the plotter but visible here.",
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "°C",
+            "axisLabel": "\u00b0C",
             "axisPlacement": "auto",
             "drawStyle": "line",
             "fillOpacity": 8,
@@ -125,27 +184,55 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 14 },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
       "options": {
-        "legend": { "calcs": ["min", "max", "lastNotNull"], "displayMode": "list", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "single", "sort": "none" }
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "influxdb", "uid": "bracino-influx" },
-          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"gw_ambient\" and r._field == \"t_amb\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"_mean\")",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bracino-influx"
+          },
+          "query": "from(bucket: \"bracino\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"gw_ambient\" and r._field == \"t_amb\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> map(fn: (r) => ({ r with _field: \"Ambient\" }))\n  |> group(columns: [\"_field\"])\n  |> keep(columns: [\"_time\", \"_value\", \"_field\"])\n  |> yield(name: \"_mean\")",
           "refId": "A"
         }
       ],
-      "title": "Ambient — GW (boiler room)",
+      "title": "Ambient \u2014 GW (boiler room)",
       "type": "timeseries"
     }
   ],
   "refresh": "1m",
   "schemaVersion": 41,
-  "tags": ["bracino", "starter"],
-  "templating": { "list": [] },
-  "time": { "from": "now-24h", "to": "now" },
+  "tags": [
+    "bracino",
+    "starter"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "browser",
   "title": "BBU overview",
