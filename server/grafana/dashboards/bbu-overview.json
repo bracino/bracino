@@ -93,7 +93,7 @@
         "type": "influxdb",
         "uid": "bracino-influx"
       },
-      "description": "Pump relay from telemetry samples. Shaded ON spans at coarse zoom smear; check the record's relay_state for edges (plotter/JSONL adjudicates).",
+      "description": "Pump relay from telemetry samples. X-axis hidden by design \u2014 the tank-temps panel above carries the time axis (shared crosshair keeps rows aligned); Grafana has no native 'date only when it changes' tick format, so dates are shown once instead of on every tick. Shaded ON spans smear at coarse zoom; edges come from relay_state in the record.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -102,7 +102,8 @@
           "custom": {
             "fillOpacity": 60,
             "lineWidth": 0,
-            "spanNulls": 300000
+            "spanNulls": 300000,
+            "axisPlacement": "Hidden"
           },
           "mappings": [
             {
