@@ -153,6 +153,8 @@ static const char *event_name(uint8_t tag)
     case EVENT_PARAM_CHANGED: return "PARAM_CHANGED";
     case EVENT_CONFIG_CHANGED: return "CONFIG_CHANGED";
     case EVENT_BATTERY_WARN:  return "BATTERY_WARN";
+    case EVENT_LINK_SCAN:     return "LINK_SCAN";
+    case EVENT_LINK_BIND:     return "LINK_BIND";
     default:                  return "?";
     }
 }
@@ -549,6 +551,22 @@ static void handle_event(const rx_msg_t *m, const espnow_envelope_t *e,
     } else if (tag == EVENT_BATTERY_WARN && vlen >= 1) {
         snprintf(json, sizeof(json),
                  "{\"event\":\"BATTERY_WARN\",\"level_pct\":%u", v[0]);
+    } else if (tag == EVENT_LINK_SCAN && vlen >= 10) {
+        /* issue 027: node-side outage record (LE fields) */
+        snprintf(json, sizeof(json),
+                 "{\"event\":\"LINK_SCAN\",\"consec_fail\":%u,"
+                 "\"last_ch\":%u,\"tx_fail\":%lu,\"retrans\":%lu",
+                 v[0], v[1],
+                 (unsigned long)((uint32_t)v[2] | ((uint32_t)v[3] << 8) |
+                                 ((uint32_t)v[4] << 16) |
+                                 ((uint32_t)v[5] << 24)),
+                 (unsigned long)((uint32_t)v[6] | ((uint32_t)v[7] << 8) |
+                                 ((uint32_t)v[8] << 16) |
+                                 ((uint32_t)v[9] << 24)));
+    } else if (tag == EVENT_LINK_BIND && vlen >= 2) {
+        snprintf(json, sizeof(json),
+                 "{\"event\":\"LINK_BIND\",\"channel\":%u,"
+                 "\"scan_fails\":%u", v[0], v[1]);
     } else {
         char hex[3 * 8 + 1] = "";
         for (uint8_t i = 0; i < vlen && i < 8; i++) {

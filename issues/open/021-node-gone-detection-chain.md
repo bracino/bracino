@@ -50,7 +50,19 @@ alerting at all. A recurrence would have produced 11 more silent hours.
 - [ ] Bench or field: power off the node with comms ON → within the
       liveness window, GW logs `node silent`, status topic flips
       retained offline, commit-service logs ALARM (and pushes if NTFY_URL
-      set). Power back on → node_back clears.
+      is set). Power back on → node_back clears.
 - [ ] GW LWT drill: stop the GW container/process → gateway_gone alarm.
 - [ ] Confirm comms-off durability: toggle comms off, power-cycle node,
       param stays off; `comms_enable` reads back correctly.
+
+## Addendum — 2026-09-11: LWT silently failed its first field test (027)
+
+The chain was accidentally field-drilled by the Sep-10/11 record (026):
+node_gone/node_back bracketed every outage — but when the gw's MQTT died
+at 11:52Z (mosquitto "exceeded timeout"), **no gateway_gone alarm fired**.
+Root cause: two-ends drift. This issue specified an *empty* LWT payload;
+the firmware grew a JSON habit (LWT = `{"online":false}`, with a
+2-byte `msg_len` over-read besides) and the commit-service matcher treated
+any non-empty payload as informational. Fix in [027](027-link-instrumentation-lwt-fix.md):
+commit-service now alarms on empty OR `online:false`, and publishes
+`gateway_back` on recovery. Drill updated — see 027 Verify.

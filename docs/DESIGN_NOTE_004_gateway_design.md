@@ -284,7 +284,7 @@ Timestamps ISO-8601 UTC.
 
 | Topic | Dir | Retained | QoS | Payload |
 |---|---|---|---|---|
-| `bracino/gateway/status` | GW→ | yes | 1 | `{"online":true,"fw":"…","uptime_s":…}`; LWT = `{"online":false}` |
+| `bracino/gateway/status` | GW→ | yes | 1 | `{"online":true,"fw":"…","mode":"ACTIVE|WAIT_BACKEND","legs":{wifi,broker,time,backend},"rssi_dbm":…,"channel":…,"uptime_s":…}` (gw-016, issue 027; on transitions + every 30 s); LWT = `{"online":false}` |
 | `bracino/gateway/event` | GW→ | no | 1 | gateway-generated events (below) |
 | `bracino/gateway/commit` | commit svc→ | no | 1 | watermark: `{"node_type":t,"node_id":i,"capture_ms_end":n,"ok":true}` (DN005) |
 | `bracino/gateway/health` | commit svc→ | yes | 1 | consolidated chain health (DN005) |

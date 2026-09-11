@@ -1,6 +1,6 @@
 # Status
 
-**As of:** 2026-09-06  
+**As of:** 2026-09-11  
 **Phase:** 1 — prototype (BBU control node + WiFi gateway)  
 **Repo:** https://github.com/bracino/bracino
 
@@ -56,6 +56,17 @@ Open design work: [`issues/open/`](../issues/open/). Plan: [`ROADMAP.md`](ROADMA
   event queue 8→24; DN003 amended. Rides the node flash.
 - **021**: commit-service subscribes node/gateway status → retained
   `bracino/alarm` + optional `NTFY_URL` push. Needs t520 rebuild.
+- **026 + 027 (2026-09-11)**: node→gw ESP-NOW *delivery* outages
+  diagnosed from the Sep-10/11 record (boot/capture continuity intact;
+  charts honest via node_ts backfill) — root-cause hypothesis: gw health
+  gate tears down ESP-NOW on a single failed 1 Hz check, node scan
+  backoff amplifies into ~40 min naps; the 11:52Z event was a real gw
+  WiFi/MQTT stall, whose LWT alarm **silently failed** (payload drift,
+  fixed in 027). Measurement-only firmware cut: node LINK_SCAN/LINK_BIND
+  ring events, gw-016 status JSON (mode/legs/RSSI/channel, 30 s),
+  commit-service alarms on empty-or-online:false + `gateway_back`.
+  Fix decision (exit-hysteresis vs standby-ACK) deferred until an outage
+  produces its verdict. Flash recipe: ephemera (local) 2026-09-12.
 - **Pending field/bench ops:** GW flash (restore_time + status), node
   flash `bdf4a44`-line + `min_tpo_tpu_delta_c`→1.5 + comms ON (field
   default; NVS-persisted so off stays off), tel=15; commit-service

@@ -304,6 +304,8 @@ class Commit:
         self.state = self._load_state()
         self.last_commit_wall = None
         self.lines_written = 0
+        self.gw_down = False        # gateway alarm state (issue 021/027)
+        self.last_gw_marker = ""
 
     def _append_line(self, line):
         """Open-append-fsync-close per line. The fsync dominates cost, so
@@ -442,13 +444,46 @@ class Commit:
         notify_push(body)
 
     def handle_gw_lwt(self):
-        """GW LWT arrives as an empty payload on bracino/gateway/status."""
-        alarm = {"kind": "gateway_gone",
-                 "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
-        log("!! ALARM: gateway LWT — bracino/gateway is DOWN")
-        body = json.dumps(alarm)
-        self.client.publish("bracino/alarm", body, qos=1, retain=True)
-        notify_push(body)
+        """GW down: empty LWT payload, or JSON online:false (gw-016+
+        LWT message; issue 027 — the old matcher dropped the JSON LWT
+        silently, so the Sep-10 11:52Z gw death raised no alarm)."""
+        if not self.gw_down:
+            self.gw_down = True
+            alarm = {"kind": "gateway_gone",
+                     "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                         time.gmtime())}
+            log("!! ALARM: gateway DOWN (LWT or online:false)")
+            body = json.dumps(alarm)
+            self.client.publish("bracino/alarm", body, qos=1, retain=True)
+            notify_push(body)
+
+    def handle_gw_status(self, payload):
+        """Retained gw status: informational heartbeats (mode, legs,
+        rssi) from gw-016+, plus the online:false down signal."""
+        try:
+            t = json.loads(payload)
+        except ValueError:
+            log(f"!! bad JSON on gateway/status: {payload!r}")
+            return
+        if not t.get("online", False):
+            self.handle_gw_lwt()
+            return
+        if self.gw_down:
+            self.gw_down = False
+            alarm = {"kind": "gateway_back",
+                     "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                         time.gmtime())}
+            log("ALARM CLEARED: gateway back online")
+            body = json.dumps(alarm)
+            self.client.publish("bracino/alarm", body, qos=1, retain=True)
+            notify_push(body)
+        # log on mode/legs change only — heartbeats arrive every 30 s
+        marker = f"{t.get('mode')} wifi={t.get('legs', {}).get('wifi')} " \
+                 f"backend={t.get('legs', {}).get('backend')} " \
+                 f"rssi={t.get('rssi_dbm')} ch={t.get('channel')}"
+        if marker != self.last_gw_marker:
+            self.last_gw_marker = marker
+            log(f"gw status: {marker}")
 
     # ---- periodic publications ----
 
@@ -490,7 +525,8 @@ class Commit:
             if m.payload == b"":  # LWT: broker-side, no JSON
                 self.handle_gw_lwt()
                 return
-            return  # retained GW state — informational, not alarmed
+            self.handle_gw_status(m.payload)
+            return
         if m.topic == "bracino/gateway/telemetry":
             self.handle_gw_ambient(m.payload)
             return

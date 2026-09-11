@@ -710,6 +710,13 @@ static void scan_attempt(void)
                     continue; /* deadline reached: loop fires shot2 or exits */
                 }
                 if (parse_hello_ack(&m, chans[i])) {
+                    /* Issue 027: bind diagnostics — scan_fails BEFORE the
+                     * reset below says how many cycles (and which backoff
+                     * tier) preceded this bind. */
+                    {
+                        uint8_t v[2] = { chans[i], s_scan_fails };
+                        comms_offer_event(EVENT_LINK_BIND, v, sizeof(v));
+                    }
                     s_channel = chans[i];
                     memcpy(s_gw_mac, m.mac, 6);
                     add_gw_peer(s_gw_mac);
@@ -750,6 +757,23 @@ static void go_unreachable(void)
 {
     TLOG("comms: gateway unreachable after %u failed exchanges — "
            "buffering, rescanning\n", s_consec_fail);
+    /* Issue 027: record the outage from the node's side. Counters are
+     * captured before any reset; the event queues and arrives in the
+     * post-rebind backfill. 10-byte value = val[] capacity exactly. */
+    {
+        uint8_t v[10];
+        v[0] = s_consec_fail;
+        v[1] = s_channel;
+        v[2] = (uint8_t)(s_ct.tx_fail);
+        v[3] = (uint8_t)(s_ct.tx_fail >> 8);
+        v[4] = (uint8_t)(s_ct.tx_fail >> 16);
+        v[5] = (uint8_t)(s_ct.tx_fail >> 24);
+        v[6] = (uint8_t)(s_ct.retrans);
+        v[7] = (uint8_t)(s_ct.retrans >> 8);
+        v[8] = (uint8_t)(s_ct.retrans >> 16);
+        v[9] = (uint8_t)(s_ct.retrans >> 24);
+        comms_offer_event(EVENT_LINK_SCAN, v, sizeof(v));
+    }
     s_bound = false;
     s_batch_out = false; /* entries stay in the FIFO and drain on rebind */
     s_state = CS_SCANNING;

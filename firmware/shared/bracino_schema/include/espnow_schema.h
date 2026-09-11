@@ -203,6 +203,15 @@ typedef struct __attribute__((packed)) {
                                     *       2=PARAM_SET echo)          */
 #define EVENT_CONFIG_CHANGED 0x04u /* value: config_ver u8         */
 #define EVENT_BATTERY_WARN   0x05u /* value: level_pct u8 (future) */
+/* Link diagnostics (issue 027): offered by the node comms task on the
+ * unreachable→scan transition and on successful re-bind. They ride the
+ * normal event path (queue + EVENT frame), so during an outage they sit
+ * queued and arrive with the backfill — post-mortem node-side truth. */
+#define EVENT_LINK_SCAN      0x06u /* value: consec_fail u8, last_ch u8,
+                                    *       tx_fail u32le, retrans u32le  */
+#define EVENT_LINK_BIND      0x07u /* value: channel u8, scan_fails u8
+                                    * (failed full scan cycles before bind
+                                    *  — 0 = bound on first attempt)     */
 
 #define PARAM_SRC_LOCAL_UI   1u
 #define PARAM_SRC_PARAM_SET  2u

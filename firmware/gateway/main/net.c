@@ -50,7 +50,7 @@
 #define CHECKPOINT_S     300
 #define MQTT_TIMEOUT_MS  10000
 
-#define FW_VERSION       "gw-015.1"
+#define FW_VERSION       "gw-016"
 
 volatile gw_mode_t gw_mode = GW_WAIT_BACKEND;
 
@@ -359,8 +359,11 @@ static void start_mqtt(void)
         .session.keepalive = 30,
         .session.last_will = {
             .topic = STATUS_TOPIC,
+            /* Commit-service alarms on this topic when the payload is
+             * empty OR online:false (issue 027: the old msg_len = 18 was
+             * also a 2-byte over-read past the literal). */
             .msg = "{\"online\":false}",
-            .msg_len = 18,
+            .msg_len = 16,
             .qos = 1,
             .retain = 1,
         },
@@ -419,12 +422,46 @@ static void apply_sta_config(void)
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wc));
 }
 
+/* ---- gw status publishing (issues 021/027 diagnostics) ----
+ * Retained bracino/gateway/status with mode + which health legs are up,
+ * plus STA RSSI/channel when associated. Best-effort: if the broker leg
+ * itself is down nothing can be published — that absence (then the LWT
+ * when the broker times us out) IS the message. The commit-service
+ * alarms on empty payload or online:false and treats online:true as
+ * informational, so this JSON shape is safe to evolve. */
+static void publish_status(bool wifi, bool broker, bool time_ok,
+                           bool backend)
+{
+    if (!s_mqtt || !s_broker_up) {
+        return; /* nothing sane to send on */
+    }
+    int8_t rssi = 0;
+    uint8_t channel = 0;
+    wifi_ap_record_t ap;
+    if (s_wifi_up && esp_wifi_sta_get_ap_info(&ap) == ESP_OK) {
+        rssi = ap.rssi;
+        channel = ap.primary;
+    }
+    char msg[224];
+    snprintf(msg, sizeof(msg),
+             "{\"online\":true,\"fw\":\"%s\",\"mode\":\"%s\","
+             "\"legs\":{\"wifi\":%u,\"broker\":%u,\"time\":%u,"
+             "\"backend\":%u},\"rssi_dbm\":%d,\"channel\":%u,"
+             "\"uptime_s\":%lu}",
+             FW_VERSION, gw_mode == GW_ACTIVE ? "ACTIVE" : "WAIT_BACKEND",
+             (unsigned)wifi, (unsigned)broker, (unsigned)time_ok,
+             (unsigned)backend, (int)rssi, (unsigned)channel,
+             (unsigned long)(gw_now_ms() / 1000));
+    esp_mqtt_client_publish(s_mqtt, STATUS_TOPIC, msg, 0, 1, 1);
+}
+
 static void state_task(void *arg)
 {
     (void)arg;
     int healthy_cnt = 0;
     uint32_t last_hour_sync_ms = 0;
     uint32_t last_checkpoint_ms = 0;
+    uint32_t last_status_ms = 0;
 
     for (;;) {
         uint32_t now = gw_now_ms();
@@ -442,6 +479,7 @@ static void state_task(void *arg)
                 gw_espnow_enable();
                 gw_mode = GW_ACTIVE;
                 last_hour_sync_ms = now; /* hourly timer starts now */
+                publish_status(true, true, true, true);
             } else if (s_ssid[0] != '\0' && !s_wifi_up &&
                        now - s_last_conn_try_ms > STA_RETRY_S * 1000) {
                 s_last_conn_try_ms = now;
@@ -457,6 +495,8 @@ static void state_task(void *arg)
                 gw_espnow_disable();
                 gw_mode = GW_WAIT_BACKEND;
                 healthy_cnt = 0;
+                publish_status(s_wifi_up, s_broker_up, s_time_valid,
+                               backend_ok);
             } else if (now - last_hour_sync_ms > 3600000) {
                 last_hour_sync_ms = now;
                 TLOG("hourly TIME_SYNC push\n");
@@ -467,6 +507,14 @@ static void state_task(void *arg)
                 }
             }
             break;
+        }
+
+        /* Issue 027: periodic status (30 s) — RSSI history is the one
+         * quantity we cannot reconstruct after an outage. */
+        if (now - last_status_ms > 30000) {
+            last_status_ms = now;
+            publish_status(s_wifi_up, s_broker_up, s_time_valid,
+                           backend_ok);
         }
 
         if (now - last_checkpoint_ms > CHECKPOINT_S * 1000) {
