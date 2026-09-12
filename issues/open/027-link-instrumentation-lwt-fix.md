@@ -67,6 +67,15 @@ the same visit (new bin carries 023's monotonic boot_id).
 - [ ] Next natural outage: JSONL shows LINK_SCAN/LINK_BIND events + gw
       WAIT_BACKEND status with failing legs → adjudicate 026 theory-1.
 
+## Addendum 2026-09-12 (post-flash, t520 session)
+
+Field flash done (node e4837ef-m / gw gw-016, see session pad). The gw
+status heartbeats were log-on-change-only — no rssi_dbm time series
+existed for 026 adjudication. Fixed: commit-service now persists one
+`kind:"gw_status"` JSONL record per 30 s heartbeat (plus influx
+measurement `gw_status`, tag `mode`). Contract noted in DN004 presence
+section. Deployed with the 854247c t520 rebuild same day.
+
 ## Deferred (deliberately, until data picks)
 
 - net.c exit-hysteresis (N consecutive unhealthy checks to leave ACTIVE).

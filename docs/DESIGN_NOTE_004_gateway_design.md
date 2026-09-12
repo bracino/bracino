@@ -394,7 +394,14 @@ telemetry.
   `{"online":false}` on ungraceful death. Graceful shutdown publishes the
   same and may zero-length-clear topics it owns. Every maintained
   retained topic must have both a will (crash) and a cleanup path
-  (shutdown).
+  (shutdown). Persistence (2026-09-12, issue 027 follow-up): commit-service
+  writes one `kind:"gw_status"` JSONL record per 30 s heartbeat (fields as
+  published; `gw_ts` = receive time) so the gw→AP `rssi_dbm` leg gets a
+  time series. Influx mapping (DN005): measurement `gw_status`, tag `mode`,
+  fields `wifi/broker/time/backend` + `rssi_dbm/channel/uptime_s` (ints),
+  timestamp from `gw_ts`. Online:false LWT raises the alarm chain only —
+  not persisted as a heartbeat record (consistent with alarms staying off
+  the JSONL).
 - **Per-node status (the rule):** the gateway publishes retained
   `online`/`offline` per node on liveness evaluation (DN003 timeouts: 3
   missed ~2 s heartbeats for ALWAYS_ON; wake-window-plus-grace for

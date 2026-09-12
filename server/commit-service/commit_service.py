@@ -201,6 +201,17 @@ class InfluxTailer(threading.Thread):
                 fields.append(f"fault={self._esc_str(o['fault'])}")
             ts = self._iso_ns(o.get("gw_ts") or o.get("ts"))
             meas = "gw_ambient"
+        elif kind == "gw_status":
+            tags.append("mode=" + self._esc_tag(o.get("mode") or "?"))
+            for k in ("wifi", "broker", "time", "backend"):
+                v = (o.get("legs") or {}).get(k)
+                if isinstance(v, (int, float)):
+                    fields.append(f"{k}={int(v)}i")
+            for k in ("rssi_dbm", "channel", "uptime_s"):
+                if isinstance(o.get(k), (int, float)):
+                    fields.append(f"{k}={int(o[k])}i")
+            ts = self._iso_ns(o.get("gw_ts") or o.get("ts"))
+            meas = "gw_status"
         else:
             return None  # unknown future kind: advance past it, unchanged
         if not fields or ts is None:
@@ -477,6 +488,22 @@ class Commit:
             body = json.dumps(alarm)
             self.client.publish("bracino/alarm", body, qos=1, retain=True)
             notify_push(body)
+        # Persist every heartbeat to the JSONL (issue 027 follow-up):
+        # rssi_dbm is the gw->AP leg time series 026 adjudication needs —
+        # log-on-change-only threw the trace away. ~2.9k lines/day at 30 s.
+        # The retained replay on each (re)connect writes one extra line;
+        # acceptable for an informational record (no dedupe domain here).
+        self._append_line({
+            "kind": "gw_status",
+            "gw_ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "online": True,
+            "fw": t.get("fw"),
+            "mode": t.get("mode"),
+            "legs": t.get("legs"),
+            "rssi_dbm": t.get("rssi_dbm"),
+            "channel": t.get("channel"),
+            "uptime_s": t.get("uptime_s"),
+        })
         # log on mode/legs change only — heartbeats arrive every 30 s
         marker = f"{t.get('mode')} wifi={t.get('legs', {}).get('wifi')} " \
                  f"backend={t.get('legs', {}).get('backend')} " \
