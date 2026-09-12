@@ -45,15 +45,22 @@ alerting at all. A recurrence would have produced 11 more silent hours.
 
 ## Verify
 
-- [ ] t520: rebuild + restart commit-service (`docker compose build
-      commit && up -d commit` — still pending from 06 Sep).
-- [ ] Bench or field: power off the node with comms ON → within the
-      liveness window, GW logs `node silent`, status topic flips
-      retained offline, commit-service logs ALARM (and pushes if NTFY_URL
-      is set). Power back on → node_back clears.
-- [ ] GW LWT drill: stop the GW container/process → gateway_gone alarm.
-- [ ] Confirm comms-off durability: toggle comms off, power-cycle node,
-      param stays off; `comms_enable` reads back correctly.
+- [x] t520: commit-service rebuilt on 027 (2026-09-12, flash-day; again
+      same day for the gw_status persistence follow-up).
+- [x] Field node-off drill (2026-09-12 17:02–17:08Z): node power removed
+      → `!! ALARM: node 1/1 GONE` + push; restore → `ALARM CLEARED` +
+      push. Two cycles (boots 3 and 4). Bracketed correctly both times.
+- [x] GW LWT drill — **field, first positive test** (2026-09-12
+      16:56:46Z): gw power removed → `!! ALARM: gateway DOWN` + push
+      within 46 s of last heartbeat; restore → `ALARM CLEARED: gateway
+      back online` (16:59:30Z). The Sep-10 silent-failure path now works
+      end-to-end (JSON LWT + fixed matcher + ntfy push).
+- [x] Comms-off durability verified accidentally during the morning
+      flash (comms stayed off across a node power cycle), then re-enabled
+      cleanly on-site.
+- [x] Push channel (ntfy) live: configured on t520, all drill alarms
+      delivered as phone push. NOTE: topic name `bracino_alerts` is
+      guessable — rotate to an unguessable one (follow-up).
 
 ## Addendum — 2026-09-11: LWT silently failed its first field test (027)
 

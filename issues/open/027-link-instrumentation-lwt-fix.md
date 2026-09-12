@@ -76,6 +76,27 @@ existed for 026 adjudication. Fixed: commit-service now persists one
 measurement `gw_status`, tag `mode`). Contract noted in DN004 presence
 section. Deployed with the 854247c t520 rebuild same day.
 
+## Addendum — 2026-09-12 drills: LINK events' first field capture
+
+Site drills (see 021 verify + session pad) exercised the 027
+instrumentation for real. Node→gw leg, gw-off window 16:56:00–16:59:31Z:
+
+- `LINK_SCAN` fired at 16:56:03Z (consec_fail=3, tx_fail=3, retrans=0)
+  — fail-fast after ~45 s of NAKs, as designed.
+- `LINK_BIND` at 16:59:44Z with scan_fails=5 — rebinding ~13 s after
+  the gw returned, nap depth ~3.5 min total. Node streamed normally
+  within one 15 s slot after bind; ring backfilled cleanly.
+- Node serial during USB window (17:07–17:12Z): tx_ok=139 fail=0
+  acks=16 retrans=1 — link essentially lossless at close range.
+- Gw serial at gw boot: wifi assoc rssi -83, then HELLO/LINK_BIND/
+  CONFIG_DESC/batch-acks all normal. One `time anomaly: mqtt disagrees
+  by 55506 ms` at gw boot (watch item, adjacent to 019 time domains).
+- 026 readout from drills: short gw outages produce fail-fast → scan →
+  quick rebind (~2–3.5 min total), NOT the 10-min-cap nap. The 40-min
+  wedges remain unexplained by these drills; gw-side rx quality
+  (raw/drop/last_rssi) in the status JSON is the next instrumentation
+  step (gw-017 candidate), plus the next natural outage.
+
 ## Deferred (deliberately, until data picks)
 
 - net.c exit-hysteresis (N consecutive unhealthy checks to leave ACTIVE).

@@ -87,7 +87,12 @@ reflash batch — no emergency reflash warranted.)
       survives soft reset and power cycle; TFT shows the count.
 - [ ] Bench: erase_flash → boots at 1; serial `boot_id 6` → next boot
       is 6 (continuity restore path).
-- [ ] GW: node reboot detection still fires on boot_session change.
+- [x] GW: node reboot detection still fires on boot_session change.
+      Field-verified 2026-09-12: boots 2→3→4→5 (USB-power swap + power
+      restore cycles during drills) → 6 (deliberate soft reboot); TFT
+      tracked each increment, t520 dedupe clean (no complaints in commit
+      logs), retained status carried the new boot_session each time.
+      Bench items (fresh-NVS=1, erase_flash restore) remain for the bench.
 - [ ] Server: commit-service dedupe unaffected (spot-check a replayed
       batch produces zero new lines).
 - [ ] DN003 amended (monotonic counter semantics, setter, erase
