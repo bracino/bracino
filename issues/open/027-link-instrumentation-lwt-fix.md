@@ -90,7 +90,9 @@ instrumentation for real. Node→gw leg, gw-off window 16:56:00–16:59:31Z:
   acks=16 retrans=1 — link essentially lossless at close range.
 - Gw serial at gw boot: wifi assoc rssi -83, then HELLO/LINK_BIND/
   CONFIG_DESC/batch-acks all normal. One `time anomaly: mqtt disagrees
-  by 55506 ms` at gw boot (watch item, adjacent to 019 time domains).
+  by 55506 ms` at gw boot (watch item, adjacent to 019 time domains;
+  human 2026-09-12: seen on bench before, once landed ~year 2165 —
+  self-corrects quickly. Note it, not an issue.)
 - 026 readout from drills: short gw outages produce fail-fast → scan →
   quick rebind (~2–3.5 min total), NOT the 10-min-cap nap. The 40-min
   wedges remain unexplained by these drills; gw-side rx quality
