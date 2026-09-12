@@ -42,6 +42,9 @@ services:
       INFLUX_ORG: bracino
       INFLUX_BUCKET: bracino
       INFLUX_TOKEN: ${INFLUX_TOKEN:-}
+      # Push channel (issue 021): alarm notifications via ntfy. Opt-in —
+      # unset = disabled, alarms stay on the broker/logs only.
+      NTFY_URL: ${NTFY_URL:-}
     volumes:
       - /var/lib/bracino/commit:/app/data
 
